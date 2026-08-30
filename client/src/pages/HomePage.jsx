@@ -1,13 +1,31 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../api';
 import CategorySidebar from '../components/CategorySidebar';
 import ProductCard from '../components/ProductCard';
 
-const heroImages = [
-  'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600',
-  'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600',
-  'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=600',
+const heroSlides = [
+  {
+    image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600',
+    tag: 'Summer Sale — Up to 50% Off',
+    title: 'Discover Joy',
+    highlight: 'in Every Box.',
+    desc: 'Vibrant fashion, quirky electronics, and delightful home finds — curated to brighten your day.',
+  },
+  {
+    image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600',
+    tag: 'New Arrivals',
+    title: 'Style Meets',
+    highlight: 'Function.',
+    desc: 'Premium watches, sleek gadgets, and modern accessories for the contemporary lifestyle.',
+  },
+  {
+    image: 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=600',
+    tag: 'Limited Edition',
+    title: 'Capture Every',
+    highlight: 'Moment.',
+    desc: 'Instant cameras, vintage lenses, and photography gear to freeze time beautifully.',
+  },
 ];
 
 const TrustBadge = ({ icon, title, desc }) => (
@@ -116,24 +134,164 @@ const CountdownTimer = () => {
   );
 };
 
+/* ═══════════════════════════════════════════════════════════════
+   HERO SECTION — with dismiss, carousel arrows, professional look
+   ═══════════════════════════════════════════════════════════════ */
+const HeroSection = () => {
+  const [heroIdx, setHeroIdx] = useState(0);
+  const [dismissed, setDismissed] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const navigate = useNavigate();
+
+  const next = useCallback(() => {
+    setHeroIdx((p) => (p + 1) % heroSlides.length);
+  }, []);
+
+  const prev = useCallback(() => {
+    setHeroIdx((p) => (p - 1 + heroSlides.length) % heroSlides.length);
+  }, []);
+
+  useEffect(() => {
+    if (isPaused || dismissed) return;
+    const timer = setInterval(next, 5000);
+    return () => clearInterval(timer);
+  }, [next, isPaused, dismissed]);
+
+  if (dismissed) return null;
+
+  const slide = heroSlides[heroIdx];
+
+  return (
+    <section
+      className="relative rounded-3xl overflow-hidden animate-fade-up"
+      style={{ background: 'linear-gradient(135deg, #fbf9f5 0%, #fff5f0 40%, #f0fffe 100%)' }}
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+    >
+      {/* Decorative elements */}
+      <div className="absolute -top-24 -right-24 w-80 h-80 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-secondary/5 rounded-full blur-3xl pointer-events-none" />
+
+      {/* Close Button */}
+      <button
+        onClick={() => setDismissed(true)}
+        className="absolute top-4 right-4 z-20 w-8 h-8 rounded-full bg-surface/80 backdrop-blur-sm flex items-center justify-center text-on-surface-variant hover:bg-surface hover:text-on-surface hover:shadow-md transition-all duration-200 border border-surface-container/60"
+        aria-label="Dismiss banner"
+      >
+        <span className="material-symbols-outlined text-[18px]">close</span>
+      </button>
+
+      <div className="relative z-10 p-8 md:p-12 lg:p-14 flex flex-col md:flex-row items-center gap-10 min-h-[400px] lg:min-h-[440px]">
+        {/* Text Content */}
+        <div className="flex-1 max-w-lg">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-tertiary-fixed to-tertiary-fixed/80 rounded-full mb-6 shadow-sm">
+            <span className="material-symbols-outlined text-on-tertiary-fixed-variant text-sm">local_offer</span>
+            <span className="text-on-tertiary-fixed-variant text-xs font-bold uppercase tracking-wider">
+              {slide.tag}
+            </span>
+          </div>
+
+          <h1 className="text-4xl md:text-5xl lg:text-[56px] font-bold text-on-surface mb-5 leading-[1.08] tracking-tight">
+            {slide.title}<br />
+            <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+              {slide.highlight}
+            </span>
+          </h1>
+
+          <p className="text-on-surface-variant mb-8 leading-relaxed text-base md:text-lg max-w-md">
+            {slide.desc}
+          </p>
+
+          <div className="flex flex-wrap items-center gap-3">
+            <Link
+              to="/shop"
+              className="bg-primary text-on-primary font-semibold px-8 py-4 rounded-full inline-flex items-center gap-2 group text-sm hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/20 transition-all duration-300"
+            >
+              Shop Now
+              <span className="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">
+                arrow_forward
+              </span>
+            </Link>
+            <Link
+              to="/shop?flash=true"
+              className="bg-surface-container-lowest border border-surface-container text-on-surface font-semibold px-6 py-4 rounded-full inline-flex items-center gap-2 text-sm hover:bg-surface-container-low hover:border-primary/30 hover:shadow-md transition-all duration-300"
+            >
+              <span className="material-symbols-outlined text-lg text-primary">bolt</span>
+              Flash Deals
+            </Link>
+          </div>
+        </div>
+
+        {/* Hero Image Carousel — Redesigned */}
+        <div className="hidden md:flex w-1/2 h-[320px] lg:h-[360px] relative items-center justify-center">
+          {/* Previous Arrow */}
+          <button
+            onClick={prev}
+            className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-surface/80 backdrop-blur-sm flex items-center justify-center text-on-surface-variant hover:bg-surface hover:text-primary hover:shadow-lg transition-all duration-200 border border-surface-container/60"
+            aria-label="Previous slide"
+          >
+            <span className="material-symbols-outlined text-[20px]">chevron_left</span>
+          </button>
+
+          {/* Images */}
+          {heroSlides.map((s, i) => (
+            <img
+              key={i}
+              src={s.image}
+              alt={s.tag}
+              className={`absolute w-[85%] h-[85%] object-contain drop-shadow-2xl transition-all duration-700 ease-out ${
+                i === heroIdx
+                  ? 'opacity-100 scale-100 translate-x-0'
+                  : i < heroIdx
+                    ? 'opacity-0 scale-90 -translate-x-8'
+                    : 'opacity-0 scale-90 translate-x-8'
+              }`}
+            />
+          ))}
+
+          {/* Next Arrow */}
+          <button
+            onClick={next}
+            className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-surface/80 backdrop-blur-sm flex items-center justify-center text-on-surface-variant hover:bg-surface hover:text-primary hover:shadow-lg transition-all duration-200 border border-surface-container/60"
+            aria-label="Next slide"
+          >
+            <span className="material-symbols-outlined text-[20px]">chevron_right</span>
+          </button>
+
+          {/* Slide Info Badge */}
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 bg-surface/80 backdrop-blur-sm rounded-full px-4 py-1.5 flex items-center gap-3 border border-surface-container/60 shadow-sm">
+            {heroSlides.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setHeroIdx(i)}
+                className={`transition-all duration-300 rounded-full ${
+                  i === heroIdx
+                    ? 'w-6 h-2 bg-primary'
+                    : 'w-2 h-2 bg-outline-variant/40 hover:bg-outline-variant/70'
+                }`}
+                aria-label={`Go to slide ${i + 1}`}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+/* ═══════════════════════════════════════════════════════════════
+   MAIN PAGE
+   ═══════════════════════════════════════════════════════════════ */
 const HomePage = () => {
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [flashDeals, setFlashDeals] = useState([]);
-  const [heroIdx, setHeroIdx] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
     api.getCategories().then(setCategories).catch(() => {});
     api.getProducts({ pageSize: 9 }).then((data) => setProducts(data.products)).catch(() => {});
     api.getFlashDeals().then(setFlashDeals).catch(() => {});
-  }, []);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setHeroIdx((prev) => (prev + 1) % heroImages.length);
-    }, 5000);
-    return () => clearInterval(timer);
   }, []);
 
   const categoryTiles = [
@@ -150,97 +308,22 @@ const HomePage = () => {
       <CategorySidebar categories={categories} activeCategory="" />
 
       <div className="flex-1 w-full min-w-0 space-y-10">
-        {/* ═══════════════ HERO ═══════════════ */}
-        <section
-          className="relative rounded-3xl overflow-hidden animate-fade-up"
-          style={{ background: 'linear-gradient(135deg, #fbf9f5 0%, #fff5f0 40%, #f0fffe 100%)' }}
-        >
-          {/* Decorative elements */}
-          <div className="absolute -top-24 -right-24 w-80 h-80 bg-primary/5 rounded-full blur-3xl" />
-          <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-secondary/5 rounded-full blur-3xl" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-tertiary/3 rounded-full blur-3xl" />
+        {/* Hero */}
+        <HeroSection />
 
-          <div className="relative z-10 p-8 md:p-12 lg:p-16 flex flex-col md:flex-row items-center gap-10 min-h-[400px] lg:min-h-[440px]">
-            {/* Text Content */}
-            <div className="flex-1 max-w-lg">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-tertiary-fixed to-tertiary-fixed/80 rounded-full mb-6 shadow-sm">
-                <span className="material-symbols-outlined text-on-tertiary-fixed-variant text-sm">local_offer</span>
-                <span className="text-on-tertiary-fixed-variant text-xs font-bold uppercase tracking-wider">
-                  Summer Sale — Up to 50% Off
-                </span>
-              </div>
-
-              <h1 className="text-4xl md:text-5xl lg:text-[56px] font-bold text-on-surface mb-5 leading-[1.08] tracking-tight">
-                Discover Joy<br />
-                <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-                  in Every Box.
-                </span>
-              </h1>
-
-              <p className="text-on-surface-variant mb-8 leading-relaxed text-base md:text-lg max-w-md">
-                Vibrant fashion, quirky electronics, and delightful home finds — curated to brighten your day.
-              </p>
-
-              <div className="flex flex-wrap items-center gap-3">
-                <Link
-                  to="/shop"
-                  className="bg-primary text-on-primary font-semibold px-8 py-4 rounded-full inline-flex items-center gap-2 group text-sm hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/20 transition-all duration-300"
-                >
-                  Shop Now
-                  <span className="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">
-                    arrow_forward
-                  </span>
-                </Link>
-                <Link
-                  to="/shop?flash=true"
-                  className="bg-surface-container-lowest border border-surface-container text-on-surface font-semibold px-6 py-4 rounded-full inline-flex items-center gap-2 text-sm hover:bg-surface-container-low hover:border-primary/30 hover:shadow-md transition-all duration-300"
-                >
-                  <span className="material-symbols-outlined text-lg text-primary">bolt</span>
-                  Flash Deals
-                </Link>
-              </div>
-            </div>
-
-            {/* Hero Image Carousel */}
-            <div className="hidden md:flex w-1/2 h-[320px] lg:h-[360px] relative items-center justify-center">
-              {heroImages.map((img, i) => (
-                <img
-                  key={img}
-                  src={img}
-                  alt="Featured product"
-                  className={`absolute w-full h-full object-contain drop-shadow-2xl transition-all duration-700 ${
-                    i === heroIdx ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
-                  }`}
-                />
-              ))}
-              {/* Carousel dots */}
-              <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-                {heroImages.map((_, i) => (
-                  <div
-                    key={i}
-                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                      i === heroIdx ? 'bg-primary w-6' : 'bg-outline-variant/40'
-                    }`}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ═══════════════ TRUST BADGES ═══════════════ */}
+        {/* Trust Badges */}
         <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
             { icon: 'local_shipping', title: 'Free Shipping', desc: 'On orders over $50' },
-            { icon: 'shield', title: 'Secure Payment', desc: '100% protected' },
-            { icon: 'autorenew', title: 'Easy Returns', desc: '30-day policy' },
-            { icon: 'support_agent', title: '24/7 Support', desc: 'Always here to help' },
+            { icon: 'lock', title: 'Secure Payment', desc: '100% protected' },
+            { icon: 'replay', title: 'Easy Returns', desc: '30-day policy' },
+            { icon: 'headset_mic', title: '24/7 Support', desc: 'Always here to help' },
           ].map((badge) => (
             <TrustBadge key={badge.title} {...badge} />
           ))}
         </section>
 
-        {/* ═══════════════ CATEGORIES ═══════════════ */}
+        {/* Categories */}
         <section>
           <div className="flex items-end justify-between mb-6">
             <div>
@@ -259,7 +342,7 @@ const HomePage = () => {
           </div>
         </section>
 
-        {/* ═══════════════ FLASH DEALS ═══════════════ */}
+        {/* Flash Deals */}
         {flashDeals.length > 0 && (
           <section>
             <div className="flex items-center justify-between mb-6 rounded-2xl px-6 py-5"
@@ -287,7 +370,7 @@ const HomePage = () => {
           </section>
         )}
 
-        {/* ═══════════════ FEATURED PRODUCTS ═══════════════ */}
+        {/* Featured Products */}
         <section>
           <div className="flex items-end justify-between mb-6">
             <div>
@@ -306,7 +389,7 @@ const HomePage = () => {
           </div>
         </section>
 
-        {/* ═══════════════ CTA BANNER ═══════════════ */}
+        {/* CTA Banner */}
         <section className="relative rounded-3xl overflow-hidden"
           style={{ background: 'linear-gradient(135deg, #006a62 0%, #5ef6e6 100%)' }}
         >
@@ -332,7 +415,7 @@ const HomePage = () => {
           </div>
         </section>
 
-        {/* ═══════════════ WHY CHOOSE US ═══════════════ */}
+        {/* Why Choose Us */}
         <section>
           <h2 className="text-2xl font-bold text-on-surface mb-6 text-center">Why Choose NovaCart?</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
