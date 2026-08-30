@@ -6,21 +6,21 @@ import ProductCard from '../components/ProductCard';
 
 const heroSlides = [
   {
-    image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600',
+    image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=700',
     tag: 'Summer Sale — Up to 50% Off',
     title: 'Discover Joy',
     highlight: 'in Every Box.',
     desc: 'Vibrant fashion, quirky electronics, and delightful home finds — curated to brighten your day.',
   },
   {
-    image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600',
+    image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=700',
     tag: 'New Arrivals',
     title: 'Style Meets',
     highlight: 'Function.',
     desc: 'Premium watches, sleek gadgets, and modern accessories for the contemporary lifestyle.',
   },
   {
-    image: 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=600',
+    image: 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=700',
     tag: 'Limited Edition',
     title: 'Capture Every',
     highlight: 'Moment.',
@@ -135,11 +135,11 @@ const CountdownTimer = () => {
 };
 
 /* ═══════════════════════════════════════════════════════════════
-   HERO SECTION — with dismiss, carousel arrows, professional look
+   HERO SECTION — Amazon/Flipkart style big carousel
    ═══════════════════════════════════════════════════════════════ */
 const HeroSection = () => {
   const [heroIdx, setHeroIdx] = useState(0);
-  const [dismissed, setDismissed] = useState(false);
+  const [dismissed, setDismissed] = useState(() => localStorage.getItem('novacart_hero_dismissed') === '1');
   const [isPaused, setIsPaused] = useState(false);
   const navigate = useNavigate();
 
@@ -152,85 +152,78 @@ const HeroSection = () => {
   }, []);
 
   useEffect(() => {
-    if (isPaused || dismissed) return;
+    if (isPaused) return;
     const timer = setInterval(next, 5000);
     return () => clearInterval(timer);
-  }, [next, isPaused, dismissed]);
-
-  if (dismissed) return null;
+  }, [next, isPaused]);
 
   const slide = heroSlides[heroIdx];
 
   return (
     <section
-      className="relative rounded-3xl overflow-hidden animate-fade-up"
+      className="relative rounded-2xl overflow-hidden animate-fade-up"
       style={{ background: 'linear-gradient(135deg, #fbf9f5 0%, #fff5f0 40%, #f0fffe 100%)' }}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      {/* Decorative elements */}
-      <div className="absolute -top-24 -right-24 w-80 h-80 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-secondary/5 rounded-full blur-3xl pointer-events-none" />
-
-      {/* Close Button */}
-      <button
-        onClick={() => setDismissed(true)}
-        className="absolute top-4 right-4 z-20 w-8 h-8 rounded-full bg-surface/80 backdrop-blur-sm flex items-center justify-center text-on-surface-variant hover:bg-surface hover:text-on-surface hover:shadow-md transition-all duration-200 border border-surface-container/60"
-        aria-label="Dismiss banner"
-      >
-        <span className="material-symbols-outlined text-[18px]">close</span>
-      </button>
-
-      <div className="relative z-10 p-8 md:p-12 lg:p-14 flex flex-col md:flex-row items-center gap-10 min-h-[400px] lg:min-h-[440px]">
-        {/* Text Content */}
-        <div className="flex-1 max-w-lg">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-tertiary-fixed to-tertiary-fixed/80 rounded-full mb-6 shadow-sm">
-            <span className="material-symbols-outlined text-on-tertiary-fixed-variant text-sm">local_offer</span>
+      <div className="relative z-10 flex flex-col md:flex-row items-center min-h-[340px] lg:min-h-[400px]">
+        {/* Text Content — reduced left padding */}
+        <div className="flex-1 px-6 md:px-8 lg:px-12 py-8 md:py-0 max-w-lg">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-gradient-to-r from-tertiary-fixed to-tertiary-fixed/80 rounded-full mb-4 shadow-sm">
+            <svg className="w-3.5 h-3.5 text-on-tertiary-fixed-variant" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+            </svg>
             <span className="text-on-tertiary-fixed-variant text-xs font-bold uppercase tracking-wider">
               {slide.tag}
             </span>
           </div>
 
-          <h1 className="text-4xl md:text-5xl lg:text-[56px] font-bold text-on-surface mb-5 leading-[1.08] tracking-tight">
+          <h1 className="text-3xl md:text-4xl lg:text-[52px] font-bold text-on-surface mb-4 leading-[1.1] tracking-tight">
             {slide.title}<br />
             <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
               {slide.highlight}
             </span>
           </h1>
 
-          <p className="text-on-surface-variant mb-8 leading-relaxed text-base md:text-lg max-w-md">
+          <p className="text-on-surface-variant mb-6 leading-relaxed text-sm md:text-base max-w-md">
             {slide.desc}
           </p>
 
           <div className="flex flex-wrap items-center gap-3">
             <Link
               to="/shop"
-              className="bg-primary text-on-primary font-semibold px-8 py-4 rounded-full inline-flex items-center gap-2 group text-sm hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/20 transition-all duration-300"
+              className="bg-primary text-on-primary font-semibold px-7 py-3 rounded-full inline-flex items-center gap-2 group text-sm hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/20 transition-all duration-300"
             >
               Shop Now
-              <span className="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">
-                arrow_forward
-              </span>
+              <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
             </Link>
             <Link
               to="/shop?flash=true"
-              className="bg-surface-container-lowest border border-surface-container text-on-surface font-semibold px-6 py-4 rounded-full inline-flex items-center gap-2 text-sm hover:bg-surface-container-low hover:border-primary/30 hover:shadow-md transition-all duration-300"
+              className="bg-surface-container-lowest border border-surface-container text-on-surface font-semibold px-5 py-3 rounded-full inline-flex items-center gap-2 text-sm hover:bg-surface-container-low hover:border-primary/30 hover:shadow-md transition-all duration-300"
             >
-              <span className="material-symbols-outlined text-lg text-primary">bolt</span>
+              <svg className="w-4 h-4 text-primary" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
+              </svg>
               Flash Deals
             </Link>
           </div>
         </div>
 
-        {/* Hero Image Carousel — Redesigned */}
-        <div className="hidden md:flex w-1/2 h-[320px] lg:h-[360px] relative items-center justify-center">
+        {/* Hero Image — Amazon/Flipkart style BIG carousel */}
+        <div
+          className="hidden md:flex flex-1 h-[340px] lg:h-[400px] relative items-center justify-center overflow-hidden"
+        >
           {/* Previous Arrow */}
           <button
             onClick={prev}
-            className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-surface/80 backdrop-blur-sm flex items-center justify-center text-on-surface-variant hover:bg-surface hover:text-primary hover:shadow-lg transition-all duration-200 border border-surface-container/60"
-            aria-label="Previous slide"
+            className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-black/10 backdrop-blur-sm flex items-center justify-center text-on-surface-variant hover:bg-black/20 hover:shadow-lg transition-all duration-200"
+            aria-label="Previous"
           >
-            <span className="material-symbols-outlined text-[20px]">chevron_left</span>
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
           </button>
 
           {/* Images */}
@@ -239,12 +232,10 @@ const HeroSection = () => {
               key={i}
               src={s.image}
               alt={s.tag}
-              className={`absolute w-[85%] h-[85%] object-contain drop-shadow-2xl transition-all duration-700 ease-out ${
+              className={`absolute w-[75%] h-[75%] object-contain drop-shadow-2xl transition-all duration-600 ease-out ${
                 i === heroIdx
-                  ? 'opacity-100 scale-100 translate-x-0'
-                  : i < heroIdx
-                    ? 'opacity-0 scale-90 -translate-x-8'
-                    : 'opacity-0 scale-90 translate-x-8'
+                  ? 'opacity-100 scale-100'
+                  : 'opacity-0 scale-95'
               }`}
             />
           ))}
@@ -252,14 +243,16 @@ const HeroSection = () => {
           {/* Next Arrow */}
           <button
             onClick={next}
-            className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-surface/80 backdrop-blur-sm flex items-center justify-center text-on-surface-variant hover:bg-surface hover:text-primary hover:shadow-lg transition-all duration-200 border border-surface-container/60"
-            aria-label="Next slide"
+            className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-black/10 backdrop-blur-sm flex items-center justify-center text-on-surface-variant hover:bg-black/20 hover:shadow-lg transition-all duration-200"
+            aria-label="Next"
           >
-            <span className="material-symbols-outlined text-[20px]">chevron_right</span>
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
           </button>
 
-          {/* Slide Info Badge */}
-          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 bg-surface/80 backdrop-blur-sm rounded-full px-4 py-1.5 flex items-center gap-3 border border-surface-container/60 shadow-sm">
+          {/* Dots */}
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2">
             {heroSlides.map((_, i) => (
               <button
                 key={i}
@@ -267,9 +260,9 @@ const HeroSection = () => {
                 className={`transition-all duration-300 rounded-full ${
                   i === heroIdx
                     ? 'w-6 h-2 bg-primary'
-                    : 'w-2 h-2 bg-outline-variant/40 hover:bg-outline-variant/70'
+                    : 'w-2 h-2 bg-on-surface/20 hover:bg-on-surface/40'
                 }`}
-                aria-label={`Go to slide ${i + 1}`}
+                aria-label={`Slide ${i + 1}`}
               />
             ))}
           </div>
@@ -304,10 +297,10 @@ const HomePage = () => {
   const goCategory = (name) => navigate(`/shop/${encodeURIComponent(name)}`);
 
   return (
-    <main className="flex-grow flex flex-col lg:flex-row w-full max-w-[1400px] mx-auto px-4 md:px-6 lg:px-10 py-6 gap-6 lg:gap-8">
+    <main className="flex-grow flex flex-col lg:flex-row w-full max-w-[1400px] mx-auto px-4 md:px-6 lg:px-10 py-4 gap-6 lg:gap-8">
       <CategorySidebar categories={categories} activeCategory="" />
 
-      <div className="flex-1 w-full min-w-0 space-y-10">
+      <div className="flex-1 w-full min-w-0 space-y-8">
         {/* Hero */}
         <HeroSection />
 
@@ -325,14 +318,16 @@ const HomePage = () => {
 
         {/* Categories */}
         <section>
-          <div className="flex items-end justify-between mb-6">
+          <div className="flex items-end justify-between mb-5">
             <div>
-              <h2 className="text-2xl font-bold text-on-surface mb-1">Browse Categories</h2>
+              <h2 className="text-xl font-bold text-on-surface mb-0.5">Browse Categories</h2>
               <p className="text-sm text-on-surface-variant">Explore our curated collections</p>
             </div>
             <Link to="/shop" className="text-sm font-semibold text-primary hover:text-primary/80 flex items-center gap-1 transition-colors group">
               View All
-              <span className="material-symbols-outlined text-sm group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
+              <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
             </Link>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -345,15 +340,17 @@ const HomePage = () => {
         {/* Flash Deals */}
         {flashDeals.length > 0 && (
           <section>
-            <div className="flex items-center justify-between mb-6 rounded-2xl px-6 py-5"
+            <div className="flex items-center justify-between mb-5 rounded-2xl px-6 py-4"
               style={{ background: 'linear-gradient(135deg, #a43c12 0%, #ff7f50 100%)' }}
             >
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm">
-                  <span className="material-symbols-outlined text-white text-xl">bolt</span>
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm">
+                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                  </svg>
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-white m-0">Flash Deals</h2>
+                  <h2 className="text-lg font-bold text-white m-0">Flash Deals</h2>
                   <p className="text-white/80 text-xs m-0">Hurry up! Limited time offers</p>
                 </div>
               </div>
@@ -372,14 +369,16 @@ const HomePage = () => {
 
         {/* Featured Products */}
         <section>
-          <div className="flex items-end justify-between mb-6">
+          <div className="flex items-end justify-between mb-5">
             <div>
-              <h2 className="text-2xl font-bold text-on-surface mb-1">Featured Products</h2>
+              <h2 className="text-xl font-bold text-on-surface mb-0.5">Featured Products</h2>
               <p className="text-sm text-on-surface-variant">Hand-picked for you</p>
             </div>
             <Link to="/shop" className="text-sm font-semibold text-primary hover:text-primary/80 flex items-center gap-1 transition-colors group">
               View All
-              <span className="material-symbols-outlined text-sm group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
+              <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
             </Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -390,15 +389,15 @@ const HomePage = () => {
         </section>
 
         {/* CTA Banner */}
-        <section className="relative rounded-3xl overflow-hidden"
+        <section className="relative rounded-2xl overflow-hidden"
           style={{ background: 'linear-gradient(135deg, #006a62 0%, #5ef6e6 100%)' }}
         >
           <div className="absolute -top-16 -right-16 w-48 h-48 bg-white/10 rounded-full blur-2xl" />
           <div className="absolute -bottom-16 -left-16 w-40 h-40 bg-white/10 rounded-full blur-2xl" />
-          <div className="relative z-10 p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="relative z-10 p-8 md:p-10 flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="max-w-lg">
-              <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">Join the NovaCart Community</h2>
-              <p className="text-white/80 leading-relaxed">
+              <h2 className="text-xl md:text-2xl font-bold text-white mb-2">Join the NovaCart Community</h2>
+              <p className="text-white/80 leading-relaxed text-sm">
                 Get exclusive deals, early access to new arrivals, and 10% off your first order when you sign up.
               </p>
             </div>
@@ -406,9 +405,9 @@ const HomePage = () => {
               <input
                 type="email"
                 placeholder="Enter your email"
-                className="flex-1 md:w-64 bg-white/20 backdrop-blur-sm text-white placeholder-white/60 rounded-full px-5 py-3.5 text-sm border border-white/30 outline-none focus:border-white transition-colors"
+                className="flex-1 md:w-60 bg-white/20 backdrop-blur-sm text-white placeholder-white/60 rounded-full px-5 py-3 text-sm border border-white/30 outline-none focus:border-white transition-colors"
               />
-              <button className="bg-white text-on-secondary-container font-semibold px-6 py-3.5 rounded-full text-sm hover:bg-white/90 hover:shadow-lg transition-all shrink-0">
+              <button className="bg-white text-on-secondary-container font-semibold px-6 py-3 rounded-full text-sm hover:bg-white/90 hover:shadow-lg transition-all shrink-0">
                 Subscribe
               </button>
             </div>
@@ -417,19 +416,19 @@ const HomePage = () => {
 
         {/* Why Choose Us */}
         <section>
-          <h2 className="text-2xl font-bold text-on-surface mb-6 text-center">Why Choose NovaCart?</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <h2 className="text-xl font-bold text-on-surface mb-5 text-center">Why Choose NovaCart?</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[
               { icon: 'inventory_2', title: 'Curated Selection', desc: 'Every product is hand-selected for quality, design, and joy factor.' },
               { icon: 'local_shipping', title: 'Fast & Free Shipping', desc: 'Free shipping on orders over $50. Express options available.' },
               { icon: 'handshake', title: 'Trusted by Thousands', desc: 'Over 10,000 happy customers and counting. 5-star rated service.' },
             ].map((item) => (
-              <div key={item.title} className="bg-surface-container-low rounded-2xl p-6 text-center hover:bg-surface hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 border border-surface-container/40 hover:border-primary/15 group cursor-default">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 shadow-sm">
-                  <span className="material-symbols-outlined text-primary text-2xl">{item.icon}</span>
+              <div key={item.title} className="bg-surface-container-low rounded-2xl p-5 text-center hover:bg-surface hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 border border-surface-container/40 hover:border-primary/15 group cursor-default">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300 shadow-sm">
+                  <span className="material-symbols-outlined text-primary text-xl">{item.icon}</span>
                 </div>
-                <h3 className="text-base font-bold text-on-surface mb-2">{item.title}</h3>
-                <p className="text-sm text-on-surface-variant leading-relaxed">{item.desc}</p>
+                <h3 className="text-sm font-bold text-on-surface mb-1">{item.title}</h3>
+                <p className="text-xs text-on-surface-variant leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>
