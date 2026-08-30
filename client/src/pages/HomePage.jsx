@@ -297,7 +297,7 @@ const HomePage = () => {
   const goCategory = (name) => navigate(`/shop/${encodeURIComponent(name)}`);
 
   return (
-    <main className="flex-grow flex flex-col lg:flex-row w-full max-w-[1400px] mx-auto pl-2 pr-4 md:pl-4 md:pr-6 lg:pl-6 lg:pr-10 py-4 gap-5 lg:gap-6">
+    <main className="flex-grow flex flex-col lg:flex-row w-full max-w-[1400px] mx-auto px-4 md:px-6 lg:px-8 py-4 gap-5 lg:gap-6">
       <CategorySidebar categories={categories} activeCategory="" />
 
       <div className="flex-1 w-full min-w-0 space-y-8">
