@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NovaCart - Designed for Joy</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;800&amp;family=Quicksand:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "primary": "#a43c12",
+                      "primary-container": "#ff7f50",
+                      "tertiary-fixed-dim": "#e9c400",
+                      "tertiary-container": "#c0a200",
+                      "secondary-fixed": "#61f9e9",
+                      "surface-bright": "#fbf9f5",
+                      "on-error-container": "#93000a",
+                      "surface-container": "#efeeea",
+                      "error-container": "#ffdad6",
+                      "surface-dim": "#dbdad6",
+                      "on-primary-container": "#6c2000",
+                      "on-tertiary": "#ffffff",
+                      "secondary": "#006a62",
+                      "inverse-primary": "#ffb59c",
+                      "on-background": "#1b1c1a",
+                      "tertiary-fixed": "#ffe16d",
+                      "primary-fixed-dim": "#ffb59c",
+                      "on-primary": "#ffffff",
+                      "secondary-container": "#5ef6e6",
+                      "inverse-on-surface": "#f2f0ed",
+                      "on-tertiary-fixed": "#221b00",
+                      "tertiary": "#705d00",
+                      "surface-container-highest": "#e4e2de",
+                      "on-secondary-fixed-variant": "#005049",
+                      "on-tertiary-fixed-variant": "#544600",
+                      "surface": "#fbf9f5",
+                      "on-surface": "#1b1c1a",
+                      "inverse-surface": "#30312e",
+                      "on-error": "#ffffff",
+                      "surface-container-lowest": "#ffffff",
+                      "on-primary-fixed-variant": "#822800",
+                      "on-secondary-container": "#006f66",
+                      "surface-container-high": "#eae8e4",
+                      "on-secondary-fixed": "#00201d",
+                      "on-secondary": "#ffffff",
+                      "error": "#ba1a1a",
+                      "secondary-fixed-dim": "#3adccc",
+                      "on-tertiary-container": "#453900",
+                      "surface-variant": "#e4e2de",
+                      "primary-fixed": "#ffdbcf",
+                      "outline": "#8b7169",
+                      "background": "#fbf9f5",
+                      "surface-container-low": "#f5f3ef",
+                      "on-surface-variant": "#57423b",
+                      "on-primary-fixed": "#380c00",
+                      "outline-variant": "#dec0b6",
+                      "surface-tint": "#a43c12"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "margin-mobile": "16px",
+                      "gutter": "24px",
+                      "margin-desktop": "40px",
+                      "base": "8px",
+                      "container-max": "1280px"
+              },
+              "fontFamily": {
+                      "label-bold": [
+                              "Nunito Sans"
+                      ],
+                      "body-md": [
+                              "Nunito Sans"
+                      ],
+                      "body-lg": [
+                              "Nunito Sans"
+                      ],
+                      "display-lg": [
+                              "Quicksand"
+                      ],
+                      "display-lg-mobile": [
+                              "Quicksand"
+                      ],
+                      "headline-md": [
+                              "Quicksand"
+                      ]
+              },
+              "fontSize": {
+                      "label-bold": [
+                              "14px",
+                              {
+                                      "lineHeight": "1.0",
+                                      "fontWeight": "800"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.5",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "display-lg-mobile": [
+                              "32px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "1.3",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+          font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        /* Custom Animations */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-up {
+            animation: fadeUp 0.6s ease-out forwards;
+        }
+        
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(-3deg); }
+            50% { transform: rotate(3deg); }
+        }
+        .hover\:animate-wiggle:hover {
+            animation: wiggle 0.3s ease-in-out infinite;
+        }
+
+        @keyframes pulse-fast {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+        }
+        .animate-pulse-fast {
+            animation: pulse-fast 1s infinite;
+        }
+
+        @keyframes blob-float {
+            0% { transform: translate(0px, 0px) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+            100% { transform: translate(0px, 0px) scale(1); }
+        }
+        .animate-blob {
+            animation: blob-float 7s infinite;
+        }
+        
+        @keyframes sparkle {
+            0% { transform: scale(0) rotate(0deg); opacity: 0; }
+            50% { transform: scale(1.2) rotate(180deg); opacity: 1; }
+            100% { transform: scale(0) rotate(360deg); opacity: 0; }
+        }
+        .sparkle-effect {
+            position: absolute;
+            pointer-events: none;
+            animation: sparkle 0.6s ease-out forwards;
+        }
+
+        /* Ambient Shadows */
+        .ambient-shadow-primary {
+            box-shadow: 0 10px 25px -5px rgba(255, 127, 80, 0.4);
+        }
+        .ambient-shadow-surface {
+            box-shadow: 0 4px 20px rgba(164, 60, 18, 0.05);
+        }
+        
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, #FF7F50, #ffb59c);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px -5px rgba(255, 127, 80, 0.5);
+        }
+        .btn-primary:active {
+            transform: scale(0.95);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #40E0D0, #5ef6e6);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            color: #005049;
+        }
+        .btn-secondary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px -5px rgba(64, 224, 208, 0.4);
+        }
+
+        /* Card Hover */
+        .product-card {
+            transition: all 0.3s ease;
+        }
+        .product-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 12px 30px rgba(164, 60, 18, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md overflow-x-hidden">
+<!-- TopNavBar -->
+<header class="bg-surface dark:bg-on-background shadow-[0px_4px_20px_rgba(164,60,18,0.05)] sticky top-0 z-50 transition-all duration-300 w-full">
+<div class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto h-20">
+<!-- Brand -->
+<a class="text-headline-md font-headline-md font-bold text-primary dark:text-primary-fixed-dim flex items-center gap-2 group" href="#">
+<span class="material-symbols-outlined text-primary-container group-hover:animate-wiggle" style="font-variation-settings: 'FILL' 1;">local_mall</span>
+                NovaCart
+            </a>
+<!-- Navigation Links (Web) -->
+<nav class="hidden md:flex gap-8 items-center">
+<a class="text-primary dark:text-primary-fixed-dim border-b-2 border-primary pb-1 font-label-bold text-label-bold transition-all duration-150" href="#">Shop</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary font-label-bold text-label-bold hover:scale-105 transition-transform duration-200" href="#">Deals</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary font-label-bold text-label-bold hover:scale-105 transition-transform duration-200" href="#">New arrivals</a>
+</nav>
+<!-- Search & Actions -->
+<div class="flex items-center gap-4">
+<div class="hidden md:flex relative group">
+<input class="bg-surface-container-low border-none rounded-full py-2 pl-4 pr-10 focus:ring-2 focus:ring-primary-container text-body-md text-on-surface w-64 transition-all duration-300" placeholder="Search for joy..." type="text"/>
+<span class="material-symbols-outlined absolute right-3 top-2.5 text-on-surface-variant group-hover:text-primary-container transition-colors">search</span>
+</div>
+<button aria-label="Shopping Cart" class="relative p-2 text-on-surface-variant hover:text-primary transition-colors hover:animate-wiggle group">
+<span class="material-symbols-outlined text-2xl group-hover:text-primary-container" style="font-variation-settings: 'FILL' 0;">shopping_cart</span>
+<span class="absolute top-0 right-0 bg-primary-container text-on-tertiary text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center border-2 border-surface animate-bounce">3</span>
+</button>
+<img alt="User profile" class="w-10 h-10 rounded-full border-2 border-surface-container hover:border-primary-container transition-colors cursor-pointer object-cover hidden md:block" data-alt="A vibrant, modern profile illustration of a smiling person with a colorful abstract background in a circular frame, high quality, soft lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC_AlbadZsAzvBjW0B3Xsqd1bngZ5doG6PYGTyCe6qP5PiTmkQ5RfMnz5iXC_alx9MigpRRWCIUHxooqKkYWNOQIrYtmq8tzLHudyvkI-uSqMtg9F9sGAnu0-XzmxeqZLMaTdRTsjeVnjhqQuoafHw48bgMrkfgZyEJHZ6476rKP8LoLErsPv6aFXDYjA1Fp_qFfIx0Fg5z337j8Et8Nd8iN3FNeWl7pg4fslRQFqEw2sX_psRGLACVfg"/>
+</div>
+</div>
+</header>
+<main class="flex-grow flex w-full max-w-container-max mx-auto relative px-margin-mobile md:px-margin-desktop py-gutter">
+<!-- SideNavBar (Hidden on Mobile) -->
+<aside class="hidden lg:flex flex-col py-base bg-surface-container-low dark:bg-surface-container-lowest h-[calc(100vh-80px)] w-64 rounded-xl shadow-md sticky top-[100px] mr-gutter shrink-0">
+<div class="p-6 mb-4">
+<h2 class="font-headline-md text-headline-md text-primary mb-1">Categories</h2>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm">Explore curated collections</p>
+</div>
+<nav class="flex-1 flex flex-col gap-2">
+<a class="bg-primary-container text-on-primary-container rounded-full mx-2 px-4 py-3 flex items-center gap-3 font-label-bold text-label-bold scale-98 transition-transform shadow-sm" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+                    Home
+                </a>
+<a class="text-on-surface-variant hover:bg-surface-container-high hover:text-primary rounded-full mx-2 px-4 py-3 flex items-center gap-3 font-label-bold text-label-bold hover:bg-primary-fixed-dim transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:animate-wiggle">devices</span>
+                    Electronics
+                </a>
+<a class="text-on-surface-variant hover:bg-surface-container-high hover:text-primary rounded-full mx-2 px-4 py-3 flex items-center gap-3 font-label-bold text-label-bold hover:bg-primary-fixed-dim transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:animate-wiggle">apparel</span>
+                    Fashion
+                </a>
+<a class="text-on-surface-variant hover:bg-surface-container-high hover:text-primary rounded-full mx-2 px-4 py-3 flex items-center gap-3 font-label-bold text-label-bold hover:bg-primary-fixed-dim transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:animate-wiggle">deck</span>
+                    Home Decor
+                </a>
+<a class="text-on-surface-variant hover:bg-surface-container-high hover:text-primary rounded-full mx-2 px-4 py-3 flex items-center gap-3 font-label-bold text-label-bold hover:bg-primary-fixed-dim transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:animate-wiggle">toys</span>
+                    Toys
+                </a>
+</nav>
+<div class="p-4 mt-auto">
+<button class="w-full btn-secondary rounded-full py-3 font-label-bold text-label-bold shadow-md">Join Prime</button>
+</div>
+</aside>
+<!-- Main Content Area -->
+<div class="flex-1 w-full min-w-0">
+<!-- Section 1: Animated Hero Banner -->
+<section class="relative bg-surface-container-lowest rounded-3xl overflow-hidden mb-12 shadow-[0px_8px_30px_rgba(164,60,18,0.05)] h-[400px] flex items-center animate-fade-up border border-surface-container">
+<!-- Blobs -->
+<div class="absolute top-0 left-0 w-64 h-64 bg-primary-container rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
+<div class="absolute top-0 right-0 w-64 h-64 bg-secondary-fixed rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob" style="animation-delay: 2s;"></div>
+<div class="absolute -bottom-32 left-32 w-64 h-64 bg-tertiary-fixed rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob" style="animation-delay: 4s;"></div>
+<div class="relative z-10 p-8 md:p-12 flex flex-col md:flex-row items-center justify-between w-full h-full">
+<div class="max-w-lg">
+<span class="inline-block px-4 py-1 bg-tertiary-fixed text-on-tertiary-fixed-variant font-label-bold text-label-bold rounded-full mb-4 shadow-sm animate-bounce">Summer Sale!</span>
+<h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-primary mb-4 leading-tight">Discover Joy in Every Box.</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-8">Up to 50% off on vibrant fashion, quirky electronics, and home delights.</p>
+<button class="btn-primary text-on-primary font-label-bold text-label-bold px-8 py-4 rounded-full shadow-lg flex items-center gap-2 group">
+                            Shop Now
+                            <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</div>
+<div class="hidden md:block w-1/2 h-full relative">
+<img alt="Hero Products" class="absolute inset-0 w-full h-full object-contain p-4 drop-shadow-2xl hover:scale-105 transition-transform duration-500" data-alt="A lively composition of floating consumer products like a colorful camera, trendy sunglasses, and a stylish sneaker, set against a soft cream background with subtle drop shadows, highly stylized 3d render, soft lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBahmvGQ-y95kfYNh9f7mpEm6aKLI43SNbG4TBrAz-od7gxD0xM-k5Zn_nx6moZXNDdV9PyguTJU-Xi4_jxerZLwGNnFxEIQl8oc6KNSjc9x1Dp1_zS1O-_7IU3fY_P3NLWwD3PTp_W83xzF64EKtjzDMZ9ntqYOUNf8NMAkFXg76L1p3vgevQamEvRQ6i4IV76Z7ENyQjIvqVvdzRUVKw0Dm4G9nMhk88yxBNDJHx-eBcjd-28d3jZBg"/>
+</div>
+</div>
+</section>
+<!-- Section 2: Colorful Category Tiles -->
+<section class="mb-12 animate-fade-up" style="animation-delay: 0.1s;">
+<div class="flex justify-between items-end mb-6">
+<h2 class="font-headline-md text-headline-md text-primary">Browse Categories</h2>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+<!-- Category 1 -->
+<div class="bg-surface-container-low rounded-2xl p-6 flex flex-col items-center justify-center cursor-pointer group hover:bg-surface-container-high transition-colors shadow-sm hover:shadow-md">
+<div class="w-16 h-16 rounded-full bg-secondary-fixed flex items-center justify-center mb-3 shadow-[0_4px_15px_rgba(97,249,233,0.3)] group-hover:animate-wiggle">
+<span class="material-symbols-outlined text-on-secondary-fixed-variant text-3xl" style="font-variation-settings: 'FILL' 1;">devices</span>
+</div>
+<span class="font-label-bold text-label-bold text-on-surface">Electronics</span>
+</div>
+<!-- Category 2 -->
+<div class="bg-surface-container-low rounded-2xl p-6 flex flex-col items-center justify-center cursor-pointer group hover:bg-surface-container-high transition-colors shadow-sm hover:shadow-md">
+<div class="w-16 h-16 rounded-full bg-primary-fixed flex items-center justify-center mb-3 shadow-[0_4px_15px_rgba(255,219,207,0.5)] group-hover:animate-wiggle">
+<span class="material-symbols-outlined text-on-primary-fixed-variant text-3xl" style="font-variation-settings: 'FILL' 1;">apparel</span>
+</div>
+<span class="font-label-bold text-label-bold text-on-surface">Fashion</span>
+</div>
+<!-- Category 3 -->
+<div class="bg-surface-container-low rounded-2xl p-6 flex flex-col items-center justify-center cursor-pointer group hover:bg-surface-container-high transition-colors shadow-sm hover:shadow-md">
+<div class="w-16 h-16 rounded-full bg-tertiary-fixed flex items-center justify-center mb-3 shadow-[0_4px_15px_rgba(255,225,109,0.4)] group-hover:animate-wiggle">
+<span class="material-symbols-outlined text-on-tertiary-fixed-variant text-3xl" style="font-variation-settings: 'FILL' 1;">deck</span>
+</div>
+<span class="font-label-bold text-label-bold text-on-surface">Home Decor</span>
+</div>
+<!-- Category 4 -->
+<div class="bg-surface-container-low rounded-2xl p-6 flex flex-col items-center justify-center cursor-pointer group hover:bg-surface-container-high transition-colors shadow-sm hover:shadow-md">
+<div class="w-16 h-16 rounded-full bg-error-container flex items-center justify-center mb-3 shadow-[0_4px_15px_rgba(255,218,214,0.4)] group-hover:animate-wiggle">
+<span class="material-symbols-outlined text-on-error-container text-3xl" style="font-variation-settings: 'FILL' 1;">toys</span>
+</div>
+<span class="font-label-bold text-label-bold text-on-surface">Toys</span>
+</div>
+</div>
+</section>
+<!-- Section 3: Flash Deals -->
+<section class="mb-12 animate-fade-up" style="animation-delay: 0.2s;">
+<div class="flex items-center gap-4 mb-6 bg-primary-fixed-dim rounded-2xl p-4 shadow-sm">
+<span class="material-symbols-outlined text-primary-container text-3xl animate-pulse">bolt</span>
+<h2 class="font-headline-md text-headline-md text-on-primary-fixed-variant m-0">Flash Deals</h2>
+<div class="ml-auto flex items-center gap-2 bg-surface text-primary font-label-bold text-label-bold px-4 py-2 rounded-full shadow-inner">
+                        Ends in: <span class="animate-pulse-fast text-error">02:14:59</span>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Deal 1 -->
+<div class="product-card bg-surface-container-lowest rounded-2xl border border-surface-container overflow-hidden group">
+<div class="h-48 bg-surface-container-low relative overflow-hidden flex items-center justify-center p-4">
+<img alt="Product" class="h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-300" data-alt="A sleek, modern pair of wireless headphones in a bright coral color, floating in a clean studio environment with soft shadows, high resolution, minimalist aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDeCuuToKc2zjM3WuuxjUpVRA19oeLlZJ7uXsGBYBStUaewX13x9FLpOV2pTPB0u39F0Xa0OGifHG0ueHLrZqDvn753hMThPu-Xw6J7BdfG-znK4XzVu2k6y-pmcbYGPvEp0VmPAJrmsWJbNw52n4YCzed32F-NAzCvUKXEARXFgPZRouBOdnFWy-BSZuwHDSc4LY9e8smiyummdanfKqePFqyaSn8ePMxq_ZgVcmPNTlh8CFL4TeQ30A"/>
+<span class="absolute top-3 left-3 bg-error text-on-error text-xs font-bold px-2 py-1 rounded-full">-30%</span>
+</div>
+<div class="p-4">
+<h3 class="font-label-bold text-label-bold text-on-surface mb-1 truncate">Vibe Wireless Headphones</h3>
+<div class="flex items-center gap-2 mb-3">
+<span class="font-body-md text-body-md font-bold text-primary">$89.99</span>
+<span class="text-sm text-on-surface-variant line-through">$129.99</span>
+</div>
+<button class="w-full btn-secondary rounded-full py-2 font-label-bold text-label-bold text-sm add-to-cart-btn relative overflow-hidden">
+                                Grab Deal
+                            </button>
+</div>
+</div>
+<!-- Deal 2 -->
+<div class="product-card bg-surface-container-lowest rounded-2xl border border-surface-container overflow-hidden group">
+<div class="h-48 bg-surface-container-low relative overflow-hidden flex items-center justify-center p-4">
+<img alt="Product" class="h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-300" data-alt="A trendy, compact instant camera in a bright turquoise color, displayed on a soft cream background, studio lighting, photorealistic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhXMLdfWpEborEWE_5xJlbKTcrYtVgCBzVXUHsBRtWncF6ZdI_D9ElQZT8iWss-Twtn0x4bmIciPhVX3DklSIc2GQTDMJjv_OvIIZDjRtpqkYi2VMLJgPWDd_YxVVE9V4dA3XDZRIQ-l_BypAeXY4jf_OMCuHttOwLJBQTjfrm8aPqEcCnxMosrpKMeNY-v1-KQrLVQ2F-fSkWMvVqgSYyId3_m79nbjyBqIk8iOJWJF-at44Qqsd60A"/>
+<span class="absolute top-3 left-3 bg-error text-on-error text-xs font-bold px-2 py-1 rounded-full">-15%</span>
+</div>
+<div class="p-4">
+<h3 class="font-label-bold text-label-bold text-on-surface mb-1 truncate">SnapJoy Instant Camera</h3>
+<div class="flex items-center gap-2 mb-3">
+<span class="font-body-md text-body-md font-bold text-primary">$59.00</span>
+<span class="text-sm text-on-surface-variant line-through">$69.00</span>
+</div>
+<button class="w-full btn-secondary rounded-full py-2 font-label-bold text-label-bold text-sm add-to-cart-btn relative overflow-hidden">
+                                Grab Deal
+                            </button>
+</div>
+</div>
+<!-- Deal 3 -->
+<div class="product-card bg-surface-container-lowest rounded-2xl border border-surface-container overflow-hidden group hidden md:block">
+<div class="h-48 bg-surface-container-low relative overflow-hidden flex items-center justify-center p-4">
+<img alt="Product" class="h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-300" data-alt="A stylish, minimalist smart watch with a bright yellow band, floating against a clean background, soft lighting, 3d render style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDyUAsC2xwH5z6J32dFUha2PN-YTdUkZOh_qwP8rn-kw-zPS845gWj3PhyagT8dGy2T_v__35BcbeowMA1CiXJ9eyRUftQd9mH0fHOfl-dmHW6RSZHQoQpaHcw9UH2LQCh2mnzlMRY7XtFH0hkoNwj4NWNx4wBaX_rwxafyPlm3qBW8LnPpokbmeBkLQ1cTrda1UUU41nAynf2sdwLZcdYBLCZ7fHvrF2NYqrY5E7a1XIIJYElEqLw2Zw"/>
+<span class="absolute top-3 left-3 bg-error text-on-error text-xs font-bold px-2 py-1 rounded-full">-40%</span>
+</div>
+<div class="p-4">
+<h3 class="font-label-bold text-label-bold text-on-surface mb-1 truncate">Aura Smart Watch</h3>
+<div class="flex items-center gap-2 mb-3">
+<span class="font-body-md text-body-md font-bold text-primary">$119.00</span>
+<span class="text-sm text-on-surface-variant line-through">$199.00</span>
+</div>
+<button class="w-full btn-secondary rounded-full py-2 font-label-bold text-label-bold text-sm add-to-cart-btn relative overflow-hidden">
+                                Grab Deal
+                            </button>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-highest dark:bg-inverse-surface rounded-t-[32px] w-full mt-gutter px-margin-mobile md:px-margin-desktop py-gutter flex flex-col md:flex-row justify-between items-center max-w-container-max mx-auto shadow-[0px_-4px_20px_rgba(0,0,0,0.02)]">
+<div class="font-headline-md text-headline-md text-primary flex items-center gap-2 mb-4 md:mb-0">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">local_mall</span>
+            NovaCart
+        </div>
+<nav class="flex flex-wrap justify-center gap-4 md:gap-8 mb-4 md:mb-0">
+<a class="text-on-surface-variant hover:text-primary font-body-md text-body-md hover:underline transition-all cursor-pointer" href="#">Support</a>
+<a class="text-on-surface-variant hover:text-primary font-body-md text-body-md hover:underline transition-all cursor-pointer" href="#">Privacy Policy</a>
+<a class="text-on-surface-variant hover:text-primary font-body-md text-body-md hover:underline transition-all cursor-pointer" href="#">Sustainability</a>
+<a class="text-on-surface-variant hover:text-primary font-body-md text-body-md hover:underline transition-all cursor-pointer" href="#">Join the Community</a>
+</nav>
+<div class="text-on-surface-variant font-body-md text-body-md text-sm">
+            © 2024 NovaCart. Designed for Joy.
+        </div>
+</footer>
+<script>
+        // Micro-interaction for Add to Cart Buttons
+        document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                // Button bounce
+                this.style.transform = 'scale(0.9)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 150);
+
+                // Create sparkles
+                for(let i=0; i<5; i++) {
+                    createSparkle(e.clientX, e.clientY);
+                }
+                
+                // Change text temporarily
+                const originalText = this.innerText;
+                this.innerHTML = '<span class="material-symbols-outlined text-sm align-middle">check</span> Added';
+                this.classList.replace('btn-secondary', 'btn-primary');
+                
+                setTimeout(() => {
+                    this.innerText = originalText;
+                    this.classList.replace('btn-primary', 'btn-secondary');
+                }, 2000);
+            });
+        });
+
+        function createSparkle(x, y) {
+            const sparkle = document.createElement('span');
+            sparkle.classList.add('material-symbols-outlined', 'sparkle-effect');
+            sparkle.innerText = 'temp_preferences_custom'; // using a star-like icon
+            sparkle.style.color = '#e9c400'; // tertiary-fixed-dim
+            
+            // Randomize position around click
+            const offsetX = (Math.random() - 0.5) * 60;
+            const offsetY = (Math.random() - 0.5) * 60;
+            
+            sparkle.style.left = (x + offsetX) + 'px';
+            sparkle.style.top = (y + offsetY) + 'px';
+            sparkle.style.position = 'fixed';
+            sparkle.style.zIndex = '9999';
+            
+            document.body.appendChild(sparkle);
+            
+            setTimeout(() => {
+                sparkle.remove();
+            }, 600);
+        }
+    </script>
+</body></html>

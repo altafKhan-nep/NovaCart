@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+    }
+  </style>
+</head>
+<body>
+<!-- STITCH_THREEJS_START:ANIMATION_7 class="fixed inset-0 w-full h-full bg-transparent" -->
+<div class="fixed inset-0 w-full h-full bg-transparent" style="display:block;">
+<script src="https://ajax.googleapis.com/ajax/libs/threejs/r125/three.min.js"></script>
+<div id="threejs-container-ANIMATION_7" style="width:100%;height:100%"></div>
+<script>
+(function() {
+  const container = document.getElementById('threejs-container-ANIMATION_7');
+  const devicePixelRatio = window.devicePixelRatio || 1;
+  const container = document.getElementById('success-animation-container') || document.body;
+const width = container.clientWidth || window.innerWidth;
+const height = container.clientHeight || window.innerHeight;
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+camera.position.z = 5;
+
+const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+renderer.setSize(width, height);
+renderer.setPixelRatio(window.devicePixelRatio);
+container.appendChild(renderer.domElement);
+
+// Confetti Particles
+const geometry = new THREE.PlaneGeometry(0.1, 0.2);
+const colors = [0xff7f50, 0x40e0d0, 0xffd700, 0x32cd32]; // Coral, Turquoise, Gold, Green
+const particles = [];
+
+for (let i = 0; i < 150; i++) {
+    const material = new THREE.MeshBasicMaterial({
+        color: colors[Math.floor(Math.random() * colors.length)],
+        side: THREE.DoubleSide
+    });
+    const particle = new THREE.Mesh(geometry, material);
+    
+    particle.position.set(
+        (Math.random() - 0.5) * 10,
+        Math.random() * 5 + 5, // Start above
+        (Math.random() - 0.5) * 5
+    );
+    
+    particle.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
+    
+    particles.push({
+        mesh: particle,
+        velocity: new THREE.Vector3((Math.random() - 0.5) * 0.05, -Math.random() * 0.1 - 0.05, 0),
+        rotationSpeed: new THREE.Vector3(Math.random() * 0.1, Math.random() * 0.1, Math.random() * 0.1)
+    });
+    
+    scene.add(particle);
+}
+
+function animate() {
+    requestAnimationFrame(animate);
+    
+    particles.forEach(p => {
+        p.mesh.position.add(p.velocity);
+        p.mesh.rotation.x += p.rotationSpeed.x;
+        p.mesh.rotation.y += p.rotationSpeed.y;
+        
+        // Reset particles
+        if (p.mesh.position.y < -5) {
+            p.mesh.position.y = 7;
+            p.mesh.position.x = (Math.random() - 0.5) * 10;
+        }
+    });
+    
+    renderer.render(scene, camera);
+}
+
+window.addEventListener('resize', () => {
+    const w = container.clientWidth || window.innerWidth;
+    const h = container.clientHeight || window.innerHeight;
+    renderer.setSize(w, h);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+});
+
+animate();
+})();
+</script>
+</div>
+<!-- STITCH_THREEJS_END:ANIMATION_7 -->
+</body>
+</html>

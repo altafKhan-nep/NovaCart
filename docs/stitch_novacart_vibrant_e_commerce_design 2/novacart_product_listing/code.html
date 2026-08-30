@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NovaCart - Electronics</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;800&amp;family=Quicksand:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-background": "#1b1c1a",
+                        "error-container": "#ffdad6",
+                        "surface-variant": "#e4e2de",
+                        "on-primary-fixed-variant": "#822800",
+                        "surface-dim": "#dbdad6",
+                        "secondary-container": "#5ef6e6",
+                        "tertiary-fixed": "#ffe16d",
+                        "on-error": "#ffffff",
+                        "primary-fixed": "#ffdbcf",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed": "#61f9e9",
+                        "on-surface": "#1b1c1a",
+                        "inverse-surface": "#30312e",
+                        "on-surface-variant": "#57423b",
+                        "outline-variant": "#dec0b6",
+                        "surface": "#fbf9f5",
+                        "on-primary": "#ffffff",
+                        "primary": "#a43c12",
+                        "primary-container": "#ff7f50",
+                        "on-secondary-fixed": "#00201d",
+                        "on-secondary-container": "#006f66",
+                        "tertiary-fixed-dim": "#e9c400",
+                        "inverse-on-surface": "#f2f0ed",
+                        "surface-container-highest": "#e4e2de",
+                        "on-primary-fixed": "#380c00",
+                        "primary-fixed-dim": "#ffb59c",
+                        "surface-container-high": "#eae8e4",
+                        "outline": "#8b7169",
+                        "on-primary-container": "#6c2000",
+                        "on-tertiary-container": "#453900",
+                        "inverse-primary": "#ffb59c",
+                        "on-secondary-fixed-variant": "#005049",
+                        "secondary": "#006a62",
+                        "error": "#ba1a1a",
+                        "surface-container": "#efeeea",
+                        "surface-container-low": "#f5f3ef",
+                        "on-tertiary-fixed": "#221b00",
+                        "secondary-fixed-dim": "#3adccc",
+                        "on-tertiary-fixed-variant": "#544600",
+                        "surface-tint": "#a43c12",
+                        "background": "#fbf9f5",
+                        "on-secondary": "#ffffff",
+                        "surface-bright": "#fbf9f5",
+                        "tertiary-container": "#c0a200",
+                        "tertiary": "#705d00",
+                        "on-tertiary": "#ffffff",
+                        "on-error-container": "#93000a"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "margin-mobile": "16px",
+                        "gutter": "24px",
+                        "container-max": "1280px",
+                        "base": "8px",
+                        "margin-desktop": "40px"
+                    },
+                    fontFamily: {
+                        "body-lg": ["Nunito Sans"],
+                        "headline-md": ["Quicksand"],
+                        "display-lg": ["Quicksand"],
+                        "body-md": ["Nunito Sans"],
+                        "display-lg-mobile": ["Quicksand"],
+                        "label-bold": ["Nunito Sans"]
+                    },
+                    fontSize: {
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "display-lg-mobile": ["32px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "label-bold": ["14px", { "lineHeight": "1.0", "fontWeight": "800" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .sparkle-anim {
+            animation: sparkle 0.6s ease-out forwards;
+        }
+        @keyframes sparkle {
+            0% { transform: scale(0) rotate(0deg); opacity: 1; }
+            50% { transform: scale(1.2) rotate(180deg); opacity: 0.8; }
+            100% { transform: scale(1) rotate(360deg); opacity: 0; }
+        }
+        .lift-bounce {
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+        }
+        .lift-bounce:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0px 12px 30px rgba(164, 60, 18, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md overflow-x-hidden selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar -->
+<header class="bg-surface dark:bg-on-background shadow-[0px_4px_20px_rgba(164,60,18,0.05)] w-full sticky top-0 z-50">
+<div class="flex justify-between items-center w-full px-margin-desktop max-w-container-max mx-auto h-20">
+<!-- Brand -->
+<div class="flex items-center gap-4">
+<span class="text-headline-md font-headline-md font-bold text-primary dark:text-primary-fixed-dim">NovaCart</span>
+</div>
+<!-- Navigation Links (Desktop) -->
+<nav class="hidden md:flex gap-8">
+<a class="text-primary dark:text-primary-fixed-dim border-b-2 border-primary pb-1 font-body-md transition-all duration-150 active:scale-95 cursor-pointer" href="#">Shop</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary font-body-md hover:scale-105 transition-transform duration-200 active:scale-95 cursor-pointer" href="#">Deals</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary font-body-md hover:scale-105 transition-transform duration-200 active:scale-95 cursor-pointer" href="#">New arrivals</a>
+</nav>
+<!-- Actions -->
+<div class="flex items-center gap-4">
+<div class="relative hidden md:block">
+<input class="bg-surface-container-low border-none rounded-full py-2 pl-4 pr-10 text-body-md focus:ring-2 focus:ring-primary w-64 transition-all" placeholder="Search..." type="text"/>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+</div>
+<button class="text-primary hover:scale-105 transition-transform duration-200 active:scale-95 cursor-pointer p-2 rounded-full hover:bg-surface-container-high">
+<span class="material-symbols-outlined" data-weight="fill" style="font-variation-settings: 'FILL' 1;">shopping_cart</span>
+</button>
+<img alt="User profile" class="w-10 h-10 rounded-full object-cover border border-surface-container-highest cursor-pointer hover:scale-105 transition-transform" data-alt="A modern, cheerful profile picture of a person with a bright background, perfectly round and high quality, matching the overall optimistic e-commerce vibe." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBzbNDc77CenI2n61XtCSimLvZrtEYTSddcaQ-TsW0yHroIGrEh0kLROLOFkhhcyntMl7oTjw9yeOAkVrww6rtcOat5sGbDMAnLsOxhS_Hxb_WBzJRatu0MPMx1Dx9vQDnlmS23i91FyW9H9mhCLqshAR2mVifxXwEcT1QJ4zJx__7r-TrAroO1J-XY3GYtE2_HHBUQ_UZIJJU3hbkxZhrpeaWhANGXjZyiHRRW2BHq8GqV3fbwvsMxpA"/>
+</div>
+</div>
+</header>
+<div class="flex flex-1 max-w-container-max mx-auto w-full px-margin-desktop py-gutter gap-gutter">
+<!-- SideNavBar / Filter Sidebar -->
+<aside class="hidden md:flex flex-col w-64 flex-shrink-0 gap-6">
+<!-- Navigation Section -->
+<nav class="bg-surface-container-low dark:bg-surface-container-lowest shadow-md rounded-r-xl py-base flex flex-col h-full sticky top-28">
+<div class="px-6 py-4 mb-4 border-b border-surface-variant">
+<h2 class="font-headline-md text-headline-md text-primary">Categories</h2>
+<p class="text-on-surface-variant font-body-md text-sm mt-1">Explore curated collections</p>
+</div>
+<div class="flex-1 flex flex-col gap-2">
+<a class="text-on-surface-variant hover:bg-surface-container-high rounded-full mx-2 px-4 py-3 flex items-center gap-3 font-label-bold text-label-bold hover:bg-primary-fixed-dim transition-colors active:scale-98" href="#">
+<span class="material-symbols-outlined">home</span>
+                        Home
+                    </a>
+<a class="bg-primary-container text-on-primary-container rounded-full mx-2 px-4 py-3 flex items-center gap-3 font-label-bold text-label-bold hover:bg-primary-fixed-dim transition-colors active:scale-98" href="#">
+<span class="material-symbols-outlined">devices</span>
+                        Electronics
+                    </a>
+<a class="text-on-surface-variant hover:bg-surface-container-high rounded-full mx-2 px-4 py-3 flex items-center gap-3 font-label-bold text-label-bold hover:bg-primary-fixed-dim transition-colors active:scale-98" href="#">
+<span class="material-symbols-outlined">apparel</span>
+                        Fashion
+                    </a>
+<a class="text-on-surface-variant hover:bg-surface-container-high rounded-full mx-2 px-4 py-3 flex items-center gap-3 font-label-bold text-label-bold hover:bg-primary-fixed-dim transition-colors active:scale-98" href="#">
+<span class="material-symbols-outlined">deck</span>
+                        Home Decor
+                    </a>
+<a class="text-on-surface-variant hover:bg-surface-container-high rounded-full mx-2 px-4 py-3 flex items-center gap-3 font-label-bold text-label-bold hover:bg-primary-fixed-dim transition-colors active:scale-98" href="#">
+<span class="material-symbols-outlined">toys</span>
+                        Toys
+                    </a>
+</div>
+<div class="px-6 py-4 mt-auto">
+<button class="w-full bg-gradient-to-r from-primary-container to-primary-fixed text-on-primary-container font-label-bold py-3 rounded-full hover:shadow-[0px_4px_20px_rgba(255,127,80,0.3)] transition-all transform hover:scale-105">
+                        Join Prime
+                    </button>
+</div>
+</nav>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col min-w-0">
+<!-- Header Area -->
+<div class="mb-6">
+<!-- Breadcrumbs -->
+<nav class="flex text-sm text-on-surface-variant mb-2 items-center gap-2 font-body-md">
+<a class="hover:text-primary transition-colors" href="#">Home</a>
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+<a class="hover:text-primary transition-colors" href="#">Shop</a>
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+<span class="text-primary font-semibold">Electronics &amp; Gadgets</span>
+</nav>
+<div class="flex justify-between items-end">
+<h1 class="font-display-lg text-display-lg text-on-background">Electronics &amp; Gadgets</h1>
+<div class="flex items-center gap-2 bg-surface-container-low rounded-full p-1 border border-surface-variant">
+<button class="p-2 rounded-full bg-primary-container text-on-primary-container shadow-sm transition-all">
+<span class="material-symbols-outlined">grid_view</span>
+</button>
+<button class="p-2 rounded-full text-on-surface-variant hover:bg-surface-container-high transition-all">
+<span class="material-symbols-outlined">view_list</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Product Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-gutter">
+<!-- Card 1 -->
+<article class="bg-surface rounded-xl border border-surface-variant p-4 flex flex-col lift-bounce group relative overflow-hidden">
+<div class="aspect-square bg-surface-container-lowest rounded-lg mb-4 flex items-center justify-center p-4 relative">
+<img alt="NovaSound Headphones" class="object-contain w-full h-full drop-shadow-md group-hover:scale-105 transition-transform duration-500" data-alt="High-end noise-canceling headphones resting on a minimalist display stand. Soft studio lighting highlights the premium matte finish and sleek curves. The background is a very light, warm cream color, perfectly matching a modern optimistic e-commerce aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCBuBkdWUFNpLzyrrQsvJn4NSnc6cJ0oQFbkEOzIGicqofcxo7No0wdKgbZBDqhYB2dR-YEatpWtDfAaLbS-yZKvXCtlx_uaehYD28jjI763qsSemVQThaFmmhzfbk4qO3nXK-G54L4kvSQufmine3AfxVtbB1cRRev0Dy035amZNXR3ZvyX40Ys6j1Kdugtj7ibE-ruQ6191HrsS5EAYphym4Pvwa5baSyrsCcnhnNZQyTwQBRZukZVg"/>
+<span class="absolute top-2 right-2 bg-tertiary-fixed text-on-tertiary-fixed text-xs font-label-bold px-2 py-1 rounded-full shadow-sm">New</span>
+</div>
+<div class="flex-1 flex flex-col">
+<h3 class="font-headline-md text-body-lg text-on-background mb-1">NovaSound Headphones</h3>
+<div class="flex items-center gap-1 mb-2 text-tertiary">
+<span class="material-symbols-outlined text-sm" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm">star_half</span>
+<span class="text-xs text-on-surface-variant ml-1">(128)</span>
+</div>
+<div class="mt-auto flex items-center justify-between">
+<span class="font-headline-md text-headline-md text-primary">$249.99</span>
+<button class="bg-secondary-container text-on-secondary-container p-2 rounded-full opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 hover:bg-secondary-fixed shadow-sm add-to-cart-btn relative">
+<span class="material-symbols-outlined">add_shopping_cart</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Card 2 -->
+<article class="bg-surface rounded-xl border border-surface-variant p-4 flex flex-col lift-bounce group relative overflow-hidden">
+<div class="aspect-square bg-surface-container-lowest rounded-lg mb-4 flex items-center justify-center p-4 relative">
+<img alt="GlowTab Tablet" class="object-contain w-full h-full drop-shadow-md group-hover:scale-105 transition-transform duration-500" data-alt="A sleek, ultra-thin tablet device displaying a colorful, abstract wallpaper. It sits slightly angled on a clean, light surface. The lighting is bright and cheerful, emphasizing the vibrant screen and modern design of the device against a soft cream background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuApqhv97Adk6eUwR_mZvmjjb7EhxAoyAqho1SAxu0iiValHUOZBj-ezi3KfG0RydmUcueHBaajLho2Mc8KLuKf4Marw7N8f0pWgMlrO30XFqPaa5O6mIDpz4VsUX0C-gjib9pYN7sdrH5UYD0vk389Z5Nwdmo6KZaVS2aBl2-VeyRskP9A1a_PYmi8_VQX2F4esr_9hkwSWJVhuJQoEh0-f3AT7pCtiRXQFFMA70cb0Sta69J--XkBq9g"/>
+</div>
+<div class="flex-1 flex flex-col">
+<h3 class="font-headline-md text-body-lg text-on-background mb-1">GlowTab Tablet Pro</h3>
+<div class="flex items-center gap-1 mb-2 text-tertiary">
+<span class="material-symbols-outlined text-sm" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-xs text-on-surface-variant ml-1">(84)</span>
+</div>
+<div class="mt-auto flex items-center justify-between">
+<span class="font-headline-md text-headline-md text-primary">$499.00</span>
+<button class="bg-secondary-container text-on-secondary-container p-2 rounded-full opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 hover:bg-secondary-fixed shadow-sm add-to-cart-btn relative">
+<span class="material-symbols-outlined">add_shopping_cart</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Card 3 -->
+<article class="bg-surface rounded-xl border border-surface-variant p-4 flex flex-col lift-bounce group relative overflow-hidden">
+<div class="aspect-square bg-surface-container-lowest rounded-lg mb-4 flex items-center justify-center p-4 relative">
+<img alt="PixelWatch Series 3" class="object-contain w-full h-full drop-shadow-md group-hover:scale-105 transition-transform duration-500" data-alt="A modern smartwatch with a vibrant, colorful digital face and a soft coral silicone band. The watch is positioned dynamically, floating slightly above a soft, light cream surface. Bright, playful lighting highlights the metallic bezel and clean lines." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDG9VLlULx1JyvrMDqPAwlHu4aUqtNEUEROCEpNis3JtBCDM9i5Rk1jtS3asOsXBTIK9pH29BlizvIPx8KVN1z9Kl0gr24SuaQv1OxyTvmouKMDnOLoeY6JsU97xAeiPCGflF4NMF5Tqlbt9Ak4R4W8cTJ4xN1G9ZAvv5ECnN-u1I7oxVJTA_Vn3daemYddsj_djn3Fwe9haxiXRDSVW_EEMEmKK1vjdZGh2I6TctBKa_dZLPjiKdnuwg"/>
+<span class="absolute top-2 right-2 bg-primary-container text-on-primary-container text-xs font-label-bold px-2 py-1 rounded-full shadow-sm">Sale</span>
+</div>
+<div class="flex-1 flex flex-col">
+<h3 class="font-headline-md text-body-lg text-on-background mb-1">PixelWatch Series 3</h3>
+<div class="flex items-center gap-1 mb-2 text-tertiary">
+<span class="material-symbols-outlined text-sm" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm">star_border</span>
+<span class="text-xs text-on-surface-variant ml-1">(42)</span>
+</div>
+<div class="mt-auto flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-headline-md text-headline-md text-primary">$199.00</span>
+<span class="text-sm text-on-surface-variant line-through">$249.00</span>
+</div>
+<button class="bg-secondary-container text-on-secondary-container p-2 rounded-full opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 hover:bg-secondary-fixed shadow-sm add-to-cart-btn relative">
+<span class="material-symbols-outlined">add_shopping_cart</span>
+</button>
+</div>
+</div>
+</article>
+</div>
+<!-- Pagination -->
+<div class="mt-8 flex justify-center items-center gap-2">
+<button class="w-10 h-10 rounded-full flex items-center justify-center border border-surface-variant text-on-surface-variant hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="w-10 h-10 rounded-full flex items-center justify-center bg-primary-container text-on-primary-container font-label-bold shadow-sm">1</button>
+<button class="w-10 h-10 rounded-full flex items-center justify-center border border-surface-variant text-on-surface-variant hover:bg-surface-container-high transition-colors font-label-bold">2</button>
+<button class="w-10 h-10 rounded-full flex items-center justify-center border border-surface-variant text-on-surface-variant hover:bg-surface-container-high transition-colors font-label-bold">3</button>
+<span class="text-on-surface-variant">...</span>
+<button class="w-10 h-10 rounded-full flex items-center justify-center border border-surface-variant text-on-surface-variant hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</main>
+</div>
+<!-- Footer -->
+<footer class="bg-surface-container-highest dark:bg-inverse-surface rounded-t-[32px] w-full mt-gutter flat no shadows">
+<div class="flex flex-col md:flex-row justify-between items-center px-margin-desktop py-gutter w-full max-w-container-max mx-auto gap-6">
+<span class="font-headline-md text-headline-md text-primary">NovaCart</span>
+<div class="flex gap-6 font-body-md text-body-md">
+<a class="text-on-surface-variant hover:text-primary hover:underline transition-all cursor-pointer" href="#">Support</a>
+<a class="text-on-surface-variant hover:text-primary hover:underline transition-all cursor-pointer" href="#">Privacy Policy</a>
+<a class="text-on-surface-variant hover:text-primary hover:underline transition-all cursor-pointer" href="#">Sustainability</a>
+<a class="text-on-surface-variant hover:text-primary hover:underline transition-all cursor-pointer" href="#">Join the Community</a>
+</div>
+<span class="text-on-surface-variant font-body-md text-sm">© 2024 NovaCart. Designed for Joy.</span>
+</div>
+</footer>
+<script>
+        // Micro-interaction for Add to Cart buttons
+        document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                // Create sparkle element
+                const sparkle = document.createElement('span');
+                sparkle.classList.add('material-symbols-outlined', 'absolute', 'text-tertiary-fixed', 'sparkle-anim');
+                sparkle.textContent = 'auto_awesome';
+                sparkle.style.left = '50%';
+                sparkle.style.top = '50%';
+                sparkle.style.transform = 'translate(-50%, -50%)';
+                sparkle.style.pointerEvents = 'none';
+                
+                // Add icon momentarily change
+                const icon = btn.querySelector('.material-symbols-outlined');
+                const originalIcon = icon.textContent;
+                icon.textContent = 'check';
+                icon.classList.add('text-primary');
+                
+                btn.appendChild(sparkle);
+                
+                // Reset
+                setTimeout(() => {
+                    sparkle.remove();
+                    icon.textContent = originalIcon;
+                    icon.classList.remove('text-primary');
+                }, 1000);
+            });
+        });
+    </script>
+</body></html>

@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NovaCart Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&amp;family=Quicksand:wght@300..700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-lowest": "#ffffff",
+                      "surface-bright": "#fbf9f5",
+                      "primary": "#a43c12",
+                      "primary-fixed-dim": "#ffb59c",
+                      "error-container": "#ffdad6",
+                      "on-primary": "#ffffff",
+                      "on-surface": "#1b1c1a",
+                      "outline": "#8b7169",
+                      "surface-container-high": "#eae8e4",
+                      "on-background": "#1b1c1a",
+                      "on-tertiary-fixed": "#221b00",
+                      "on-tertiary-container": "#453900",
+                      "on-error": "#ffffff",
+                      "error": "#ba1a1a",
+                      "surface-container": "#efeeea",
+                      "inverse-on-surface": "#f2f0ed",
+                      "outline-variant": "#dec0b6",
+                      "tertiary": "#705d00",
+                      "primary-fixed": "#ffdbcf",
+                      "surface-container-low": "#f5f3ef",
+                      "tertiary-fixed-dim": "#e9c400",
+                      "on-primary-fixed-variant": "#822800",
+                      "surface-tint": "#a43c12",
+                      "secondary-fixed": "#61f9e9",
+                      "on-secondary-container": "#006f66",
+                      "tertiary-container": "#c0a200",
+                      "secondary": "#006a62",
+                      "surface": "#fbf9f5",
+                      "on-error-container": "#93000a",
+                      "on-primary-container": "#6c2000",
+                      "on-surface-variant": "#57423b",
+                      "on-primary-fixed": "#380c00",
+                      "secondary-container": "#5ef6e6",
+                      "inverse-surface": "#30312e",
+                      "on-tertiary-fixed-variant": "#544600",
+                      "on-secondary-fixed-variant": "#005049",
+                      "surface-dim": "#dbdad6",
+                      "inverse-primary": "#ffb59c",
+                      "on-secondary-fixed": "#00201d",
+                      "surface-container-highest": "#e4e2de",
+                      "background": "#fbf9f5",
+                      "primary-container": "#ff7f50",
+                      "on-tertiary": "#ffffff",
+                      "on-secondary": "#ffffff",
+                      "surface-variant": "#e4e2de",
+                      "tertiary-fixed": "#ffe16d",
+                      "secondary-fixed-dim": "#3adccc"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "container-max": "1280px",
+                      "base": "8px",
+                      "gutter": "24px",
+                      "margin-mobile": "16px",
+                      "margin-desktop": "40px"
+              },
+              "fontFamily": {
+                      "body-md": [
+                              "Nunito Sans"
+                      ],
+                      "body-lg": [
+                              "Nunito Sans"
+                      ],
+                      "display-lg-mobile": [
+                              "Quicksand"
+                      ],
+                      "display-lg": [
+                              "Quicksand"
+                      ],
+                      "label-bold": [
+                              "Nunito Sans"
+                      ],
+                      "headline-md": [
+                              "Quicksand"
+                      ]
+              },
+              "fontSize": {
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.5",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "display-lg-mobile": [
+                              "32px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "label-bold": [
+                              "14px",
+                              {
+                                      "lineHeight": "1.0",
+                                      "fontWeight": "800"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "1.3",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        .animate-pop {
+            animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.4); }
+            100% { transform: scale(1); }
+        }
+
+        .animate-progress {
+            animation: progress 2s ease-in-out forwards;
+            stroke-dasharray: 283;
+            stroke-dashoffset: 283;
+        }
+        @keyframes progress {
+            to { stroke-dashoffset: 80; } /* Example value for progress */
+        }
+        
+        .animate-timeline-dot {
+            animation: slideDot 3s ease-in-out infinite alternate;
+        }
+        @keyframes slideDot {
+            from { left: 0%; }
+            to { left: 100%; }
+        }
+
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+        @keyframes fadeInUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .delay-100 { animation-delay: 100ms; }
+        .delay-200 { animation-delay: 200ms; }
+        .delay-300 { animation-delay: 300ms; }
+
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen font-body-md selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar (Mobile Only) -->
+<header class="md:hidden bg-surface shadow-sm sticky top-0 z-50">
+<div class="flex justify-between items-center w-full px-margin-mobile h-20">
+<div class="font-headline-md text-headline-md font-bold text-primary">NovaCart</div>
+<button class="text-primary p-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">menu</span>
+</button>
+</div>
+</header>
+<div class="flex flex-col md:flex-row max-w-container-max mx-auto h-screen">
+<!-- SideNavBar (Desktop) -->
+<aside class="hidden md:flex flex-col py-base bg-surface-container-low h-screen w-64 rounded-r-xl shadow-md flex-shrink-0 sticky top-0">
+<div class="px-gutter mb-6 pt-4 flex flex-col items-center">
+<img class="w-16 h-16 rounded-full shadow-sm mb-4" data-alt="A small, stylized circular avatar logo for NovaCart featuring a vibrant coral shopping cart icon on a clean white background. Modern, soft minimalism style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxx15S5bm7WFtMmNGMRvJLqMwiesTiOzUUUN3S5GJVLFc5AHhAlA2p4vpsX2td1dONvjvXVggJDRmi2k9LJF63WMq-V2BmAJms4BSkvWo3lLfSipIKBV1-PmM6jhnr-pv2_K5SoRBp0_-bLHGpdZj_reCchFj0zxxOuhW5mRpEE9BwZj5zOkOGZYM3rFzEHZdE3EVZD8ZhffB2r6_NLUf5Ue_M_XShLFRaD1Eqs5QZMaycZlmXdSlmzw"/>
+<h2 class="font-headline-md text-headline-md text-primary font-bold">Categories</h2>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm mt-1">Explore curated collections</p>
+</div>
+<nav class="flex-1 px-2 space-y-1 overflow-y-auto">
+<a class="flex items-center space-x-3 text-on-surface-variant hover:bg-surface-container-high rounded-full mx-2 px-4 py-3 hover:bg-primary-fixed-dim transition-colors group cursor-pointer" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">home</span>
+<span class="font-label-bold text-label-bold">Home</span>
+</a>
+<a class="flex items-center space-x-3 text-on-surface-variant hover:bg-surface-container-high rounded-full mx-2 px-4 py-3 hover:bg-primary-fixed-dim transition-colors group cursor-pointer" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">devices</span>
+<span class="font-label-bold text-label-bold">Electronics</span>
+</a>
+<a class="flex items-center space-x-3 text-on-surface-variant hover:bg-surface-container-high rounded-full mx-2 px-4 py-3 hover:bg-primary-fixed-dim transition-colors group cursor-pointer" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">apparel</span>
+<span class="font-label-bold text-label-bold">Fashion</span>
+</a>
+<a class="flex items-center space-x-3 text-on-surface-variant hover:bg-surface-container-high rounded-full mx-2 px-4 py-3 hover:bg-primary-fixed-dim transition-colors group cursor-pointer" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">deck</span>
+<span class="font-label-bold text-label-bold">Home Decor</span>
+</a>
+<a class="flex items-center space-x-3 text-on-surface-variant hover:bg-surface-container-high rounded-full mx-2 px-4 py-3 hover:bg-primary-fixed-dim transition-colors group cursor-pointer" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">toys</span>
+<span class="font-label-bold text-label-bold">Toys</span>
+</a>
+</nav>
+<div class="p-4 mt-auto">
+<button class="w-full bg-gradient-to-r from-primary-container to-[#ff9f7a] text-on-primary-container font-label-bold text-label-bold py-3 rounded-full shadow-[0px_4px_20px_rgba(255,127,80,0.2)] hover:scale-105 transition-transform duration-200">
+                    Join Prime
+                </button>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 p-margin-mobile md:p-margin-desktop overflow-y-auto w-full">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter max-w-5xl mx-auto">
+<!-- Profile Summary & Loyalty Widget Bento -->
+<div class="col-span-1 md:col-span-12 grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+<!-- Profile Card -->
+<div class="lg:col-span-2 bg-surface-container-lowest border border-surface-variant rounded-xl p-6 shadow-[0px_4px_20px_rgba(164,60,18,0.05)] flex items-center space-x-6 fade-in-up">
+<img class="w-24 h-24 rounded-full object-cover border-4 border-surface-container" data-alt="A warm, engaging portrait photo of a smiling person, used as a user profile avatar. Soft natural lighting, soft focus background, modern and approachable style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCew671r6OAa8A0nZVqbVQ31L4s2v_6y9Mp4c8wM0Ejv7cuppBwTZ7kkyuYSTe5l5CeBkP4x77jnno9C9-rcj9gPxPZkI2UbAHx3sVMbDcim9nL4rxCbIUb6CnYMNTpvS7IxpE2dK4hLYVUSJL6uIuX4yL2HoAW8tei1Nm7qxRVdQReZr5rOHGs3HmgN4IOfUPGun3ml_gVOTCCzPH2LJCcdgSvkaV3WGIWNRXCXJ32ecVmD4UY1zC4Rg"/>
+<div>
+<h1 class="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg text-primary">Welcome back, Alex!</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mt-2">Ready to discover something joyful today?</p>
+</div>
+</div>
+<!-- Loyalty Rewards -->
+<div class="lg:col-span-1 bg-surface-container-lowest border border-surface-variant rounded-xl p-6 shadow-[0px_4px_20px_rgba(164,60,18,0.05)] flex flex-col items-center justify-center relative fade-in-up delay-100">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-4">Joy Points</h3>
+<div class="relative w-32 h-32 flex items-center justify-center">
+<!-- SVG Progress Ring -->
+<svg class="w-full h-full transform -rotate-90" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="none" r="45" stroke="var(--color-surface-container)" stroke-width="8"></circle>
+<circle class="animate-progress" cx="50" cy="50" fill="none" r="45" stroke="var(--color-primary-container)" stroke-linecap="round" stroke-width="8"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="font-display-lg-mobile text-display-lg-mobile text-primary">850</span>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mt-3 text-center text-sm">150 pts to Gold Tier</p>
+</div>
+</div>
+<!-- Active Orders -->
+<div class="col-span-1 md:col-span-12 bg-surface-container-lowest border border-surface-variant rounded-xl p-6 shadow-[0px_4px_20px_rgba(164,60,18,0.05)] fade-in-up delay-200">
+<div class="flex justify-between items-center mb-6">
+<h2 class="font-headline-md text-headline-md text-on-surface">Active Orders</h2>
+<a class="font-label-bold text-label-bold text-primary hover:underline" href="#">View All</a>
+</div>
+<div class="bg-surface-bright rounded-lg p-4 border border-surface-variant flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6 hover:shadow-[0px_4px_20px_rgba(164,60,18,0.05)] hover:scale-[1.01] transition-all duration-200 cursor-pointer">
+<div class="w-20 h-20 bg-surface-container rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A sleek, modern wireless headphone resting on a soft cream background. Product photography style, well lit, high contrast." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC0YwQ_DKFLu2qyQZ3aYixtmc9NttRLOLXSlf4OYowqi0heOG2MTHpqiLb3PIXL8T8EuDVWMNAwss81eave1bAenl0CzIUW6xIW_ukjBUUutIu6aAfIXyWooz6xlKxZJdIuPa3Z-P_VM8RSMykwmgWT2OzpL9m_nYW_8NogV6GjDEy5XU9XVqeGFFhagbWFlC9ERG9W8ORvVLOsQSGlFLFbdWWFFsngoEELl769RxTuB-Mx0f4zOpKsSg"/>
+</div>
+<div class="flex-1">
+<h4 class="font-label-bold text-label-bold text-on-surface text-lg">Aura Wireless Headphones</h4>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm mt-1">Order #NC-49201</p>
+</div>
+<!-- Timeline -->
+<div class="w-full md:w-1/2 relative mt-4 md:mt-0 px-4">
+<div class="h-1 bg-surface-container-high w-full rounded-full relative">
+<div class="absolute top-0 left-0 h-1 bg-primary-container rounded-full" style="width: 60%;"></div>
+<!-- Moving Dot -->
+<div class="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-primary rounded-full shadow-sm animate-timeline-dot"></div>
+</div>
+<div class="flex justify-between mt-2 font-body-md text-body-md text-xs text-on-surface-variant">
+<span>Ordered</span>
+<span>Shipped</span>
+<span>Arriving</span>
+</div>
+</div>
+</div>
+</div>
+<!-- My Wishlist -->
+<div class="col-span-1 md:col-span-12 fade-in-up delay-300">
+<div class="flex justify-between items-center mb-6">
+<h2 class="font-headline-md text-headline-md text-on-surface">My Wishlist</h2>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-gutter">
+<!-- Product Card 1 -->
+<div class="bg-surface-container-lowest border border-surface-variant rounded-xl overflow-hidden shadow-[0px_4px_20px_rgba(164,60,18,0.05)] hover:shadow-[0px_8px_30px_rgba(164,60,18,0.1)] hover:-translate-y-1 transition-all duration-300 group">
+<div class="relative w-full aspect-square bg-surface-bright flex items-center justify-center p-4">
+<img class="w-3/4 h-3/4 object-contain" data-alt="A minimalist ceramic coffee mug in a soft terracotta color. Product photography, clean light-mode aesthetic, cream background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3TXs7y1W7_ZXq8Qw8P5NndCVf2DquLHt9AWe0wCoOhYi63iWI8uRN2EeuiaRQ9hCLGe374J9jmy-vdMKWDBFyjmif815Kxsr6MZv6Tz2nqQWlh4TBJ6J2e10kk3n-TEgoCHNTFAJ8YeJb7dTXa_BW9eJ5TfQDTREMl2ZUxea555l7t_miH9-1jcf8RTaXNoD3C0s5LWebyOROGI9zKZFLaiiF6OHXesvY44cYXsjCEQXFeOXDH0gzUQ"/>
+<button class="absolute top-3 right-3 p-2 bg-surface-container-lowest/80 backdrop-blur-sm rounded-full text-on-surface-variant hover:text-primary transition-colors wishlist-btn">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1; color: var(--color-primary-container);">favorite</span>
+</button>
+</div>
+<div class="p-4 text-center">
+<h3 class="font-label-bold text-label-bold text-on-surface truncate">Terra Ceramic Mug</h3>
+<p class="font-body-md text-body-md text-primary mt-1">$24.00</p>
+</div>
+</div>
+<!-- Product Card 2 -->
+<div class="bg-surface-container-lowest border border-surface-variant rounded-xl overflow-hidden shadow-[0px_4px_20px_rgba(164,60,18,0.05)] hover:shadow-[0px_8px_30px_rgba(164,60,18,0.1)] hover:-translate-y-1 transition-all duration-300 group">
+<div class="relative w-full aspect-square bg-surface-bright flex items-center justify-center p-4">
+<img class="w-3/4 h-3/4 object-contain" data-alt="A stylish, soft-cover notebook with a minimalist design in pastel teal. Modern stationary flat lay, bright lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCv222t9DYJrVUqBkDXi1-tXImfVYtLLBTe5mm3QGlH6gSfYeZn0X7Z145S5bjq8ErQZdH8yG8a1sYfcg8H_rWquiol6A3VjyZiq8dXK2IDbq_TfBIL5UzVrxIKf1B3xz_h1qnf6ExEUFAf6HzMP8Nmq8zPf_7bTukqT20vrVTFZ26hhlR24z--CILH3uX4SsfsxJRuZ0a4KRqADySYDQfysDDhhzStdRacOUUAdUZ9e8lQ72l9ZptbqA"/>
+<button class="absolute top-3 right-3 p-2 bg-surface-container-lowest/80 backdrop-blur-sm rounded-full text-on-surface-variant hover:text-primary transition-colors wishlist-btn">
+<span class="material-symbols-outlined">favorite</span>
+</button>
+</div>
+<div class="p-4 text-center">
+<h3 class="font-label-bold text-label-bold text-on-surface truncate">Flow Notebook</h3>
+<p class="font-body-md text-body-md text-primary mt-1">$18.00</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 w-full bg-surface shadow-[0px_-4px_20px_rgba(164,60,18,0.05)] z-50">
+<div class="flex justify-around items-center h-16 pb-2 pt-2">
+<a class="flex flex-col items-center justify-center text-primary w-16" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="text-[10px] mt-1 font-label-bold">Dashboard</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary w-16 transition-colors" href="#">
+<span class="material-symbols-outlined">favorite</span>
+<span class="text-[10px] mt-1 font-label-bold">Wishlist</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary w-16 transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] mt-1 font-label-bold">Settings</span>
+</a>
+</div>
+</nav>
+<script>
+        // Wishlist micro-interaction
+        document.querySelectorAll('.wishlist-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const icon = this.querySelector('.material-symbols-outlined');
+                
+                // Toggle fill and animation
+                if (icon.style.fontVariationSettings.includes('1')) {
+                    icon.style.fontVariationSettings = "'FILL' 0";
+                    icon.style.color = 'inherit';
+                } else {
+                    icon.style.fontVariationSettings = "'FILL' 1";
+                    icon.style.color = 'var(--color-primary-container)';
+                    icon.classList.add('animate-pop');
+                    setTimeout(() => icon.classList.remove('animate-pop'), 300);
+                }
+            });
+        });
+    </script>
+</body></html>

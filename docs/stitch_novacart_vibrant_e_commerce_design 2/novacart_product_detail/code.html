@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NovaCart - Product Detail Page</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary": "#ffffff",
+                        "primary": "#a43c12",
+                        "surface-container-low": "#f5f3ef",
+                        "inverse-surface": "#30312e",
+                        "surface": "#fbf9f5",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-fixed": "#221b00",
+                        "surface-bright": "#fbf9f5",
+                        "inverse-on-surface": "#f2f0ed",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-container": "#c0a200",
+                        "on-error": "#ffffff",
+                        "error": "#ba1a1a",
+                        "primary-fixed": "#ffdbcf",
+                        "on-primary-container": "#6c2000",
+                        "secondary-container": "#5ef6e6",
+                        "secondary-fixed": "#61f9e9",
+                        "surface-dim": "#dbdad6",
+                        "on-background": "#1b1c1a",
+                        "surface-container-high": "#eae8e4",
+                        "primary-fixed-dim": "#ffb59c",
+                        "background": "#fbf9f5",
+                        "primary-container": "#ff7f50",
+                        "secondary-fixed-dim": "#3adccc",
+                        "tertiary-fixed": "#ffe16d",
+                        "outline-variant": "#dec0b6",
+                        "inverse-primary": "#ffb59c",
+                        "surface-variant": "#e4e2de",
+                        "outline": "#8b7169",
+                        "on-surface-variant": "#57423b",
+                        "on-secondary": "#ffffff",
+                        "secondary": "#006a62",
+                        "on-primary-fixed-variant": "#822800",
+                        "on-primary-fixed": "#380c00",
+                        "surface-container-highest": "#e4e2de",
+                        "on-tertiary-container": "#453900",
+                        "surface-container": "#efeeea",
+                        "tertiary": "#705d00",
+                        "on-surface": "#1b1c1a",
+                        "on-secondary-container": "#006f66",
+                        "on-tertiary-fixed-variant": "#544600",
+                        "on-secondary-fixed-variant": "#005049",
+                        "on-secondary-fixed": "#00201d",
+                        "error-container": "#ffdad6",
+                        "on-tertiary": "#ffffff",
+                        "surface-tint": "#a43c12",
+                        "tertiary-fixed-dim": "#e9c400"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "container-max": "1280px",
+                        "base": "8px",
+                        "margin-mobile": "16px",
+                        "margin-desktop": "40px"
+                    },
+                    "fontFamily": {
+                        "label-bold": ["Nunito Sans"],
+                        "headline-md": ["Quicksand"],
+                        "body-md": ["Nunito Sans"],
+                        "display-lg-mobile": ["Quicksand"],
+                        "display-lg": ["Quicksand"],
+                        "body-lg": ["Nunito Sans"]
+                    },
+                    "fontSize": {
+                        "label-bold": ["14px", { "lineHeight": "1.0", "fontWeight": "800" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "display-lg-mobile": ["32px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "display-lg": ["48px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;800&amp;family=Quicksand:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body { font-family: 'Nunito Sans', sans-serif; }
+        h1, h2, h3, h4, h5, h6, .font-headline-md, .font-display-lg, .font-display-lg-mobile { font-family: 'Quicksand', sans-serif; }
+        
+        .blob-bg {
+            position: absolute;
+            z-index: -1;
+            filter: blur(40px);
+            opacity: 0.4;
+            border-radius: 50%;
+        }
+        
+        .gradient-btn {
+            background: linear-gradient(135deg, #ff7f50, #ff9f7a);
+            box-shadow: 0 4px 15px rgba(255, 127, 80, 0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .gradient-btn:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 6px 20px rgba(255, 127, 80, 0.4);
+        }
+        
+        .sparkle-animation {
+            animation: sparkle 0.5s ease-out forwards;
+        }
+        
+        @keyframes sparkle {
+            0% { transform: scale(0) rotate(0deg); opacity: 1; }
+            100% { transform: scale(1.5) rotate(180deg); opacity: 0; }
+        }
+
+        .sticky-bar {
+            transform: translateY(100%);
+            transition: transform 0.3s ease-out;
+        }
+        .sticky-bar.visible {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen relative overflow-x-hidden">
+<!-- TopNavBar -->
+<header class="bg-surface dark:bg-on-background shadow-[0px_4px_20px_rgba(164,60,18,0.05)] docked full-width top-0 sticky z-50">
+<div class="flex justify-between items-center w-full px-margin-desktop max-w-container-max mx-auto h-20">
+<div class="text-headline-md font-headline-md font-bold text-primary dark:text-primary-fixed-dim">NovaCart</div>
+<nav class="hidden md:flex space-x-8">
+<a class="text-primary dark:text-primary-fixed-dim border-b-2 border-primary pb-1 font-body-md text-body-md hover:scale-105 transition-transform duration-200" href="#">Shop</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary font-body-md text-body-md hover:scale-105 transition-transform duration-200" href="#">Deals</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary font-body-md text-body-md hover:scale-105 transition-transform duration-200" href="#">New arrivals</a>
+</nav>
+<div class="flex items-center space-x-4">
+<button class="text-primary dark:text-primary-fixed-dim hover:scale-105 transition-transform duration-200 active:scale-95 duration-150 cursor-pointer">
+<span class="material-symbols-outlined">shopping_cart</span>
+</button>
+</div>
+</div>
+</header>
+<main class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-12 relative z-10">
+<!-- Background Accents -->
+<div class="blob-bg w-64 h-64 bg-primary-container top-10 left-[-50px]"></div>
+<div class="blob-bg w-80 h-80 bg-secondary-container top-40 right-[-100px]"></div>
+<!-- Hero Section -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-24 relative">
+<!-- Product Gallery -->
+<div class="relative rounded-xl overflow-hidden shadow-[0px_8px_30px_rgba(164,60,18,0.05)] bg-white border border-surface-variant group">
+<div class="aspect-w-4 aspect-h-3">
+<img class="object-cover w-full h-full rounded-t-xl transition-opacity duration-300" data-alt="A modern, high-end wireless smart speaker with soft rounded edges and a premium fabric finish in a warm light cream environment. The lighting is soft and natural, emphasizing the product's friendly, approachable design. Vibrant accents of coral and turquoise are subtly present in the background decor." id="mainImage" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAy9NySo2Ohs1AAW7CawEC9XouuCq5WDsjyhZIjGH-qaQ2tfYnnsds_T1Mt7s0fS9WkJiX8Q9Eqdzdk4j7aJt11aiq4iIANpkbqyATusWKQiOMIpR6rHpBMFyZD1733i8x8D9SYhmayy2br8ksbCiLPliBKNTLnan9XsnzeENMSC96FD7hg2OhTtZVhjIAQlyk1yr2TW9Q2qP2x_nIh_7tnXOlYiRHGIZWQ2BMyBfJStbApIbMl52qsWA"/>
+</div>
+<div class="flex p-4 gap-4 bg-surface-container-lowest justify-center border-t border-surface-variant">
+<img class="w-20 h-20 object-cover rounded-lg border-2 border-primary-container cursor-pointer" data-alt="Close up shot of the wireless smart speaker's top control panel, showing tactile buttons. Light cream background, bright and optimistic aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAriQaB2G1pIC032lXf3UpjO_gSHgzcVVOWC6BGdAOUWpwJZck-niM68AZ3Ty-c4U7AD8eGhCmngfKyDggUJcVmhvffxfQAazBKd4hxtCesPCySh_V7eftMfHw8KCTKLI9_mxT7mFnpsG-X-nqAKo4w9acMlFVSBFaRwE4huxlS11JqjTUgihfTz3ohMhcw1relQHPmIGh09Q4adbhNiLhITeI4al_O9IQuzf_Hur0vjMkBdj_rmzPZBg"/>
+<img class="w-20 h-20 object-cover rounded-lg border border-surface-variant cursor-pointer opacity-70 hover:opacity-100" data-alt="Side profile of the modern smart speaker, showcasing its sleek curved silhouette against a minimalist soft background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAlf0PPFCUjFmC4wwwwOR9OOvVvS0PndkaA1hkaaWop5mdJ04X72tzBI90Yt8Tfw6ci8CW_HSUm8r34DWD-8ft7puXhAXQI3MHlCVWHe80VgI_-UC9wADHXb_2TVzO-v9-AD5Bl2nxRK-NhQdfaL19MdYOsQRqMzXkZh09sU1HZpWIjRZpuvou-Xn9KC0mgYo1xbOYdDlUvSMQNxz7zUT9FleJWtVHbcoiregTwk6fdSbz49AOzQzrgpg"/>
+<img class="w-20 h-20 object-cover rounded-lg border border-surface-variant cursor-pointer opacity-70 hover:opacity-100" data-alt="The smart speaker placed on a modern wooden bedside table with a small potted plant, warm morning light filling the room." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAEOaMFPQspoYVKu2io54l87vjX-ALGhOQi4wSJWN6UQPqy-IsHYfMUH_xGtic7Lqt-1HmeSmKE-asT_YWqHlVAPgayfgi3q3F1IL-48fu5o-U9nQMHXK0zn3oeTF7I8x3LSIui2fygZXPjWws5GbeM3fnOXMgULWdumCjgCqApQn28uP2D4RT2j1fjDKb-EaNcHk1dfX9OpmlPDKl8ZeKAjQDjd3XWEFsimz9gw9Wunb1J3og38egyVg"/>
+</div>
+</div>
+<!-- Product Details -->
+<div class="flex flex-col justify-center">
+<div class="mb-4">
+<span class="bg-secondary-fixed text-on-secondary-fixed px-3 py-1 rounded-full font-label-bold text-label-bold uppercase tracking-wide inline-block mb-3">Best Seller</span>
+<h1 class="font-display-lg-mobile md:font-display-lg text-on-surface mb-2">Aura Smart Speaker Pro</h1>
+<p class="font-headline-md text-primary font-bold">$249.99</p>
+</div>
+<p class="font-body-lg text-on-surface-variant mb-8 leading-relaxed">
+                    Immerse yourself in crystal-clear sound with the Aura Pro. Designed with soft, organic curves to fit seamlessly into any modern home. Features intelligent voice control and seamless multi-room syncing.
+                </p>
+<div class="mb-8">
+<p class="font-label-bold text-on-surface mb-3 uppercase tracking-wider">Color: <span class="font-normal text-on-surface-variant">Soft Coral</span></p>
+<div class="flex gap-3">
+<button class="w-10 h-10 rounded-full bg-primary-container border-2 border-white ring-2 ring-primary transition-transform hover:scale-110"></button>
+<button class="w-10 h-10 rounded-full bg-surface-dim border-2 border-white hover:ring-2 hover:ring-surface-variant transition-transform hover:scale-110"></button>
+<button class="w-10 h-10 rounded-full bg-secondary border-2 border-white hover:ring-2 hover:ring-secondary transition-transform hover:scale-110"></button>
+</div>
+</div>
+<div class="flex items-center gap-4 relative">
+<div class="flex items-center border border-surface-variant rounded-full bg-white h-14 w-32">
+<button class="px-4 py-2 text-on-surface hover:text-primary transition-colors">-</button>
+<input class="w-full text-center border-none bg-transparent font-label-bold focus:ring-0" readonly="" type="text" value="1"/>
+<button class="px-4 py-2 text-on-surface hover:text-primary transition-colors">+</button>
+</div>
+<button class="gradient-btn text-white rounded-full px-8 py-4 h-14 flex-grow font-label-bold text-label-bold flex items-center justify-center gap-2 relative overflow-hidden" id="addToCartBtn">
+<span class="material-symbols-outlined">add_shopping_cart</span>
+                        Add to Cart
+                        <div class="absolute inset-0 pointer-events-none hidden" id="sparkleContainer"></div>
+</button>
+</div>
+</div>
+</div>
+<!-- Features/Bento Grid -->
+<div class="mb-24">
+<h2 class="font-display-lg-mobile md:font-headline-md text-center mb-10 text-on-surface">Designed for Joy</h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="bg-surface-container-low rounded-xl p-8 shadow-[0px_4px_20px_rgba(164,60,18,0.05)] border border-surface-variant text-center hover:scale-[1.02] transition-transform duration-300">
+<div class="w-16 h-16 rounded-full bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center mx-auto mb-4">
+<span class="material-symbols-outlined text-3xl">surround_sound</span>
+</div>
+<h3 class="font-headline-md text-on-surface mb-2 text-lg">360° Audio</h3>
+<p class="font-body-md text-on-surface-variant">Room-filling sound that adapts to your environment.</p>
+</div>
+<div class="bg-surface-container-low rounded-xl p-8 shadow-[0px_4px_20px_rgba(164,60,18,0.05)] border border-surface-variant text-center hover:scale-[1.02] transition-transform duration-300">
+<div class="w-16 h-16 rounded-full bg-primary-fixed text-on-primary-fixed flex items-center justify-center mx-auto mb-4">
+<span class="material-symbols-outlined text-3xl">mic</span>
+</div>
+<h3 class="font-headline-md text-on-surface mb-2 text-lg">Smart Assistant</h3>
+<p class="font-body-md text-on-surface-variant">Voice control integrated seamlessly for hands-free use.</p>
+</div>
+<div class="bg-surface-container-low rounded-xl p-8 shadow-[0px_4px_20px_rgba(164,60,18,0.05)] border border-surface-variant text-center hover:scale-[1.02] transition-transform duration-300">
+<div class="w-16 h-16 rounded-full bg-tertiary-fixed text-on-tertiary-fixed flex items-center justify-center mx-auto mb-4">
+<span class="material-symbols-outlined text-3xl">battery_charging_full</span>
+</div>
+<h3 class="font-headline-md text-on-surface mb-2 text-lg">All-Day Battery</h3>
+<p class="font-body-md text-on-surface-variant">Up to 24 hours of continuous playback on a single charge.</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-highest dark:bg-inverse-surface rounded-t-[32px] w-full mt-gutter relative z-10">
+<div class="flex flex-col md:flex-row justify-between items-center px-margin-desktop py-gutter w-full max-w-container-max mx-auto">
+<div class="font-headline-md text-headline-md text-primary mb-4 md:mb-0">NovaCart</div>
+<div class="flex gap-6 flex-wrap justify-center">
+<a class="text-on-surface-variant hover:text-primary font-body-md text-body-md hover:underline transition-all cursor-pointer" href="#">Support</a>
+<a class="text-on-surface-variant hover:text-primary font-body-md text-body-md hover:underline transition-all cursor-pointer" href="#">Privacy Policy</a>
+<a class="text-on-surface-variant hover:text-primary font-body-md text-body-md hover:underline transition-all cursor-pointer" href="#">Sustainability</a>
+<a class="text-on-surface-variant hover:text-primary font-body-md text-body-md hover:underline transition-all cursor-pointer" href="#">Join the Community</a>
+</div>
+<div class="text-on-surface-variant font-body-md text-body-md mt-4 md:mt-0">© 2024 NovaCart. Designed for Joy.</div>
+</div>
+</footer>
+<!-- Sticky Add to Cart Bar -->
+<div class="sticky-bar fixed bottom-0 left-0 w-full bg-white border-t border-surface-variant shadow-[0px_-8px_30px_rgba(164,60,18,0.1)] z-40 px-margin-mobile md:px-margin-desktop py-4 flex justify-between items-center" id="stickyBar">
+<div class="flex items-center gap-4 hidden md:flex">
+<img class="w-12 h-12 rounded object-cover" data-alt="Small thumbnail image of the smart speaker for the sticky bottom bar." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCEH6LuYe2q_2N7OyBQtdfyRaHQYJ_inXPOvl135nXYINe-hVpA6xmuyaB0aFV9FDBb6-xnKa9PosgXb_khOiAi7sg6U3zFTpaiapspd88zVxhGbmJFo7l0PuYDsH1CeuBGAZG2Fsx9fSpulk2KmY57bQ6Kz4ZRxQrMfdfnE3T132HD9AaR6C2hbplo0zpVTRtmWU43Xu-7G7qgiuVCJhcTK25DQk8DKW9THjtPOg-3jR4C1kzqOTomyA"/>
+<div>
+<p class="font-headline-md text-sm font-bold">Aura Smart Speaker Pro</p>
+<p class="font-body-md text-primary">$249.99</p>
+</div>
+</div>
+<button class="gradient-btn text-white rounded-full px-8 py-3 w-full md:w-auto font-label-bold text-label-bold">Add to Cart</button>
+</div>
+<script>
+        // Micro-interaction: Add to cart animation
+        const btn = document.getElementById('addToCartBtn');
+        const container = document.getElementById('sparkleContainer');
+        
+        btn.addEventListener('click', (e) => {
+            container.classList.remove('hidden');
+            container.innerHTML = '';
+            
+            for(let i=0; i<8; i++) {
+                const sparkle = document.createElement('span');
+                sparkle.className = 'material-symbols-outlined absolute text-tertiary-fixed sparkle-animation';
+                sparkle.textContent = 'auto_awesome';
+                sparkle.style.left = `calc(50% + ${(Math.random() - 0.5) * 100}px)`;
+                sparkle.style.top = `calc(50% + ${(Math.random() - 0.5) * 40}px)`;
+                container.appendChild(sparkle);
+            }
+            
+            setTimeout(() => {
+                container.classList.add('hidden');
+                container.innerHTML = '';
+            }, 600);
+        });
+
+        // Sticky Bar Logic
+        const stickyBar = document.getElementById('stickyBar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 400) {
+                stickyBar.classList.add('visible');
+            } else {
+                stickyBar.classList.remove('visible');
+            }
+        });
+    </script>
+</body></html>
