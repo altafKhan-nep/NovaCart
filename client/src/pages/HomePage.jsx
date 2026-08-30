@@ -11,13 +11,13 @@ const heroImages = [
 ];
 
 const TrustBadge = ({ icon, title, desc }) => (
-  <div className="flex items-center gap-3 group">
-    <div className="w-10 h-10 rounded-xl bg-primary-container/30 flex items-center justify-center shrink-0 group-hover:bg-primary-container/50 transition-colors">
+  <div className="flex items-center gap-3 group cursor-default">
+    <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary/8 to-primary/4 flex items-center justify-center shrink-0 group-hover:from-primary/15 group-hover:to-primary/8 transition-all duration-300 shadow-sm">
       <span className="material-symbols-outlined text-primary text-xl">{icon}</span>
     </div>
     <div>
-      <p className="text-sm font-semibold text-on-surface">{title}</p>
-      <p className="text-xs text-on-surface-variant">{desc}</p>
+      <p className="text-sm font-semibold text-on-surface leading-tight">{title}</p>
+      <p className="text-xs text-on-surface-variant leading-tight">{desc}</p>
     </div>
   </div>
 );
@@ -25,15 +25,15 @@ const TrustBadge = ({ icon, title, desc }) => (
 const CategoryTile = ({ name, icon, bgClass, count, idx, onClick }) => (
   <div
     onClick={onClick}
-    className="bg-surface-container-low rounded-2xl p-6 flex flex-col items-center justify-center cursor-pointer group hover:bg-surface-container-high hover:shadow-md transition-all duration-300 animate-fade-up border border-transparent hover:border-surface-container"
+    className="bg-surface-container-low rounded-2xl p-5 flex flex-col items-center justify-center cursor-pointer group hover:bg-surface hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 animate-fade-up border border-surface-container/40 hover:border-primary/20"
     style={{ animationDelay: `${0.1 + idx * 0.05}s` }}
   >
-    <div className={`w-16 h-16 rounded-2xl ${bgClass} flex items-center justify-center mb-4 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
-      <span className="material-symbols-outlined text-3xl" style={{ fontVariationSettings: "'FILL' 1" }}>
+    <div className={`w-14 h-14 rounded-2xl ${bgClass} flex items-center justify-center mb-3 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-sm`}>
+      <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>
         {icon}
       </span>
     </div>
-    <span className="text-sm font-semibold text-on-surface mb-1">{name}</span>
+    <span className="text-sm font-semibold text-on-surface mb-0.5">{name}</span>
     <span className="text-xs text-on-surface-variant">{count} items</span>
   </div>
 );
@@ -45,8 +45,8 @@ const FlashDealCard = ({ product }) => {
 
   return (
     <Link to={`/product/${product._id}`} className="block group">
-      <div className="bg-surface-container-lowest rounded-2xl border border-surface-container/60 overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1.5 flex flex-col h-full">
-        <div className="relative aspect-[4/3] bg-gradient-to-br from-surface-container-low to-surface-container overflow-hidden flex items-center justify-center p-5">
+      <div className="bg-surface-container-lowest rounded-2xl border border-surface-container/50 overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1.5 flex flex-col h-full">
+        <div className="relative aspect-[4/3] bg-gradient-to-br from-surface-container-low to-surface-container overflow-hidden flex items-center justify-center p-6">
           <img
             src={product.images?.[0]}
             alt={product.name}
@@ -54,12 +54,12 @@ const FlashDealCard = ({ product }) => {
             loading="lazy"
           />
           {discount > 0 && (
-            <span className="absolute top-3 left-3 bg-error text-on-error text-xs font-bold px-3 py-1.5 rounded-lg shadow-sm">
+            <span className="absolute top-3 left-3 bg-gradient-to-r from-error to-error/90 text-on-error text-xs font-bold px-3 py-1.5 rounded-lg shadow-sm">
               -{discount}% OFF
             </span>
           )}
-          <div className="absolute top-3 right-3">
-            <span className="material-symbols-outlined text-error text-xl animate-pulse">bolt</span>
+          <div className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center shadow-sm">
+            <span className="material-symbols-outlined text-primary text-lg">favorite_border</span>
           </div>
         </div>
         <div className="p-5 flex flex-col flex-1">
@@ -70,8 +70,8 @@ const FlashDealCard = ({ product }) => {
               <span className="text-sm text-on-surface-variant line-through">${product.originalPrice.toFixed(2)}</span>
             )}
           </div>
-          <button className="w-full bg-gradient-to-r from-secondary-container to-secondary-container/80 text-on-secondary-container font-semibold py-3 rounded-xl text-sm hover:from-secondary hover:to-secondary transition-all mt-auto shadow-sm hover:shadow-md">
-            Grab Deal
+          <button className="w-full bg-gradient-to-r from-primary to-primary/90 text-on-primary font-semibold py-3 rounded-xl text-sm hover:from-primary/90 hover:to-primary hover:shadow-md transition-all mt-auto">
+            Add to Cart
           </button>
         </div>
       </div>
@@ -106,10 +106,10 @@ const CountdownTimer = () => {
         { val: time.s, label: 'S' },
       ].map((item, i) => (
         <div key={i} className="flex items-center gap-1.5">
-          <span className="bg-white/25 backdrop-blur-sm text-white font-mono font-bold text-sm px-2 py-1 rounded-md min-w-[36px] text-center">
+          <span className="bg-white/20 backdrop-blur-sm text-white font-mono font-bold text-sm px-2.5 py-1.5 rounded-lg min-w-[38px] text-center shadow-sm">
             {pad(item.val)}
           </span>
-          {i < 2 && <span className="text-white/70 font-bold text-xs">:</span>}
+          {i < 2 && <span className="text-white/60 font-bold text-xs">:</span>}
         </div>
       ))}
     </div>
@@ -137,45 +137,54 @@ const HomePage = () => {
   }, []);
 
   const categoryTiles = [
-    { name: 'Electronics', icon: 'devices', bg: 'bg-secondary-fixed', count: 6 },
-    { name: 'Fashion', icon: 'apparel', bg: 'bg-primary-fixed', count: 2 },
-    { name: 'Home Decor', icon: 'deck', bg: 'bg-tertiary-fixed', count: 4 },
-    { name: 'Toys', icon: 'toys', bg: 'bg-error-container', count: 2 },
+    { name: 'Electronics', icon: 'devices', bg: 'bg-gradient-to-br from-blue-50 to-blue-100 text-blue-600', count: 6 },
+    { name: 'Fashion', icon: 'apparel', bg: 'bg-gradient-to-br from-rose-50 to-rose-100 text-rose-600', count: 2 },
+    { name: 'Home Decor', icon: 'deck', bg: 'bg-gradient-to-br from-amber-50 to-amber-100 text-amber-600', count: 4 },
+    { name: 'Toys', icon: 'toys', bg: 'bg-gradient-to-br from-violet-50 to-violet-100 text-violet-600', count: 2 },
   ];
 
   const goCategory = (name) => navigate(`/shop/${encodeURIComponent(name)}`);
 
   return (
-    <main className="flex-grow flex flex-col lg:flex-row w-full px-3 md:px-6 lg:px-8 pr-4 md:pr-margin-desktop py-6 gap-4 lg:gap-6">
+    <main className="flex-grow flex flex-col lg:flex-row w-full max-w-[1400px] mx-auto px-4 md:px-6 lg:px-10 py-6 gap-6 lg:gap-8">
       <CategorySidebar categories={categories} activeCategory="" />
 
-      <div className="flex-1 w-full min-w-0 space-y-12">
+      <div className="flex-1 w-full min-w-0 space-y-10">
         {/* ═══════════════ HERO ═══════════════ */}
         <section
           className="relative rounded-3xl overflow-hidden animate-fade-up"
-          style={{ background: 'linear-gradient(135deg, #fbf9f5 0%, #fff5f0 50%, #f0fffe 100%)' }}
+          style={{ background: 'linear-gradient(135deg, #fbf9f5 0%, #fff5f0 40%, #f0fffe 100%)' }}
         >
-          {/* Decorative blobs */}
-          <div className="absolute -top-20 -right-20 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
-          <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-secondary/5 rounded-full blur-3xl" />
+          {/* Decorative elements */}
+          <div className="absolute -top-24 -right-24 w-80 h-80 bg-primary/5 rounded-full blur-3xl" />
+          <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-secondary/5 rounded-full blur-3xl" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-tertiary/3 rounded-full blur-3xl" />
 
-          <div className="relative z-10 p-8 md:p-12 lg:p-16 flex flex-col md:flex-row items-center gap-8 min-h-[380px] lg:min-h-[420px]">
-            {/* Text */}
+          <div className="relative z-10 p-8 md:p-12 lg:p-16 flex flex-col md:flex-row items-center gap-10 min-h-[400px] lg:min-h-[440px]">
+            {/* Text Content */}
             <div className="flex-1 max-w-lg">
-              <span className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-tertiary-fixed text-on-tertiary-fixed-variant text-xs font-bold rounded-full mb-5">
-                <span className="material-symbols-outlined text-sm">local_offer</span>
-                Summer Sale — Up to 50% Off
-              </span>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-on-surface mb-4 leading-[1.1] tracking-tight">
-                Discover Joy<br />in Every Box.
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-tertiary-fixed to-tertiary-fixed/80 rounded-full mb-6 shadow-sm">
+                <span className="material-symbols-outlined text-on-tertiary-fixed-variant text-sm">local_offer</span>
+                <span className="text-on-tertiary-fixed-variant text-xs font-bold uppercase tracking-wider">
+                  Summer Sale — Up to 50% Off
+                </span>
+              </div>
+
+              <h1 className="text-4xl md:text-5xl lg:text-[56px] font-bold text-on-surface mb-5 leading-[1.08] tracking-tight">
+                Discover Joy<br />
+                <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+                  in Every Box.
+                </span>
               </h1>
+
               <p className="text-on-surface-variant mb-8 leading-relaxed text-base md:text-lg max-w-md">
                 Vibrant fashion, quirky electronics, and delightful home finds — curated to brighten your day.
               </p>
+
               <div className="flex flex-wrap items-center gap-3">
                 <Link
                   to="/shop"
-                  className="bg-primary text-on-primary font-semibold px-8 py-3.5 rounded-full inline-flex items-center gap-2 group text-sm hover:bg-primary/90 hover:shadow-lg transition-all duration-300"
+                  className="bg-primary text-on-primary font-semibold px-8 py-4 rounded-full inline-flex items-center gap-2 group text-sm hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/20 transition-all duration-300"
                 >
                   Shop Now
                   <span className="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">
@@ -184,7 +193,7 @@ const HomePage = () => {
                 </Link>
                 <Link
                   to="/shop?flash=true"
-                  className="bg-surface-container-lowest border border-surface-container text-on-surface font-semibold px-6 py-3.5 rounded-full inline-flex items-center gap-2 text-sm hover:bg-surface-container-low hover:border-primary/30 transition-all duration-300"
+                  className="bg-surface-container-lowest border border-surface-container text-on-surface font-semibold px-6 py-4 rounded-full inline-flex items-center gap-2 text-sm hover:bg-surface-container-low hover:border-primary/30 hover:shadow-md transition-all duration-300"
                 >
                   <span className="material-symbols-outlined text-lg text-primary">bolt</span>
                   Flash Deals
@@ -192,8 +201,8 @@ const HomePage = () => {
               </div>
             </div>
 
-            {/* Hero image carousel */}
-            <div className="hidden md:flex w-1/2 h-[300px] lg:h-[340px] relative items-center justify-center">
+            {/* Hero Image Carousel */}
+            <div className="hidden md:flex w-1/2 h-[320px] lg:h-[360px] relative items-center justify-center">
               {heroImages.map((img, i) => (
                 <img
                   key={img}
@@ -204,6 +213,17 @@ const HomePage = () => {
                   }`}
                 />
               ))}
+              {/* Carousel dots */}
+              <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                {heroImages.map((_, i) => (
+                  <div
+                    key={i}
+                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                      i === heroIdx ? 'bg-primary w-6' : 'bg-outline-variant/40'
+                    }`}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         </section>
@@ -227,9 +247,9 @@ const HomePage = () => {
               <h2 className="text-2xl font-bold text-on-surface mb-1">Browse Categories</h2>
               <p className="text-sm text-on-surface-variant">Explore our curated collections</p>
             </div>
-            <Link to="/shop" className="text-sm font-semibold text-primary hover:text-primary/80 flex items-center gap-1 transition-colors">
+            <Link to="/shop" className="text-sm font-semibold text-primary hover:text-primary/80 flex items-center gap-1 transition-colors group">
               View All
-              <span className="material-symbols-outlined text-sm">arrow_forward</span>
+              <span className="material-symbols-outlined text-sm group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
             </Link>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -246,7 +266,7 @@ const HomePage = () => {
               style={{ background: 'linear-gradient(135deg, #a43c12 0%, #ff7f50 100%)' }}
             >
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm">
                   <span className="material-symbols-outlined text-white text-xl">bolt</span>
                 </div>
                 <div>
@@ -274,9 +294,9 @@ const HomePage = () => {
               <h2 className="text-2xl font-bold text-on-surface mb-1">Featured Products</h2>
               <p className="text-sm text-on-surface-variant">Hand-picked for you</p>
             </div>
-            <Link to="/shop" className="text-sm font-semibold text-primary hover:text-primary/80 flex items-center gap-1 transition-colors">
+            <Link to="/shop" className="text-sm font-semibold text-primary hover:text-primary/80 flex items-center gap-1 transition-colors group">
               View All
-              <span className="material-symbols-outlined text-sm">arrow_forward</span>
+              <span className="material-symbols-outlined text-sm group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
             </Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -303,9 +323,9 @@ const HomePage = () => {
               <input
                 type="email"
                 placeholder="Enter your email"
-                className="flex-1 md:w-64 bg-white/20 backdrop-blur-sm text-white placeholder-white/60 rounded-xl px-5 py-3.5 text-sm border border-white/30 outline-none focus:border-white transition-colors"
+                className="flex-1 md:w-64 bg-white/20 backdrop-blur-sm text-white placeholder-white/60 rounded-full px-5 py-3.5 text-sm border border-white/30 outline-none focus:border-white transition-colors"
               />
-              <button className="bg-white text-on-secondary-container font-semibold px-6 py-3.5 rounded-xl text-sm hover:bg-white/90 hover:shadow-lg transition-all shrink-0">
+              <button className="bg-white text-on-secondary-container font-semibold px-6 py-3.5 rounded-full text-sm hover:bg-white/90 hover:shadow-lg transition-all shrink-0">
                 Subscribe
               </button>
             </div>
@@ -315,14 +335,14 @@ const HomePage = () => {
         {/* ═══════════════ WHY CHOOSE US ═══════════════ */}
         <section>
           <h2 className="text-2xl font-bold text-on-surface mb-6 text-center">Why Choose NovaCart?</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {[
               { icon: 'inventory_2', title: 'Curated Selection', desc: 'Every product is hand-selected for quality, design, and joy factor.' },
               { icon: 'local_shipping', title: 'Fast & Free Shipping', desc: 'Free shipping on orders over $50. Express options available.' },
               { icon: 'handshake', title: 'Trusted by Thousands', desc: 'Over 10,000 happy customers and counting. 5-star rated service.' },
             ].map((item) => (
-              <div key={item.title} className="bg-surface-container-low rounded-2xl p-6 text-center hover:bg-surface-container-high transition-colors border border-transparent hover:border-surface-container">
-                <div className="w-14 h-14 rounded-2xl bg-primary-container/30 flex items-center justify-center mx-auto mb-4">
+              <div key={item.title} className="bg-surface-container-low rounded-2xl p-6 text-center hover:bg-surface hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 border border-surface-container/40 hover:border-primary/15 group cursor-default">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 shadow-sm">
                   <span className="material-symbols-outlined text-primary text-2xl">{item.icon}</span>
                 </div>
                 <h3 className="text-base font-bold text-on-surface mb-2">{item.title}</h3>
