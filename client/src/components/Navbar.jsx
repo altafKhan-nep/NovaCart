@@ -4,11 +4,11 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 
 const TopBar = () => {
-  const [visible, setVisible] = useState(() => !localStorage.getItem('novacart_topbar_dismissed'));
+  const [visible, setVisible] = useState(() => !localStorage.getItem('novacart_banner_dismissed'));
 
   const dismiss = () => {
     setVisible(false);
-    localStorage.setItem('novacart_topbar_dismissed', '1');
+    localStorage.setItem('novacart_banner_dismissed', '1');
   };
 
   if (!visible) return null;
