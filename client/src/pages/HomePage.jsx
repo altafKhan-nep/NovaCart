@@ -232,7 +232,7 @@ const HeroSection = () => {
               key={i}
               src={s.image}
               alt={s.tag}
-              className={`absolute w-[75%] h-[75%] object-contain drop-shadow-2xl transition-all duration-600 ease-out ${
+              className={`absolute w-[75%] h-[75%] object-contain drop-shadow-2xl rounded-3xl transition-all duration-600 ease-out ${
                 i === heroIdx
                   ? 'opacity-100 scale-100'
                   : 'opacity-0 scale-95'
