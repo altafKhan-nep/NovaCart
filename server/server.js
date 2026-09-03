@@ -67,6 +67,8 @@ const allowedOrigins = [
   'http://localhost:5174',
   'http://127.0.0.1:5173',
   'http://127.0.0.1:5174',
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
   process.env.FRONTEND_URL,
 ].filter(Boolean);
 app.use(
@@ -128,7 +130,7 @@ const authLimiter = rateLimit({
 });
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 10,
+  max: parseInt(process.env.LOGIN_RATE_LIMIT_MAX, 10) || 10,
   standardHeaders: true,
   legacyHeaders: false,
   message: { message: 'Too many login attempts from this IP, please try again after 15 minutes.' },
@@ -161,6 +163,10 @@ app.use((err, req, res, next) => {
 });
 
 // --- Routes ---
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', uptime: process.uptime(), timestamp: Date.now() });
+});
+
 app.get('/', (req, res) => {
   res.send('NovaCart API is running...');
 });
