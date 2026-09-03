@@ -254,11 +254,14 @@ const AdminAnalytics = () => {
     fetchData();
   }, [fetchData]);
 
-  const monthlyRevenue = analytics?.monthlyRevenue || stats?.monthlySales || [];
-  const orderStatusCounts = analytics?.orderStatusCounts || stats?.statusCounts || {};
+  const monthlyRevenue = analytics?.revenueByMonth || stats?.monthlySales || [];
+  const orderStatusRaw = analytics?.ordersByStatus || stats?.statusCounts || {};
+  const orderStatusCounts = Array.isArray(orderStatusRaw)
+    ? orderStatusRaw.reduce((acc, item) => { acc[item._id || item.status] = item.count; return acc; }, {})
+    : orderStatusRaw;
   const topCategories = analytics?.topCategories || [];
   const topProducts = analytics?.topProducts || [];
-  const monthlyUsers = analytics?.monthlyUsers || [];
+  const monthlyUsers = analytics?.customerGrowth || [];
 
   const filteredRevenue = monthlyRevenue.filter((m) => {
     const date = m.date || m.month;
@@ -281,7 +284,21 @@ const AdminAnalytics = () => {
     return true;
   });
 
-  const totalRevenue = filteredRevenue.reduce((sum, m) => sum + (m.total || m.revenue || m.sales || 0), 0);
+  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+  const chartRevenueData = filteredRevenue.map(m => ({
+    ...m,
+    total: m.revenue || m.total || m.sales || 0,
+    month: m._id?.month ? monthNames[m._id.month - 1] : m.month || m.label || m.name,
+  }));
+
+  const chartCustomerData = monthlyUsers.map(u => ({
+    ...u,
+    count: u.count || 0,
+    month: u._id?.month ? monthNames[u._id.month - 1] : u.month || u.label || u.name,
+  }));
+
+  const totalRevenue = filteredRevenue.reduce((sum, m) => sum + (m.revenue || m.total || m.sales || 0), 0);
   const avgOrderValue = stats?.totalOrders > 0 ? totalRevenue / stats.totalOrders : 0;
   const conversionRate = stats?.conversionRate || 0;
   const repeatRate = stats?.repeatCustomerRate || 0;
@@ -378,7 +395,7 @@ const AdminAnalytics = () => {
         {/* Charts Row 1: Revenue + Orders by Status */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <BarChart
-            data={filteredRevenue}
+            data={chartRevenueData}
             label="Monthly Revenue"
             valueKey="total"
             labelKey="month"
@@ -428,7 +445,7 @@ const AdminAnalytics = () => {
 
           {/* Customer Growth */}
           <BarChart
-            data={monthlyUsers}
+            data={chartCustomerData}
             label="New Customers"
             valueKey="count"
             labelKey="month"

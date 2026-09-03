@@ -252,22 +252,20 @@ const AdminDashboard = () => {
             label="Total Sales"
             value={`$${(stats?.totalSales || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
             icon="payments"
-            change={stats?.salesChange}
-            changeUp={stats?.salesChange >= 0}
+            change={stats?.revenue?.percentageChange}
+            changeUp={(stats?.revenue?.percentageChange || 0) >= 0}
           />
           <StatCard
             label="Total Orders"
             value={(stats?.totalOrders || 0).toLocaleString()}
             icon="shopping_cart"
-            change={stats?.ordersChange}
-            changeUp={stats?.ordersChange >= 0}
+            change={stats?.orders?.percentageChange}
+            changeUp={(stats?.orders?.percentageChange || 0) >= 0}
           />
           <StatCard
             label="Total Customers"
-            value={(stats?.totalUsers || 0).toLocaleString()}
+            value={(stats?.totalCustomers || 0).toLocaleString()}
             icon="people"
-            change={stats?.usersChange}
-            changeUp={stats?.usersChange >= 0}
           />
           <StatCard
             label="Total Products"
@@ -289,7 +287,9 @@ const AdminDashboard = () => {
                 {monthlySales.slice(-6).map((month, i) => {
                   const value = month.total || month.sales || 0;
                   const height = Math.max((value / maxSales) * 100, 4);
-                  const label = month.month || month.label || month.name || `M${i + 1}`;
+                  const monthNum = month._id?.month || month.month;
+                  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                  const label = monthNum ? monthNames[monthNum - 1] : month.label || month.name || `M${i + 1}`;
                   return (
                     <div key={i} className="flex flex-col items-center gap-2 flex-1 min-w-0 group">
                       <span className="text-[10px] font-bold text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity">

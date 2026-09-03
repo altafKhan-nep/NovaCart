@@ -70,11 +70,12 @@ export const AuthProvider = ({ children }) => {
   }, [user]);
 
   const isAdminRole = user?.role && user.role !== 'customer';
+  const isAdmin = user?.isAdmin || (user?.role && user.role !== 'customer');
 
   return (
     <AuthContext.Provider value={{
       user, loading, login, register, logout, refreshProfile, toggleWishlist,
-      isAdmin: user?.isAdmin,
+      isAdmin,
       role: user?.role,
       permissions: user?.permissions || [],
       hasPermission,

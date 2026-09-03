@@ -16,7 +16,9 @@ const ProtectedRoute = ({ children, requireAdmin = false, requirePermission, req
     return <Navigate to="/login" replace />;
   }
 
-  if (requireAdmin && !isAdmin) {
+  const isAdminUser = role === 'super_admin' || role === 'admin' || role === 'content_manager' || role === 'order_manager';
+
+  if (requireAdmin && !isAdminUser) {
     return <Navigate to="/" replace />;
   }
 

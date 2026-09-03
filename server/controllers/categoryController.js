@@ -185,14 +185,15 @@ const deleteCategory = asyncHandler(async (req, res) => {
 // @route   PUT /api/categories/reorder
 // @access  Private/Admin
 const reorderCategories = asyncHandler(async (req, res) => {
-  const { orderedIds } = req.body;
+  const { orderedIds, items } = req.body;
+  const ids = orderedIds || (Array.isArray(items) ? items.map(i => i.id || i._id) : []);
 
-  if (!Array.isArray(orderedIds) || orderedIds.length === 0) {
+  if (!Array.isArray(ids) || ids.length === 0) {
     res.status(400);
-    throw new Error('orderedIds array is required');
+    throw new Error('orderedIds array or items array is required');
   }
 
-  const bulkOps = orderedIds.map((id, index) => ({
+  const bulkOps = ids.map((id, index) => ({
     updateOne: {
       filter: { _id: id },
       update: { $set: { order: index } },

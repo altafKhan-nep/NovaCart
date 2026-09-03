@@ -198,7 +198,9 @@ export const api = {
 
   // Banners
   getBanners: async () => {
-    const res = await fetch(`${API_URL}/banners`);
+    const res = await fetch(`${API_URL}/banners`, {
+      headers: getHeaders(true),
+    });
     return handleResponse(res);
   },
   getActiveBanners: async (position) => {
