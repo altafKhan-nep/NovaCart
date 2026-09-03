@@ -95,8 +95,18 @@ CMD ["nginx", "-g", "daemon off;"]
 
 ```nginx
 # SPA routing — all routes fallback to index.html
+# index.html has no-cache headers so browser always fetches latest version
 location / {
     try_files $uri $uri/ /index.html;
+    add_header Cache-Control "no-cache, no-store, must-revalidate";
+    add_header Pragma "no-cache";
+    add_header Expires "0";
+}
+
+# Static assets (hashed filenames) — cache for 1 year
+location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+    expires 1y;
+    add_header Cache-Control "public, immutable";
 }
 
 # API proxy — forwards /api/* to the server container
@@ -108,11 +118,12 @@ location /api {
 # Gzip compression
 gzip on;
 gzip_types text/plain text/css application/json ...;
-
-# Cache static assets for 1 year
-expires 1y;
-add_header Cache-Control "public, immutable";
 ```
+
+**Cache strategy:**
+- `index.html` → `no-cache, no-store` (browser always fetches latest)
+- JS/CSS assets with hashed filenames → `immutable` (cached 1 year, filename changes when content changes)
+- This prevents the old bug where stale `index.html` was served from browser cache
 
 ### Docker Compose Structure
 
