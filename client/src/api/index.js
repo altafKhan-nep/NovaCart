@@ -20,7 +20,9 @@ const handleResponse = async (res) => {
     data = { message: text || 'Something went wrong' };
   }
   if (!res.ok) {
-    throw new Error(data.message || `Request failed with status ${res.status}`);
+    const err = new Error(data.message || `Request failed with status ${res.status}`);
+    err.status = res.status;
+    throw err;
   }
   return data;
 };

@@ -3,29 +3,51 @@ import { api } from '../api';
 
 const AuthContext = createContext();
 
+const CACHED_USER_KEY = 'novacart_user';
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem('novacart_token');
-    if (token) {
-      api.getProfile()
-        .then((profile) => { setUser({ ...profile, token }); })
-        .catch(() => {
-          localStorage.removeItem('novacart_token');
-          localStorage.removeItem('novacart_user');
-        })
-        .finally(() => setLoading(false));
-    } else {
+    if (!token) {
       setLoading(false);
+      return;
     }
+
+    const cached = localStorage.getItem(CACHED_USER_KEY);
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        if (parsed.token === token && parsed.role) {
+          setUser({ ...parsed, token });
+        }
+      } catch {}
+    }
+
+    api.getProfile()
+      .then((profile) => {
+        const merged = { ...profile, token };
+        setUser(merged);
+        localStorage.setItem(CACHED_USER_KEY, JSON.stringify(merged));
+      })
+      .catch((err) => {
+        const isAuth = err?.status === 401 || err?.status === 403 || 
+          (err?.message && (err.message.includes('Not authorized') || err.message.includes('token failed')));
+        if (isAuth) {
+          localStorage.removeItem('novacart_token');
+          localStorage.removeItem(CACHED_USER_KEY);
+          setUser(null);
+        }
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   const login = async (email, password) => {
     const data = await api.login(email, password);
     localStorage.setItem('novacart_token', data.token);
-    localStorage.setItem('novacart_user', JSON.stringify(data));
+    localStorage.setItem(CACHED_USER_KEY, JSON.stringify(data));
     setUser({ ...data, token: data.token });
     return data;
   };
@@ -33,7 +55,7 @@ export const AuthProvider = ({ children }) => {
   const register = async (name, email, password) => {
     const data = await api.register(name, email, password);
     localStorage.setItem('novacart_token', data.token);
-    localStorage.setItem('novacart_user', JSON.stringify(data));
+    localStorage.setItem(CACHED_USER_KEY, JSON.stringify(data));
     const profile = await api.getProfile();
     setUser({ ...profile, token: data.token });
     return data;
@@ -41,13 +63,17 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem('novacart_token');
-    localStorage.removeItem('novacart_user');
+    localStorage.removeItem(CACHED_USER_KEY);
     setUser(null);
   };
 
   const refreshProfile = async () => {
     const profile = await api.getProfile();
-    setUser((prev) => ({ ...prev, ...profile }));
+    setUser((prev) => {
+      const merged = { ...prev, ...profile };
+      localStorage.setItem(CACHED_USER_KEY, JSON.stringify(merged));
+      return merged;
+    });
     return profile;
   };
 
