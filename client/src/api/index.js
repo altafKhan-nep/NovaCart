@@ -322,6 +322,10 @@ export const api = {
     });
     return handleResponse(res);
   },
+  getActivePromotions: async () => {
+    const res = await fetch(`${API_URL}/promotions/active`);
+    return handleResponse(res);
+  },
   createPromotion: async (data) => {
     const res = await fetch(`${API_URL}/promotions`, {
       method: 'POST',
@@ -345,11 +349,11 @@ export const api = {
     });
     return handleResponse(res);
   },
-  validatePromotion: async (code) => {
+  validatePromotion: async (code, cartTotal) => {
     const res = await fetch(`${API_URL}/promotions/validate`, {
       method: 'POST',
-      headers: getHeaders(true),
-      body: JSON.stringify({ code }),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code, cartTotal }),
     });
     return handleResponse(res);
   },

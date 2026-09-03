@@ -169,6 +169,26 @@ const deletePromotion = asyncHandler(async (req, res) => {
   res.json({ message: 'Promotion deleted successfully' });
 });
 
+// @desc    Get active promotions
+// @route   GET /api/promotions/active
+// @access  Public
+const getActivePromotions = asyncHandler(async (req, res) => {
+  const now = new Date();
+  const promotions = await Promotion.find({
+    isActive: true,
+    $or: [
+      { startDate: { $lte: now } },
+      { startDate: null },
+    ],
+    $or: [
+      { endDate: { $gte: now } },
+      { endDate: null },
+    ],
+  }).sort({ createdAt: -1 });
+
+  res.json(promotions);
+});
+
 // @desc    Validate a promotion code
 // @route   POST /api/promotions/validate
 // @access  Public
@@ -245,4 +265,5 @@ module.exports = {
   updatePromotion,
   deletePromotion,
   validatePromotion,
+  getActivePromotions,
 };
