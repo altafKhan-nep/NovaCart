@@ -9,7 +9,7 @@ const INITIAL_FORM = {
   icon: '',
   image: '',
   parent: '',
-  status: 'active',
+  isActive: true,
 };
 
 const slugify = (text) =>
@@ -115,7 +115,7 @@ const CategoryFormModal = ({ open, category, categories, onSave, onClose }) => {
         icon: category.icon || '',
         image: category.image || '',
         parent: category.parent?._id || category.parent || '',
-        status: category.status || 'active',
+        isActive: category.isActive !== false,
       });
     } else {
       setForm(INITIAL_FORM);
@@ -309,13 +309,14 @@ const CategoryFormModal = ({ open, category, categories, onSave, onClose }) => {
               Status
             </label>
             <select
-              value={form.status}
-              onChange={(e) => handleChange('status', e.target.value)}
-              className={inputClass('status')}
-            >
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-            </select>
+              value={form.isActive}
+              onChange={(e) => handleChange('isActive', e.target.checked)}
+              className="sr-only peer"
+            />
+            <div className="w-9 h-5 bg-surface-container-high rounded-full peer peer-checked:bg-primary transition-colors after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full" />
+            <span className="text-sm font-semibold text-on-surface">
+              {form.isActive ? 'Active' : 'Inactive'}
+            </span>
           </div>
 
           <div className="border-t border-surface-container/60 pt-5 flex items-center justify-end gap-3">
@@ -622,12 +623,12 @@ const AdminCategories = () => {
 
           <span
             className={`inline-block text-xs font-bold px-2.5 py-1 rounded-full capitalize ${
-              cat.status === 'active' || !cat.status
+              cat.isActive !== false
                 ? 'bg-emerald-100 text-emerald-800'
                 : 'bg-gray-100 text-gray-700'
             }`}
           >
-            {cat.status || 'active'}
+            {cat.isActive !== false ? 'active' : 'inactive'}
           </span>
 
           <div className="flex items-center gap-1 shrink-0">

@@ -1,9 +1,0 @@
-FROM node:20-alpine
-
-WORKDIR /app
-
-RUN npm install -g node-fetch@2
-
-COPY tests/e2e-docker.test.js ./
-
-CMD ["node", "e2e-docker.test.js"]

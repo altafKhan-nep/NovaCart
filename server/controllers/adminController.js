@@ -424,6 +424,40 @@ const getAnalytics = asyncHandler(async (req, res) => {
     { $limit: 10 },
   ]);
 
+  const topProducts = await Order.aggregate([
+    {
+      $unwind: '$orderItems',
+    },
+    {
+      $group: {
+        _id: '$orderItems.product',
+        unitsSold: { $sum: '$orderItems.qty' },
+        revenue: { $sum: { $multiply: ['$orderItems.price', '$orderItems.qty'] } },
+      },
+    },
+    { $sort: { revenue: -1 } },
+    { $limit: 10 },
+    {
+      $lookup: {
+        from: 'products',
+        localField: '_id',
+        foreignField: '_id',
+        as: 'product',
+      },
+    },
+    { $unwind: '$product' },
+    {
+      $project: {
+        _id: '$product._id',
+        name: '$product.name',
+        images: '$product.images',
+        price: '$product.price',
+        unitsSold: 1,
+        revenue: 1,
+      },
+    },
+  ]);
+
   const customerGrowth = await User.aggregate([
     {
       $match: {
@@ -448,6 +482,7 @@ const getAnalytics = asyncHandler(async (req, res) => {
     revenueByMonth,
     ordersByStatus,
     topCategories,
+    topProducts,
     customerGrowth,
   });
 });

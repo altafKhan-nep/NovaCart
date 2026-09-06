@@ -66,7 +66,27 @@ const Navbar = () => {
   const [query, setQuery] = useState('');
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [banners, setBanners] = useState([]);
+  const [activeBanner, setActiveBanner] = useState(null);
+  const [bannerIdx, setBannerIdx] = useState(0);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    api.getActiveBanners('hero').then((data) => {
+      if (Array.isArray(data) && data.length > 0) {
+        setBanners(data);
+        setActiveBanner(data[0]);
+      }
+    }).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (banners.length <= 1) return;
+    const timer = setInterval(() => {
+      setBannerIdx((prev) => (prev + 1) % banners.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [banners.length]);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
@@ -109,6 +129,23 @@ const Navbar = () => {
   return (
     <>
       <TopBar />
+
+{activeBanner && (
+        <div className="relative overflow-hidden bg-gradient-to-r from-primary to-primary/80">
+          <div className="max-w-[1400px] mx-auto px-4 md:px-6 lg:px-10 py-3 flex items-center gap-4">
+            {activeBanner.image && (
+              <img src={activeBanner.image} alt={activeBanner.title} className="w-12 h-12 rounded-lg object-cover shrink-0" />
+            )}
+            <div className="flex-1">
+              <p className="text-white text-sm font-bold">{activeBanner.title}</p>
+              <p className="text-white/80 text-xs">{activeBanner.subtitle}</p>
+            </div>
+            <a href={activeBanner.link || '/shop'} className="bg-white text-primary font-semibold px-4 py-2 rounded-lg text-xs hover:bg-white/90 transition-colors shrink-0">
+              {activeBanner.ctaText || 'Shop Now'}
+            </a>
+          </div>
+        </div>
+      )}
 
       <header
         className={`sticky top-0 z-50 w-full transition-all duration-300 ${

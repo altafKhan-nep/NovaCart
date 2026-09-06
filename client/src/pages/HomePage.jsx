@@ -1,32 +1,8 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../api';
 import CategorySidebar from '../components/CategorySidebar';
 import ProductCard from '../components/ProductCard';
-
-const heroSlides = [
-  {
-    image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=700',
-    tag: 'Summer Sale — Up to 50% Off',
-    title: 'Discover Joy',
-    highlight: 'in Every Box.',
-    desc: 'Vibrant fashion, quirky electronics, and delightful home finds — curated to brighten your day.',
-  },
-  {
-    image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=700',
-    tag: 'New Arrivals',
-    title: 'Style Meets',
-    highlight: 'Function.',
-    desc: 'Premium watches, sleek gadgets, and modern accessories for the contemporary lifestyle.',
-  },
-  {
-    image: 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=700',
-    tag: 'Limited Edition',
-    title: 'Capture Every',
-    highlight: 'Moment.',
-    desc: 'Instant cameras, vintage lenses, and photography gear to freeze time beautifully.',
-  },
-];
 
 const TrustBadge = ({ icon, title, desc }) => (
   <div className="flex items-center gap-3 group cursor-default">
@@ -36,6 +12,24 @@ const TrustBadge = ({ icon, title, desc }) => (
     <div>
       <p className="text-sm font-semibold text-on-surface leading-tight">{title}</p>
       <p className="text-xs text-on-surface-variant leading-tight">{desc}</p>
+    </div>
+  </div>
+);
+
+const HeroSlide = ({ slide }) => (
+  <div className="relative w-full h-full">
+    <img
+      src={slide.image}
+      alt={slide.title}
+      className="w-full h-full object-cover"
+    />
+    <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/20 to-transparent" />
+    <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10">
+      <span className="inline-block px-3 py-1 bg-primary/80 text-white text-xs font-bold rounded-full mb-3">
+        {slide.ctaText || 'Shop Now'}
+      </span>
+      <h2 className="text-2xl md:text-4xl font-bold text-white mb-2">{slide.title}</h2>
+      <p className="text-white/80 text-sm md:text-base max-w-md">{slide.description || slide.subtitle}</p>
     </div>
   </div>
 );
@@ -138,133 +132,79 @@ const CountdownTimer = () => {
    HERO SECTION — Amazon/Flipkart style big carousel
    ═══════════════════════════════════════════════════════════════ */
 const HeroSection = () => {
-  const [heroIdx, setHeroIdx] = useState(0);
+  const [slides, setSlides] = useState([]);
+  const [activeIdx, setActiveIdx] = useState(0);
   const [dismissed, setDismissed] = useState(() => localStorage.getItem('novacart_banner_dismissed') === '1');
   const [isPaused, setIsPaused] = useState(false);
   const navigate = useNavigate();
 
-  const next = useCallback(() => {
-    setHeroIdx((p) => (p + 1) % heroSlides.length);
+  useEffect(() => {
+    api.getActiveBanners('hero').then((data) => {
+      if (Array.isArray(data)) setSlides(data);
+    }).catch(() => {});
   }, []);
+
+  const next = useCallback(() => {
+    setActiveIdx((p) => (p + 1) % slides.length);
+  }, [slides.length]);
 
   const prev = useCallback(() => {
-    setHeroIdx((p) => (p - 1 + heroSlides.length) % heroSlides.length);
-  }, []);
+    setActiveIdx((p) => (p - 1 + slides.length) % slides.length);
+  }, [slides.length]);
 
   useEffect(() => {
-    if (isPaused) return;
+    if (isPaused || slides.length === 0) return;
     const timer = setInterval(next, 5000);
     return () => clearInterval(timer);
-  }, [next, isPaused]);
+  }, [next, isPaused, slides.length]);
 
-  const slide = heroSlides[heroIdx];
+  if (slides.length === 0) {
+    return (
+      <section className="relative rounded-2xl overflow-hidden animate-fade-up" style={{ background: 'linear-gradient(135deg, #fbf9f5 0%, #fff5f0 40%, #f0fffe 100%)' }}>
+        <div className="relative z-10 flex flex-col md:flex-row items-center min-h-[340px] lg:min-h-[400px]">
+          <div className="flex-1 px-6 md:px-8 lg:px-12 py-8 md:py-0 max-w-lg">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-gradient-to-r from-tertiary-fixed to-tertiary-fixed/80 rounded-full mb-4 shadow-sm">
+              <span className="text-on-tertiary-fixed-variant text-xs font-bold uppercase tracking-wider">Summer Sale</span>
+            </div>
+            <h1 className="text-3xl md:text-4xl lg:text-[52px] font-bold text-on-surface mb-4 leading-[1.1] tracking-tight">
+              Discover Joy<br /><span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">in Every Box.</span>
+            </h1>
+            <p className="text-on-surface-variant mb-6 leading-relaxed text-sm md:text-base max-w-md">Vibrant fashion, quirky electronics, and delightful home finds.</p>
+            <div className="flex flex-wrap items-center gap-3">
+              <Link to="/shop" className="bg-primary text-on-primary font-semibold px-7 py-3 rounded-full inline-flex items-center gap-2 group text-sm hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/20 transition-all duration-300">Shop Now<svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg></Link>
+              <Link to="/shop?flash=true" className="bg-surface-container-lowest border border-surface-container text-on-surface font-semibold px-5 py-3 rounded-full inline-flex items-center gap-2 text-sm hover:bg-surface-container-low hover:border-primary/30 hover:shadow-md transition-all duration-300"><svg className="w-4 h-4 text-primary" fill="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>Flash Deals</Link>
+            </div>
+          </div>
+          <div className="hidden md:flex flex-1 h-[340px] lg:h-[400px] relative items-center justify-center overflow-hidden"><img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600" alt="Hero" className="w-[75%] h-[75%] object-contain drop-shadow-2xl rounded-3xl" /></div>
+        </div>
+      </section>
+    );
+  }
+
+  const slide = slides[activeIdx];
 
   return (
-    <section
-      className="relative rounded-2xl overflow-hidden animate-fade-up"
-      style={{ background: 'linear-gradient(135deg, #fbf9f5 0%, #fff5f0 40%, #f0fffe 100%)' }}
-      onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={() => setIsPaused(false)}
-    >
+    <section className="relative rounded-2xl overflow-hidden animate-fade-up" style={{ background: 'linear-gradient(135deg, #fbf9f5 0%, #fff5f0 40%, #f0fffe 100%)' }} onMouseEnter={() => setIsPaused(true)} onMouseLeave={() => setIsPaused(false)}>
       <div className="relative z-10 flex flex-col md:flex-row items-center min-h-[340px] lg:min-h-[400px]">
-        {/* Text Content — reduced left padding */}
         <div className="flex-1 px-6 md:px-8 lg:px-12 py-8 md:py-0 max-w-lg">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-gradient-to-r from-tertiary-fixed to-tertiary-fixed/80 rounded-full mb-4 shadow-sm">
-            <svg className="w-3.5 h-3.5 text-on-tertiary-fixed-variant" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-            </svg>
-            <span className="text-on-tertiary-fixed-variant text-xs font-bold uppercase tracking-wider">
-              {slide.tag}
-            </span>
+            <span className="text-on-tertiary-fixed-variant text-xs font-bold uppercase tracking-wider">{slide.title}</span>
           </div>
-
-          <h1 className="text-3xl md:text-4xl lg:text-[52px] font-bold text-on-surface mb-4 leading-[1.1] tracking-tight">
-            {slide.title}<br />
-            <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-              {slide.highlight}
-            </span>
-          </h1>
-
-          <p className="text-on-surface-variant mb-6 leading-relaxed text-sm md:text-base max-w-md">
-            {slide.desc}
-          </p>
-
+          <h1 className="text-3xl md:text-4xl lg:text-[52px] font-bold text-on-surface mb-4 leading-[1.1] tracking-tight">{slide.subtitle || slide.title}<br /><span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">{slide.ctaText || 'Shop Now'}</span></h1>
+          <p className="text-on-surface-variant mb-6 leading-relaxed text-sm md:text-base max-w-md">{slide.description || 'Vibrant fashion, quirky electronics, and delightful home finds.'}</p>
           <div className="flex flex-wrap items-center gap-3">
-            <Link
-              to="/shop"
-              className="bg-primary text-on-primary font-semibold px-7 py-3 rounded-full inline-flex items-center gap-2 group text-sm hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/20 transition-all duration-300"
-            >
-              Shop Now
-              <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
-            </Link>
-            <Link
-              to="/shop?flash=true"
-              className="bg-surface-container-lowest border border-surface-container text-on-surface font-semibold px-5 py-3 rounded-full inline-flex items-center gap-2 text-sm hover:bg-surface-container-low hover:border-primary/30 hover:shadow-md transition-all duration-300"
-            >
-              <svg className="w-4 h-4 text-primary" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
-              </svg>
-              Flash Deals
-            </Link>
+            <Link to={slide.link || '/shop'} className="bg-primary text-on-primary font-semibold px-7 py-3 rounded-full inline-flex items-center gap-2 group text-sm hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/20 transition-all duration-300">{slide.ctaText || 'Shop Now'}<svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg></Link>
+            <Link to="/shop?flash=true" className="bg-surface-container-lowest border border-surface-container text-on-surface font-semibold px-5 py-3 rounded-full inline-flex items-center gap-2 text-sm hover:bg-surface-container-low hover:border-primary/30 hover:shadow-md transition-all duration-300"><svg className="w-4 h-4 text-primary" fill="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>Flash Deals</Link>
           </div>
         </div>
-
-        {/* Hero Image — Amazon/Flipkart style BIG carousel */}
-        <div
-          className="hidden md:flex flex-1 h-[340px] lg:h-[400px] relative items-center justify-center overflow-hidden"
-        >
-          {/* Previous Arrow */}
-          <button
-            onClick={prev}
-            className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-black/10 backdrop-blur-sm flex items-center justify-center text-on-surface-variant hover:bg-black/20 hover:shadow-lg transition-all duration-200"
-            aria-label="Previous"
-          >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-
-          {/* Images */}
-          {heroSlides.map((s, i) => (
-            <img
-              key={i}
-              src={s.image}
-              alt={s.tag}
-              className={`absolute w-[75%] h-[75%] object-contain drop-shadow-2xl rounded-3xl transition-all duration-600 ease-out ${
-                i === heroIdx
-                  ? 'opacity-100 scale-100'
-                  : 'opacity-0 scale-95'
-              }`}
-            />
+        <div className="hidden md:flex flex-1 h-[340px] lg:h-[400px] relative items-center justify-center overflow-hidden">
+          {slides.map((s, i) => (
+            <img key={s._id || i} src={s.image} alt={s.title} className={`absolute w-[75%] h-[75%] object-contain drop-shadow-2xl rounded-3xl transition-all duration-600 ease-out ${i === activeIdx ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`} />
           ))}
-
-          {/* Next Arrow */}
-          <button
-            onClick={next}
-            className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-black/10 backdrop-blur-sm flex items-center justify-center text-on-surface-variant hover:bg-black/20 hover:shadow-lg transition-all duration-200"
-            aria-label="Next"
-          >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
-
-          {/* Dots */}
+          <button onClick={prev} className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-black/10 backdrop-blur-sm flex items-center justify-center text-on-surface-variant hover:bg-black/20 hover:shadow-lg transition-all duration-200" aria-label="Previous"><svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7"/></svg></button>
+          <button onClick={next} className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-black/10 backdrop-blur-sm flex items-center justify-center text-on-surface-variant hover:bg-black/20 hover:shadow-lg transition-all duration-200" aria-label="Next"><svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"/></svg></button>
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2">
-            {heroSlides.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setHeroIdx(i)}
-                className={`transition-all duration-300 rounded-full ${
-                  i === heroIdx
-                    ? 'w-6 h-2 bg-primary'
-                    : 'w-2 h-2 bg-on-surface/20 hover:bg-on-surface/40'
-                }`}
-                aria-label={`Slide ${i + 1}`}
-              />
-            ))}
+            {slides.map((_, i) => <button key={i} onClick={() => setActiveIdx(i)} className={`transition-all duration-300 rounded-full ${i === activeIdx ? 'w-6 h-2 bg-primary' : 'w-2 h-2 bg-on-surface/20 hover:bg-on-surface/40'}`} aria-label={`Slide ${i + 1}`} />)}
           </div>
         </div>
       </div>
@@ -279,12 +219,14 @@ const HomePage = () => {
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [flashDeals, setFlashDeals] = useState([]);
+  const [banners, setBanners] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
     api.getCategories().then(setCategories).catch(() => {});
     api.getProducts({ pageSize: 9 }).then((data) => setProducts(data.products)).catch(() => {});
     api.getFlashDeals().then(setFlashDeals).catch(() => {});
+    api.getActiveBanners('hero').then(setBanners).catch(() => {});
   }, []);
 
   const categoryTiles = [
@@ -413,6 +355,34 @@ const HomePage = () => {
             </div>
           </div>
         </section>
+
+        {/* Banners from API */}
+        {banners.length > 0 && (
+          <section>
+            <div className="relative rounded-2xl overflow-hidden bg-surface-container-lowest shadow-sm">
+              <div className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                {banners.map((banner) => (
+                  <div key={banner._id || banner.id} className="w-full shrink-0 snap-start">
+                    <div className="relative rounded-2xl overflow-hidden" style={{ background: banner.bgColor || '#fbf9f5' }}>
+                      <div className="flex flex-col md:flex-row items-center p-6 md:p-10 gap-6">
+                        <div className="flex-1">
+                          <h2 className="text-xl md:text-2xl font-bold text-on-surface mb-2">{banner.title}</h2>
+                          <p className="text-on-surface-variant text-sm mb-4">{banner.description || banner.subtitle}</p>
+                          <a href={banner.link || '/shop'} className="inline-block bg-primary text-on-primary font-semibold px-6 py-2.5 rounded-lg text-sm hover:bg-primary/90 transition-colors">{banner.ctaText || 'Shop Now'}</a>
+                        </div>
+                        {banner.image && (
+                          <div className="w-full md:w-1/2 rounded-xl overflow-hidden">
+                            <img src={banner.image} alt={banner.title} className="w-full h-48 object-cover" />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* Why Choose Us */}
         <section>

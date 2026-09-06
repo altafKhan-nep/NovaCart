@@ -2,6 +2,10 @@ const mongoose = require('mongoose');
 
 const productSchema = mongoose.Schema(
   {
+    sku: {
+      type: String,
+      default: '',
+    },
     name: {
       type: String,
       required: true,
@@ -64,6 +68,11 @@ const productSchema = mongoose.Schema(
     isNewArrival: {
       type: Boolean,
       default: false,
+    },
+    status: {
+      type: String,
+      enum: ['active', 'draft', 'out of stock'],
+      default: 'active',
     },
   },
   {

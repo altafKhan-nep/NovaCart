@@ -93,9 +93,13 @@ const createProduct = async (req, res) => {
     throw new Error(validation.errors.join(', '));
   }
 
+  const sku = req.body.slug ? `${req.body.slug}-${Date.now().toString().slice(-6)}` : '';
+
   const product = new Product({
     name: req.body.name,
     slug: req.body.slug,
+    sku: req.body.sku || sku,
+    status: req.body.status || 'active',
     price: req.body.price,
     originalPrice: req.body.originalPrice || 0,
     category: req.body.category,
@@ -123,38 +127,42 @@ const updateProduct = async (req, res) => {
     throw new Error(validation.errors.join(', '));
   }
 
-  const {
-    name,
-    slug,
-    category,
-    description,
-    price,
-    originalPrice,
-    countInStock,
-    images,
-    colors,
-    features,
-    badge,
-    isFlashDeal,
-    isNewArrival,
-  } = req.body;
+    const {
+      name,
+      slug,
+      sku,
+      status,
+      category,
+      description,
+      price,
+      originalPrice,
+      countInStock,
+      images,
+      colors,
+      features,
+      badge,
+      isFlashDeal,
+      isNewArrival,
+    } = req.body;
 
-  const product = await Product.findById(req.params.id);
+    const product = await Product.findById(req.params.id);
 
-  if (product) {
-    product.name = name || product.name;
-    product.slug = slug || product.slug;
-    product.category = category || product.category;
-    product.description = description || product.description;
-    product.price = price !== undefined ? price : product.price;
-    product.originalPrice = originalPrice !== undefined ? originalPrice : product.originalPrice;
-    product.countInStock = countInStock !== undefined ? countInStock : product.countInStock;
-    product.images = images || product.images;
-    product.colors = colors || product.colors;
-    product.features = features || product.features;
-    product.badge = badge !== undefined ? badge : product.badge;
-    product.isFlashDeal = isFlashDeal !== undefined ? isFlashDeal : product.isFlashDeal;
-    product.isNewArrival = isNewArrival !== undefined ? isNewArrival : product.isNewArrival;
+    if (product) {
+      product.name = name || product.name;
+      product.slug = slug || product.slug;
+      product.sku = sku !== undefined ? sku : product.sku;
+      product.status = status !== undefined ? status : product.status;
+      product.category = category || product.category;
+      product.description = description || product.description;
+      product.price = price !== undefined ? price : product.price;
+      product.originalPrice = originalPrice !== undefined ? originalPrice : product.originalPrice;
+      product.countInStock = countInStock !== undefined ? countInStock : product.countInStock;
+      product.images = images || product.images;
+      product.colors = colors || product.colors;
+      product.features = features || product.features;
+      product.badge = badge !== undefined ? badge : product.badge;
+      product.isFlashDeal = isFlashDeal !== undefined ? isFlashDeal : product.isFlashDeal;
+      product.isNewArrival = isNewArrival !== undefined ? isNewArrival : product.isNewArrival;
 
     const updatedProduct = await product.save();
     res.json(updatedProduct);

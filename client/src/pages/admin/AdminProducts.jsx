@@ -6,6 +6,7 @@ import { api } from '../../api';
 const INITIAL_FORM = {
   name: '',
   slug: '',
+  sku: '',
   category: '',
   description: '',
   price: '',
@@ -117,6 +118,7 @@ const ProductFormModal = ({ open, product, categories, onSave, onClose }) => {
       setForm({
         name: product.name || '',
         slug: product.slug || '',
+        sku: product.sku || '',
         category: product.category?._id || product.category || '',
         description: product.description || '',
         price: product.price || '',
@@ -126,8 +128,8 @@ const ProductFormModal = ({ open, product, categories, onSave, onClose }) => {
         colors: product.colors || [],
         features: product.features?.length > 0 ? [...product.features] : [''],
         badge: product.badge || '',
-        flashDeal: product.flashDeal || false,
-        newArrival: product.newArrival || false,
+        flashDeal: product.isFlashDeal || false,
+        newArrival: product.isNewArrival || false,
         status: product.status || 'active',
       });
     } else {
@@ -203,13 +205,18 @@ const ProductFormModal = ({ open, product, categories, onSave, onClose }) => {
     if (!validate()) return;
     const payload = {
       ...form,
+      sku: form.sku || undefined,
       price: Number(form.price),
       originalPrice: form.originalPrice ? Number(form.originalPrice) : undefined,
       countInStock: Number(form.countInStock),
       images: form.images.filter(Boolean),
       features: form.features.filter(Boolean),
       status: asDraft ? 'draft' : form.status,
+      isFlashDeal: form.flashDeal || false,
+      isNewArrival: form.newArrival || false,
     };
+    delete payload.flashDeal;
+    delete payload.newArrival;
     setSaving(true);
     try {
       await onSave(payload);
@@ -263,6 +270,29 @@ const ProductFormModal = ({ open, product, categories, onSave, onClose }) => {
               className={inputClass('slug')}
               placeholder="auto-generated-from-name"
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-on-surface mb-1.5">SKU</label>
+            <input
+              type="text"
+              value={form.sku}
+              onChange={(e) => handleChange('sku', e.target.value)}
+              className={inputClass('sku')}
+              placeholder="Auto-generated if empty"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-on-surface mb-1.5">Status</label>
+            <select
+              value={form.status}
+              onChange={(e) => handleChange('status', e.target.value)}
+              className={inputClass('status')}
+            >
+              <option value="active">Active</option>
+              <option value="draft">Draft</option>
+              <option value="out of stock">Out of Stock</option>
+            </select>
           </div>
 
           <div>
@@ -898,8 +928,9 @@ const AdminProducts = () => {
                       <SortableHeader field="image" label="Image" className="w-16" />
                       <SortableHeader field="name" label="Name" />
                       <SortableHeader field="sku" label="SKU" />
-                      <SortableHeader field="category" label="Category" />
-                      <SortableHeader field="price" label="Price" />
+<SortableHeader field="category" label="Category" />
+                       <SortableHeader field="colors" label="Colors" className="w-24" />
+                       <SortableHeader field="price" label="Price" />
                       <SortableHeader field="countInStock" label="Stock" />
                       <SortableHeader field="status" label="Status" />
                       <SortableHeader field="createdAt" label="Date" />
@@ -959,10 +990,21 @@ const AdminProducts = () => {
                           <td className="py-3 px-3 text-sm text-on-surface-variant font-mono">
                             {product.sku || '—'}
                           </td>
-                          <td className="py-3 px-3 text-sm text-on-surface-variant">
-                            {product.category?.name || product.category || '—'}
-                          </td>
-                          <td className="py-3 px-3">
+<td className="py-3 px-3 text-sm text-on-surface-variant">
+                              {product.category?.name || product.category || '—'}
+                            </td>
+                            <td className="py-3 px-3">
+                              <div className="flex flex-wrap gap-1">
+                                {(product.colors || []).length > 0 ? (
+                                  (product.colors || []).map((c, i) => (
+                                    <span key={i} className="w-5 h-5 rounded-full border border-surface-container" style={{ backgroundColor: c }} title={c} />
+                                  ))
+                                ) : (
+                                  <span className="text-on-surface-variant/40 text-xs">—</span>
+                                )}
+                              </div>
+                            </td>
+                            <td className="py-3 px-3">
                             <span className="text-sm font-bold text-primary">
                               ${(product.price || 0).toFixed(2)}
                             </span>
