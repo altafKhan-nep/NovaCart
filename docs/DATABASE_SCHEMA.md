@@ -1,104 +1,289 @@
 # Database Schema
 
-NovaCart uses **MongoDB with Mongoose**. There are three collections: `products`, `users`,
-and `orders`. The models live in `server/models/`.
+## Overview
 
-## Product (`server/models/Product.js`)
+MongoDB with Mongoose ODM. 8 models total.
 
-```js
+---
+
+## Product
+
+```javascript
 {
-  name: String,            // required
-  slug: String,            // required, unique
-  category: String,        // required (Electronics, Fashion, Home Decor, Toys, ...)
-  description: String,     // required
-  price: Number,           // required, default 0
-  originalPrice: Number,   // for showing deals / strikethrough
-  countInStock: Number,    // required, default 0
-  rating: Number,          // default 0
-  numReviews: Number,      // default 0
-  images: [String],        // product image URLs
-  colors: [String],        // hex color options for the swatches
-  features: [String],      // "Designed for Joy" feature list
-  badge: String,           // e.g. "-30%", "Sale"
-  isFlashDeal: Boolean,    // flagged for the Flash Deals section
-  isNewArrival: Boolean,   // flagged as a new arrival
-  timestamps: true         // createdAt, updatedAt
+  sku:               String,     // Unique, sparse index
+  name:              String,     // Required
+  slug:              String,     // Required, unique
+  category:          String,     // Required (e.g., "Electronics")
+  description:       String,     // Required
+  price:             Number,     // Required, default: 0
+  originalPrice:     Number,     // For sale display
+  costPrice:         Number,     // For profit calculation
+  countInStock:      Number,     // Required, default: 0
+  minStockLevel:     Number,     // Low stock threshold, default: 5
+  stockHistory:       Array,      // [{ type, quantity, previousStock, newStock, note, createdBy, date }]
+  rating:            Number,     // 0-5
+  numReviews:        Number,     // Default: 0
+  images:            [String],   // Array of image URLs
+  colors:            [String],   // Hex color codes
+  features:          [String],   // Product features
+  badge:             String,     // e.g., "-30%", "New", "Sale"
+  isFlashDeal:       Boolean,    // Default: false
+  isNewArrival:      Boolean,    // Default: false
+  status:            String,     // Enum: "active", "draft", "out of stock", default: "active"
+  createdAt:         Date,
+  updatedAt:         Date
 }
 ```
 
-## User (`server/models/User.js`)
+---
 
-```js
+## User
+
+```javascript
 {
-  name: String,                 // required
-  email: String,                // required, unique
-  password: String,             // required (bcrypt-hashed via pre-save hook)
-  isAdmin: Boolean,             // default false
-  wishlist: [ObjectId],         // ref: 'Product'
-  loyaltyPoints: Number,        // default 0 (used for "Joy Points" widget)
+  name:              String,     // Required
+  email:             String,     // Required, unique, lowercase
+  password:          String,     // Required, bcrypt-hashed via pre-save hook
+  isAdmin:           Boolean,    // Auto-true for non-customer roles
+  role:              String,     // Enum: "super_admin", "admin", "content_manager", "order_manager", "customer"
+  permissions:       [String],   // Additive custom permissions
+  isActive:          Boolean,    // Default: true (soft-delete)
+  avatar:            String,
+  phone:             String,
+  wishlist:          [ObjectId], // Ref: Product
+  loyaltyPoints:     Number,     // Default: 0
   address: {
-    fullName: String,
-    street: String,
-    city: String,
-    zip: String
+    fullName:        String,
+    street:          String,
+    city:            String,
+    state:           String,
+    zip:             String,
+    country:         String,
+    phone:           String
   },
-  timestamps: true
+  lastLogin:         Date,
+  loginCount:        Number,     // Default: 0
+  createdAt:         Date,
+  updatedAt:         Date
 }
 ```
 
-### Password handling
+**Instance Methods:**
+- `matchPassword(enteredPassword)` — bcrypt compare
+- `hasPermission(permission)` — role + user permission check
+- `hasAnyPermission(...perms)` — any permission match
+- `getEffectivePermissions()` — union of role + user permissions
+- `isAdminRole()` — true if role !== "customer"
 
-The `User` schema uses a **pre-save** hook that hashes the password with `bcrypt`
-whenever the password field is modified. When seeding or registering, **do not
-pre-hash the password** — pass the plaintext string and let the hook handle it.
+---
 
-`User.matchPassword(enteredPassword)` compares a candidate password against the stored
-hash using `bcrypt.compare`.
+## Order
 
-## Order (`server/models/Order.js`)
-
-```js
+```javascript
 {
-  user: ObjectId,               // ref: 'User', required
-  orderItems: [
+  user:              ObjectId,   // Required, ref: User
+  orderItems:        Array,      // Required
+    [{
+      name:          String,     // Product name snapshot
+      qty:           Number,     // Quantity ordered
+      image:         String,     // Product image snapshot
+      price:         Number,     // Price at time of order
+      product:       ObjectId    // ref: Product
+    }],
+  shippingAddress:   Object,     // Required
     {
-      name: String,             // required (snapshot, not a ref)
-      qty: Number,              // required
-      image: String,            // required
-      price: Number,            // required
-      product: ObjectId         // ref: 'Product', required
-    }
-  ],
-  shippingAddress: {
-    fullName: String,           // required
-    street: String,             // required
-    city: String,               // required
-    zip: String                 // required
-  },
-  paymentMethod: String,        // required, default 'Card'
-  itemsPrice: Number,           // required, default 0
-  taxPrice: Number,             // required, default 0
-  shippingPrice: Number,        // required, default 0
-  totalPrice: Number,           // required, default 0
-  status: String,               // 'Pending' | 'Processing' | 'Shipped' | 'Delivered' (default 'Pending')
-  isPaid: Boolean,              // default false
-  paidAt: Date,
-  timestamps: true
+      fullName:      String,
+      street:        String,
+      city:          String,
+      state:         String,
+      zip:           String,
+      country:       String,
+      phone:         String
+    },
+  paymentMethod:     String,     // Required, default: "Card"
+  itemsPrice:        Number,     // Required
+  taxPrice:          Number,     // Required
+  shippingPrice:     Number,     // Required
+  discountPrice:     Number,     // Default: 0
+  totalPrice:        Number,     // Required
+  status:            String,     // Required, default: "Pending"
+                       // Enum: "Pending", "Processing", "Shipped", "Delivered", "Cancelled"
+  statusHistory:     Array,      // [{ status, date, note }]
+  isPaid:            Boolean,    // Default: false
+  paidAt:            Date,
+  deliveredAt:       Date,
+  cancelledAt:       Date,
+  cancelReason:      String,
+  trackingNumber:    String,
+  notes:             String,
+  promoCode:         String,
+  createdAt:         Date,
+  updatedAt:         Date
 }
 ```
 
-> **Note:** `orderItems` stores a snapshot of the product (name/image/price at purchase
-> time) rather than references, so order history stays accurate even if the product is
-> later edited.
+---
 
-## Seed data (`server/seed/seed.js`)
+## Category
 
-Running `npm run seed`:
+```javascript
+{
+  name:              String,     // Required, unique
+  slug:              String,     // Required, unique
+  description:       String,
+  image:             String,     // Category image URL
+  icon:              String,     // Material icon name, default: "category"
+  parent:            ObjectId,   // ref: Category (hierarchical)
+  isActive:          Boolean,    // Default: true
+  order:             Number,     // Display order, default: 0
+  productCount:      Number,     // Default: 0
+}
+```
 
-1. Deletes all existing products, users, and orders.
-2. Inserts **14 products** across 4 categories.
-3. Creates two users:
-   - `Admin User` → `admin@novacart.com` / `password123` (isAdmin: true)
-   - `Alex Johnson` → `alex@novacart.com` / `password123` (loyaltyPoints: 850, wishlist prefilled)
+**Virtuals:** `children` — subcategories where `parent === this._id`
 
-> ⚠️ Seeding wipes the database. Run it only when you want to reset to demo data.
+---
+
+## Banner
+
+```javascript
+{
+  title:             String,     // Required
+  subtitle:          String,
+  description:       String,
+  image:             String,     // Required, image URL
+  link:              String,     // Default: "/"
+  ctaText:           String,     // Default: "Shop Now"
+  position:          String,     // Enum: "hero", "promo", "footer", "sidebar"
+  targetPages:       [String],   // Enum: "home", "shop", "product"
+  isActive:          Boolean,    // Default: true
+  order:             Number,     // Default: 0
+  startDate:         Date,
+  endDate:           Date,
+  bgColor:           String,     // Default: "#ffffff"
+  createdAt:         Date,
+  updatedAt:         Date
+}
+```
+
+---
+
+## Promotion
+
+```javascript
+{
+  name:              String,     // Required
+  code:              String,     // Required, unique, auto-uppercased
+  description:       String,
+  type:              String,     // Required, enum: "percentage", "fixed", "free_shipping"
+  value:             Number,     // Required
+  minPurchase:       Number,     // Default: 0
+  maxDiscount:       Number,     // For percentage type
+  usageLimit:        Number,     // 0 = unlimited
+  usedCount:         Number,     // Default: 0
+  maxPerUser:        Number,     // 0 = unlimited
+  usedByUsers:       [ObjectId], // ref: User
+  applicableProducts:[ObjectId], // ref: Product (empty = all)
+  applicableCategories:[String], // e.g., ["Electronics"]
+  isActive:          Boolean,    // Default: true
+  startDate:         Date,       // Required
+  endDate:           Date,       // Required
+  createdAt:         Date,
+  updatedAt:         Date
+}
+```
+
+---
+
+## Navigation
+
+```javascript
+{
+  label:             String,     // Required
+  url:               String,     // Required
+  parent:            ObjectId,   // ref: Navigation (hierarchical)
+  order:             Number,     // Default: 0
+  isActive:          Boolean,    // Default: true
+  isExternal:        Boolean,    // Default: false
+  openInNewTab:      Boolean,    // Default: false
+  icon:              String,
+  position:          String,     // Enum: "header", "footer", "mobile"
+}
+```
+
+**Virtuals:** `children` — sub-items where `parent === this._id`
+
+---
+
+## Settings
+
+Singleton document with 7 sections:
+
+```javascript
+{
+  store: {
+    name:            String,     // "NovaCart"
+    tagline:         String,
+    logo:            String,
+    favicon:         String,
+    contactEmail:    String,
+    phone:           String,
+    address:         String
+  },
+  payment: {
+    currency:        String,     // "USD"
+    currencySymbol:  String,     // "$"
+    acceptCreditCards: Boolean,
+    acceptPaypal:    Boolean,
+    stripePublicKey: String      // Filtered from public GET
+  },
+  shipping: {
+    freeShippingThreshold: Number,  // 50
+    standardRate:    Number,        // 5.99
+    expressRate:     Number,        // 19.99
+    enableLocalDelivery: Boolean
+  },
+  tax: {
+    enabled:         Boolean,       // true
+    rate:            Number,        // 8 (percent)
+    includeInPrice:  Boolean
+  },
+  notifications: {
+    orderConfirmation: Boolean,
+    shippingUpdates:   Boolean,
+    lowStockAlert:     Boolean,
+    lowStockThreshold: Number,
+    newOrderAlert:     Boolean
+  },
+  security: {
+    requireEmailVerification: Boolean,
+    enableTwoFactor:  Boolean,
+    sessionTimeout:   Number,
+    maxLoginAttempts: Number
+  },
+  seo: {
+    metaTitle:        String,
+    metaDescription:  String,
+    ogImage:          String
+  }
+}
+```
+
+---
+
+## Seed Data
+
+Running `node seed/seed.js` populates:
+
+| Collection | Count |
+|------------|-------|
+| Products | 26 (14 original + 12 kids' clothing) |
+| Users | 8 (4 admin + 4 customer) |
+| Orders | 6 (various statuses) |
+| Banners | 9 (hero, promo, sidebar, footer) |
+| Categories | 4 (Electronics, Fashion, Home Decor, Toys) |
+| Navigation | 7 (header + footer) |
+| Promotions | 3 (percentage, fixed, free_shipping) |
+| Settings | 1 (defaults) |
+
+**Warning:** Seeding is destructive — it deletes all existing data before inserting.

@@ -1,117 +1,200 @@
-# NovaCart — Designed for Joy 🛍️
+# NovaCart
 
-A vibrant, full-stack **MERN** e-commerce application built with the **"Vibrant Joy"**
-design system — warm cream palette, squircle shapes, and playful micro-animations.
+> A production-ready, full-stack MERN e-commerce platform with CRM/Admin Dashboard.
 
-- **Frontend:** React 18 · Vite · Tailwind CSS · React Router
-- **Backend:** Node.js · Express · MongoDB (Mongoose)
-- **Auth:** JWT + bcrypt
+[![React](https://img.shields.io/badge/React-18-61DAFB?logo=react)](https://reactjs.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-20-339933?logo=node.js)](https://nodejs.org/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-8-47A248?logo=mongodb)](https://www.mongodb.com/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3-06B6D4?logo=tailwindcss)](https://tailwindcss.com/)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
+---
+
+## Live Demo
+
+- **Frontend:** https://nova-cart-dun.vercel.app
+- **Backend:** https://novacart-api-j9um.onrender.com
 
 ## Features
 
-- Product catalog with category filtering, search, and price sort
-- Product detail pages with color swatches, quantity, and sticky add-to-cart
-- Cart with quantity controls and order summary
-- Checkout (shipping address) → order success with receipt
-- JWT authentication (register / login)
-- User dashboard with Joy Points, order history, and wishlist
-- Admin CRM dashboard with sales KPIs and order pipeline
+### Customer
+- Product browsing with category filtering and search
+- Product detail pages with images, reviews, and ratings
+- Shopping cart with quantity controls
+- Promo code validation and application
+- Secure checkout with multiple payment methods
+- Order tracking and history
+- User profile and address management
+- Wishlist functionality
+- Loyalty points system
+
+### Admin Dashboard
+- Real-time analytics and KPI cards
+- Product management (CRUD)
+- Order management with status tracking
+- Customer management
+- Inventory management with stock history
+- Category management with drag-to-reorder
+- Banner management (hero, promo, sidebar, footer)
+- Navigation management
+- Promotion management with usage tracking
+- Store settings (shipping, tax, payment, SEO)
+
+### Security
+- JWT authentication with bcrypt password hashing
+- Role-based access control (5 roles, 34 permissions)
+- HTTP security headers (Helmet)
+- NoSQL injection prevention
+- XSS prevention
+- Rate limiting
+- CORS configuration
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Frontend | React 18, Vite 6, Tailwind CSS 3, React Router v7 |
+| Backend | Node.js, Express 4, Mongoose 8 |
+| Database | MongoDB (Atlas) |
+| Auth | JWT + bcryptjs |
+| Deployment | Vercel (frontend) + Render (backend) |
 
 ## Quick Start
 
-### Option A — Local (Manual)
+### Prerequisites
+
+- Node.js v18+
+- npm
+- MongoDB (local or Atlas)
+
+### Installation
 
 ```bash
-# 1. Install all dependencies (root)
+# Clone repository
+git clone https://github.com/altafKhan-nep/NovaCart.git
+cd NovaCart
+
+# Install all dependencies
 npm run install-all
+```
 
-# 2. Seed the demo database (requires MongoDB running)
-npm run seed
+### Environment Setup
 
-# 3. Run backend (http://localhost:5001) + frontend (http://localhost:5173)
+```bash
+# Create server/.env
+cat > server/.env << EOF
+PORT=5001
+MONGO_URI=mongodb://localhost:27017/novacart
+JWT_SECRET=your_jwt_secret_here
+JWT_EXPIRE=7d
+EOF
+```
+
+### Seed Database
+
+```bash
+cd server && node seed/seed.js
+```
+
+### Start Development
+
+```bash
 npm run dev
 ```
 
-### Option B — Docker (Recommended)
+- Frontend: http://localhost:5173
+- Backend: http://localhost:5001
 
-Requires [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed.
+## Demo Accounts
 
-```bash
-# 1. Start all services (MongoDB + Server + Client)
-docker compose up -d --build
-
-# 2. Seed the database (run inside server container)
-docker exec -it novacart-server node seed/seed.js
-
-# 3. Open in browser
-open http://localhost:3000
-```
-
-**Useful Docker commands:**
-
-```bash
-# View logs (all services)
-docker compose logs -f
-
-# View logs (specific service)
-docker compose logs -f server
-docker compose logs -f client
-
-# Stop all services
-docker compose down
-
-# Stop and remove volumes (fresh start)
-docker compose down -v
-
-# Rebuild after code changes
-docker compose up -d --build
-
-# Check container health
-docker compose ps
-```
-
-**Demo logins** — Admin: `admin@novacart.com` / `password123` · User:
-`alex@novacart.com` / `password123`
-
-## Testing
-
-### API Tests (Server)
-
-```bash
-# Start server first
-cd server && node server.js
-
-# Run API tests (50 tests)
-node tests/api.test.js
-```
-
-### E2E Tests (Docker)
-
-```bash
-# Run full E2E suite against Docker containers
-docker compose -f docker-compose.yml -f docker-compose.test.yml up --build --abort-on-container-exit
-```
-
-## Documentation
-
-Full documentation lives in [`docs/`](docs/README.md):
-
-- [Getting Started](docs/GETTING_STARTED.md)
-- [Developer Guide](docs/DEVELOPER_GUIDE.md)
-- [Design System](docs/DESIGN_SYSTEM.md)
-- [API Reference](docs/API_REFERENCE.md)
-- [Database Schema](docs/DATABASE_SCHEMA.md)
-- [Deployment Guide](docs/DEPLOYMENT.md)
+| Role | Email | Password |
+|------|-------|----------|
+| Super Admin | superadmin@novacart.com | password123 |
+| Admin | admin@novacart.com | password123 |
+| Content Manager | content@novacart.com | password123 |
+| Order Manager | orders@novacart.com | password123 |
+| Customer | alex@novacart.com | password123 |
 
 ## Project Structure
 
 ```
-├── client/          # React frontend (Vite + Tailwind)
-│   ├── Dockerfile   # Multi-stage: build + nginx
-│   └── nginx.conf   # Reverse proxy config
-├── server/          # Express backend (models, controllers, routes)
-│   └── Dockerfile   # Node 20 Alpine + non-root user
-├── docs/            # Documentation + original design source files
-├── docker-compose.yml   # Production stack (Mongo + Server + Client)
-└── .dockerignore        # Docker build exclusions
+NovaCart/
+├── client/                  # React frontend
+│   ├── src/
+│   │   ├── api/            # API client
+│   │   ├── components/     # Reusable components
+│   │   ├── context/        # Auth & Cart context
+│   │   ├── pages/          # Page components
+│   │   └── utils/          # Helper functions
+│   └── package.json
+├── server/                  # Express backend
+│   ├── config/             # DB connection
+│   ├── controllers/        # Route handlers
+│   ├── middleware/          # Auth, validation
+│   ├── models/             # Mongoose schemas
+│   ├── routes/             # Express routes
+│   ├── seed/               # Database seeder
+│   └── package.json
+├── docs/                    # Documentation
+└── package.json             # Root package
 ```
+
+## Documentation
+
+| Document | Description |
+|----------|-------------|
+| [Architecture](docs/ARCHITECTURE.md) | System design and project structure |
+| [Getting Started](docs/GETTING_STARTED.md) | Setup and development guide |
+| [Backend](docs/BACKEND.md) | Express server and API |
+| [Frontend](docs/FRONTEND.md) | React app and components |
+| [API Reference](docs/API_REFERENCE.md) | Complete REST API docs |
+| [Database Schema](docs/DATABASE_SCHEMA.md) | MongoDB models |
+| [Deployment](docs/DEPLOYMENT.md) | Production deployment |
+| [Security](docs/SECURITY.md) | Security features |
+| [Troubleshooting](docs/TROUBLESHOOTING.md) | Common issues |
+
+## Development
+
+```bash
+# Install dependencies
+npm run install-all
+
+# Seed database
+cd server && node seed/seed.js
+
+# Start development servers
+npm run dev
+
+# Run API tests
+cd server && node tests/api.test.js
+```
+
+## Deployment
+
+See [Deployment Guide](docs/DEPLOYMENT.md) for full instructions.
+
+```bash
+# Frontend (Vercel)
+cd client && npm run build
+
+# Backend (Render)
+# Push to GitHub and deploy via Render dashboard
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
+
+## License
+
+MIT License - see [LICENSE](LICENSE) for details.
+
+## Support
+
+- **Email:** support@novacart.com
+- **Documentation:** [docs/](docs/)
+- **Issues:** [GitHub Issues](https://github.com/altafKhan-nep/NovaCart/issues)
