@@ -1,28 +1,50 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
+import { api } from '../api';
 import { formatPrice, formatDate } from '../utils/helpers';
 import ConfirmDialog from '../components/ConfirmDialog';
 
 const CartPage = () => {
-  const { cartItems, removeFromCart, updateQty, itemsPrice, shippingPrice, taxPrice, totalPrice, itemsCount } = useCart();
+  const { cartItems, removeFromCart, updateQty, itemsPrice, shippingPrice, taxPrice, totalPrice, itemsCount, promoCode: appliedPromo, promoDiscount: appliedDiscount, applyPromo, clearPromo } = useCart();
+  const { user } = useAuth();
   const navigate = useNavigate();
-  const [promoCode, setPromoCode] = useState('');
-  const [promoApplied, setPromoApplied] = useState(false);
-  const [promoDiscount, setPromoDiscount] = useState(0);
+  const [promoCode, setPromoCode] = useState(appliedPromo || '');
+  const [promoApplied, setPromoApplied] = useState(!!appliedPromo);
+  const [promoDiscount, setPromoDiscount] = useState(appliedDiscount || 0);
+  const [promoError, setPromoError] = useState('');
+  const [promoLoading, setPromoLoading] = useState(false);
   const [removeTarget, setRemoveTarget] = useState(null);
 
   const deliveryDate = new Date();
   deliveryDate.setDate(deliveryDate.getDate() + 5);
   const estimatedDelivery = deliveryDate.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
 
-  const handleApplyPromo = () => {
-    if (promoCode.trim().toUpperCase() === 'NOVA10') {
-      setPromoApplied(true);
-      setPromoDiscount(Number((totalPrice * 0.1).toFixed(2)));
-    } else {
+  const handleApplyPromo = async () => {
+    if (!promoCode.trim()) return;
+    setPromoError('');
+    setPromoLoading(true);
+    try {
+      const result = await api.validatePromotion(promoCode.trim(), totalPrice);
+      if (result.valid) {
+        setPromoApplied(true);
+        setPromoDiscount(result.discount);
+        applyPromo(promoCode.trim().toUpperCase(), result.discount);
+        setPromoError('');
+      } else {
+        setPromoApplied(false);
+        setPromoDiscount(0);
+        clearPromo();
+        setPromoError(result.message || 'Invalid promo code');
+      }
+    } catch (err) {
       setPromoApplied(false);
       setPromoDiscount(0);
+      clearPromo();
+      setPromoError(err.message || 'Invalid promo code');
+    } finally {
+      setPromoLoading(false);
     }
   };
 
@@ -184,26 +206,26 @@ const CartPage = () => {
                   <input
                     type="text"
                     value={promoCode}
-                    onChange={(e) => setPromoCode(e.target.value)}
+                    onChange={(e) => { setPromoCode(e.target.value); setPromoError(''); }}
                     placeholder="Enter code"
                     className="flex-1 px-3 py-2 bg-surface-container-lowest border border-surface-container rounded-lg text-sm text-on-surface outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container/20 transition-all"
                   />
                   <button
                     onClick={handleApplyPromo}
-                    disabled={!promoCode.trim()}
+                    disabled={!promoCode.trim() || promoLoading}
                     className="px-3 py-2 bg-primary-container/20 text-primary text-xs font-semibold rounded-lg hover:bg-primary-container/30 transition-colors disabled:opacity-40"
                   >
-                    Apply
+                    {promoLoading ? '...' : 'Apply'}
                   </button>
                 </div>
                 {promoApplied && (
                   <p className="text-xs text-secondary font-medium mt-1.5 flex items-center gap-1">
                     <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-                    NOVA10 applied — 10% off!
+                    {promoCode.toUpperCase()} applied — You save ${formatPrice(promoDiscount)}!
                   </p>
                 )}
-                {promoCode && !promoApplied && promoCode.toUpperCase() !== 'NOVA10' && (
-                  <p className="text-xs text-error font-medium mt-1.5">Invalid promo code</p>
+                {promoError && (
+                  <p className="text-xs text-error font-medium mt-1.5">{promoError}</p>
                 )}
               </div>
 

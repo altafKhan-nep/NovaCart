@@ -19,7 +19,7 @@ const getProducts = async (req, res) => {
     : {};
 
   const category = req.query.category
-    ? { category: req.query.category }
+    ? { category: { $regex: new RegExp(`^${req.query.category.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/-/g, '[ -]')}$`, 'i') } }
     : {};
 
   const flash = req.query.flash ? { isFlashDeal: true } : {};
@@ -28,6 +28,8 @@ const getProducts = async (req, res) => {
 
   if (req.query.lowest) sort.price = 1;
   if (req.query.highest) sort.price = -1;
+  if (req.query.newest) sort.createdAt = -1;
+  if (req.query.popular) sort.numReviews = -1;
 
   const count = await Product.countDocuments({ ...keyword, ...category, ...flash });
   const products = await Product.find({ ...keyword, ...category, ...flash })

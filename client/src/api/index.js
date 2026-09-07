@@ -102,6 +102,14 @@ export const api = {
     });
     return handleResponse(res);
   },
+  updateProfile: async (data) => {
+    const res = await fetch(`${API_URL}/users/profile`, {
+      method: 'PUT',
+      headers: getHeaders(true),
+      body: JSON.stringify(data),
+    });
+    return handleResponse(res);
+  },
 
   // Orders
   createOrder: async (order) => {
@@ -121,6 +129,14 @@ export const api = {
   getOrderById: async (id) => {
     const res = await fetch(`${API_URL}/orders/${id}`, {
       headers: getHeaders(true),
+    });
+    return handleResponse(res);
+  },
+  cancelOrder: async (id, reason) => {
+    const res = await fetch(`${API_URL}/orders/${id}/cancel`, {
+      method: 'PUT',
+      headers: getHeaders(true),
+      body: JSON.stringify({ reason }),
     });
     return handleResponse(res);
   },
@@ -287,6 +303,10 @@ export const api = {
     const res = await fetch(`${API_URL}/navigation`);
     return handleResponse(res);
   },
+  getNavigationByPosition: async (position) => {
+    const res = await fetch(`${API_URL}/navigation?position=${position}&isActive=true`);
+    return handleResponse(res);
+  },
   createNavigation: async (data) => {
     const res = await fetch(`${API_URL}/navigation`, {
       method: 'POST',
@@ -374,6 +394,30 @@ export const api = {
       method: 'PUT',
       headers: getHeaders(true),
       body: JSON.stringify(data),
+    });
+    return handleResponse(res);
+  },
+
+  // Inventory
+  bulkUpdateStock: async (updates) => {
+    const res = await fetch(`${API_URL}/admin/inventory/bulk`, {
+      method: 'PUT',
+      headers: getHeaders(true),
+      body: JSON.stringify({ updates }),
+    });
+    return handleResponse(res);
+  },
+  adjustStock: async (id, adjustment, type, note) => {
+    const res = await fetch(`${API_URL}/admin/inventory/${id}/adjust`, {
+      method: 'PUT',
+      headers: getHeaders(true),
+      body: JSON.stringify({ adjustment, type, note }),
+    });
+    return handleResponse(res);
+  },
+  getStockHistory: async (id) => {
+    const res = await fetch(`${API_URL}/admin/inventory/${id}/history`, {
+      headers: getHeaders(true),
     });
     return handleResponse(res);
   },

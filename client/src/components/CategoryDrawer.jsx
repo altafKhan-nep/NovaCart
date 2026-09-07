@@ -72,8 +72,8 @@ const getIcon = (name) => CategoryIcons[name] || FALLBACK_ICON;
 
 const quickLinks = [
   { label: 'Today\'s Deals', icon: 'local_offer', path: '/shop?flash=true' },
-  { label: 'New Arrivals', icon: 'new_releases', path: '/shop' },
-  { label: 'Best Sellers', icon: 'trending_up', path: '/shop' },
+  { label: 'New Arrivals', icon: 'new_releases', path: '/shop?sort=newest' },
+  { label: 'Best Sellers', icon: 'trending_up', path: '/shop?sort=popular' },
 ];
 
 const CategoryDrawer = ({ open, onClose }) => {

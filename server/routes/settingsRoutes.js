@@ -4,7 +4,7 @@ const {
   getSettings,
   updateSettings,
 } = require('../controllers/settingsController');
-const { protect, admin, requirePermission } = require('../middleware/authMiddleware');
+const { protect, requirePermission } = require('../middleware/authMiddleware');
 
 router.get('/', getSettings);
 router.put('/:section', protect, requirePermission('settings:edit'), updateSettings);

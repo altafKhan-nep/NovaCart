@@ -27,7 +27,7 @@ const UserDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [editingProfile, setEditingProfile] = useState(false);
   const [profileForm, setProfileForm] = useState({ name: '', email: '', phone: '' });
-  const [addressForm, setAddressForm] = useState({ fullName: '', street: '', city: '', zip: '' });
+  const [addressForm, setAddressForm] = useState({ fullName: '', street: '', city: '', state: '', zip: '', country: 'India', phone: '' });
   const [editingAddress, setEditingAddress] = useState(false);
   const [passwordForm, setPasswordForm] = useState({ current: '', new: '', confirm: '' });
   const [toast, setToast] = useState(null);
@@ -41,7 +41,7 @@ const UserDashboard = () => {
   useEffect(() => {
     if (user) {
       setProfileForm({ name: user.name || '', email: user.email || '', phone: user.phone || '' });
-      setAddressForm(user.address || { fullName: '', street: '', city: '', zip: '' });
+      setAddressForm(user.address || { fullName: '', street: '', city: '', state: '', zip: '', country: 'India', phone: '' });
     }
   }, [user]);
 
@@ -52,21 +52,23 @@ const UserDashboard = () => {
 
   const handleProfileSave = async () => {
     try {
-      await api.updateProfile?.(profileForm) || refreshProfile();
+      await api.updateProfile(profileForm);
+      await refreshProfile();
       setEditingProfile(false);
       showToast('Profile updated successfully');
-    } catch {
-      showToast('Failed to update profile', 'error');
+    } catch (err) {
+      showToast(err.message || 'Failed to update profile', 'error');
     }
   };
 
   const handleAddressSave = async () => {
     try {
-      await api.updateProfile?.({ address: addressForm }) || refreshProfile();
+      await api.updateProfile({ address: addressForm });
+      await refreshProfile();
       setEditingAddress(false);
       showToast('Address updated successfully');
-    } catch {
-      showToast('Failed to update address', 'error');
+    } catch (err) {
+      showToast(err.message || 'Failed to update address', 'error');
     }
   };
 
@@ -80,11 +82,11 @@ const UserDashboard = () => {
       return;
     }
     try {
-      await api.updateProfile?.({ password: passwordForm.new });
+      await api.updateProfile({ password: passwordForm.new });
       setPasswordForm({ current: '', new: '', confirm: '' });
       showToast('Password changed successfully');
-    } catch {
-      showToast('Failed to change password', 'error');
+    } catch (err) {
+      showToast(err.message || 'Failed to change password', 'error');
     }
   };
 

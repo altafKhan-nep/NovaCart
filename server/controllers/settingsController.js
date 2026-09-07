@@ -23,10 +23,11 @@ const DEFAULT_SETTINGS = {
     standardRate: 5.99,
     expressRate: 12.99,
     enableLocalDelivery: false,
+    localDeliveryRate: 3.99,
   },
   tax: {
     enabled: true,
-    rate: 0.08,
+    rate: 8,
     includeInPrice: false,
   },
   notifications: {
@@ -50,23 +51,29 @@ const DEFAULT_SETTINGS = {
 };
 
 const VALID_SECTIONS = ['store', 'payment', 'shipping', 'tax', 'notifications', 'security', 'seo'];
+const SENSITIVE_FIELDS = ['stripePublicKey'];
 
-// @desc    Get all settings
-// @route   GET /api/settings
-// @access  Public
+const filterSensitive = (obj) => {
+  if (!obj || typeof obj !== 'object') return obj;
+  const filtered = {};
+  for (const [key, val] of Object.entries(obj)) {
+    if (!SENSITIVE_FIELDS.includes(key)) {
+      filtered[key] = val;
+    }
+  }
+  return filtered;
+};
+
 const getSettings = asyncHandler(async (req, res) => {
   let settings = await Settings.findOne();
-
   if (!settings) {
     settings = await Settings.create(DEFAULT_SETTINGS);
   }
-
-  res.json(settings);
+  const obj = settings.toObject();
+  if (obj.payment) obj.payment = filterSensitive(obj.payment);
+  res.json(obj);
 });
 
-// @desc    Update settings by section
-// @route   PUT /api/settings/:section
-// @access  Private/Admin
 const updateSettings = asyncHandler(async (req, res) => {
   const { section } = req.params;
 
@@ -81,7 +88,6 @@ const updateSettings = asyncHandler(async (req, res) => {
   }
 
   let settings = await Settings.findOne();
-
   if (!settings) {
     settings = await Settings.create(DEFAULT_SETTINGS);
   }
@@ -109,7 +115,4 @@ const updateSettings = asyncHandler(async (req, res) => {
   res.json(settings);
 });
 
-module.exports = {
-  getSettings,
-  updateSettings,
-};
+module.exports = { getSettings, updateSettings };

@@ -7,7 +7,7 @@ import { formatPrice } from '../utils/helpers';
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
-  const { cartItems, itemsPrice, shippingPrice, taxPrice, totalPrice, clearCart } = useCart();
+  const { cartItems, itemsPrice, shippingPrice, taxPrice, discountPrice, totalPrice, promoCode, clearCart } = useCart();
   const { user, refreshProfile } = useAuth();
 
   const [address, setAddress] = useState({
@@ -54,7 +54,9 @@ const CheckoutPage = () => {
         itemsPrice,
         taxPrice,
         shippingPrice,
+        discountPrice,
         totalPrice,
+        promoCode,
       });
       clearCart();
       const points = Math.floor(totalPrice);
@@ -219,6 +221,12 @@ const CheckoutPage = () => {
                 <span>Tax</span>
                 <span>${formatPrice(taxPrice)}</span>
               </div>
+              {discountPrice > 0 && (
+                <div className="flex justify-between text-secondary font-medium">
+                  <span>Promo ({promoCode})</span>
+                  <span>-${formatPrice(discountPrice)}</span>
+                </div>
+              )}
               <div className="flex justify-between font-label-bold text-label-bold text-on-surface pt-2 text-lg">
                 <span>Total</span>
                 <span>${formatPrice(totalPrice)}</span>

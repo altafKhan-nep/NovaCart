@@ -188,14 +188,14 @@ const OrderDetailsPanel = ({ order, onClose, onUpdateStatus }) => {
             <h3 className="text-sm font-bold text-on-surface-variant uppercase tracking-wider">Shipping Address</h3>
             <div className="space-y-1">
               {shipping.fullName && <p className="text-sm text-on-surface">{shipping.fullName}</p>}
-              {shipping.address && <p className="text-sm text-on-surface">{shipping.address}</p>}
-              {(shipping.city || shipping.postalCode) && (
-                <p className="text-sm text-on-surface">
-                  {[shipping.city, shipping.postalCode].filter(Boolean).join(', ')}
+              {(shipping.street || shipping.address) && <p className="text-sm text-on-surface">{shipping.street || shipping.address}</p>}
+              {(shipping.city || shipping.zip || shipping.postalCode) && (
+                <p className="text-sm text-on-surface-variant">
+                  {[shipping.city, shipping.zip || shipping.postalCode].filter(Boolean).join(', ')}
                 </p>
               )}
               {shipping.country && <p className="text-sm text-on-surface">{shipping.country}</p>}
-              {!shipping.fullName && !shipping.address && !shipping.city && !shipping.country && (
+              {!shipping.fullName && !shipping.street && !shipping.address && !shipping.city && !shipping.country && (
                 <p className="text-sm text-on-surface-variant">No shipping address provided</p>
               )}
             </div>

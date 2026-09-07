@@ -73,10 +73,48 @@ const getAdminStats = asyncHandler(async (req, res) => {
     { $sort: { '_id.year': 1, '_id.month': 1 } },
   ]);
 
-  const topProducts = await Product.find({})
-    .sort({ numReviews: -1 })
-    .limit(5)
-    .select('name numReviews rating price images');
+  const topProducts = await Order.aggregate([
+    { $unwind: '$orderItems' },
+    {
+      $group: {
+        _id: '$orderItems.product',
+        unitsSold: { $sum: '$orderItems.qty' },
+        revenue: { $sum: { $multiply: ['$orderItems.price', '$orderItems.qty'] } },
+      },
+    },
+    { $sort: { unitsSold: -1 } },
+    { $limit: 5 },
+    {
+      $lookup: {
+        from: 'products',
+        localField: '_id',
+        foreignField: '_id',
+        as: 'product',
+      },
+    },
+    { $unwind: '$product' },
+    {
+      $project: {
+        _id: '$product._id',
+        name: '$product.name',
+        images: '$product.images',
+        price: '$product.price',
+        numReviews: '$product.numReviews',
+        rating: '$product.rating',
+        unitsSold: 1,
+        revenue: 1,
+      },
+    },
+  ]);
+
+  // Repeat customer rate: customers with >1 order / total customers
+  const repeatCustomerResult = await Order.aggregate([
+    { $group: { _id: '$user', orderCount: { $sum: 1 } } },
+    { $match: { orderCount: { $gt: 1 } } },
+    { $count: 'repeatCount' },
+  ]);
+  const repeatCount = repeatCustomerResult.length ? repeatCustomerResult[0].repeatCount : 0;
+  const repeatCustomerRate = totalCustomers > 0 ? (repeatCount / totalCustomers) * 100 : 0;
 
   const revenueThisMonthResult = await Order.aggregate([
     {
@@ -133,6 +171,7 @@ const getAdminStats = asyncHandler(async (req, res) => {
     lowStockProducts,
     monthlySales,
     topProducts,
+    repeatCustomerRate: Math.round(repeatCustomerRate * 100) / 100,
     revenue: {
       thisMonth: revenueThisMonth,
       lastMonth: revenueLastMonth,
@@ -150,7 +189,7 @@ const getAdminStats = asyncHandler(async (req, res) => {
 // @route   GET /api/admin/users
 // @access  Private/Admin
 const getAllUsers = asyncHandler(async (req, res) => {
-  const pageSize = Number(req.query.pageSize) || 20;
+  const pageSize = Number(req.query.pageSize) || 100;
   const page = Number(req.query.page) || 1;
 
   const filter = {};
@@ -168,11 +207,37 @@ const getAllUsers = asyncHandler(async (req, res) => {
   }
 
   const count = await User.countDocuments(filter);
-  const users = await User.find(filter)
-    .select('-password')
-    .sort({ createdAt: -1 })
-    .limit(pageSize)
-    .skip(pageSize * (page - 1));
+
+  // Get users with order stats aggregated
+  const users = await User.aggregate([
+    { $match: filter },
+    {
+      $lookup: {
+        from: 'orders',
+        localField: '_id',
+        foreignField: 'user',
+        as: 'userOrders',
+      },
+    },
+    {
+      $addFields: {
+        orderCount: { $size: '$userOrders' },
+        totalSpent: {
+          $sum: {
+            $map: {
+              input: '$userOrders',
+              as: 'order',
+              in: '$$order.totalPrice',
+            },
+          },
+        },
+      },
+    },
+    { $project: { password: 0, userOrders: 0 } },
+    { $sort: { createdAt: -1 } },
+    { $skip: pageSize * (page - 1) },
+    { $limit: pageSize },
+  ]);
 
   res.json({
     users,
@@ -220,11 +285,24 @@ const updateUser = asyncHandler(async (req, res) => {
   }
 
   if (req.body.name !== undefined) user.name = req.body.name;
-  if (req.body.role !== undefined) user.role = req.body.role;
+  if (req.body.role !== undefined) {
+    // Prevent non-super_admin from granting super_admin role
+    if (req.body.role === 'super_admin' && req.user.role !== 'super_admin') {
+      res.status(403);
+      throw new Error('Only super admin can assign super admin role');
+    }
+    // Prevent changing super_admin's role
+    if (user.role === 'super_admin' && req.user.role !== 'super_admin') {
+      res.status(403);
+      throw new Error('Cannot modify super admin account');
+    }
+    user.role = req.body.role;
+  }
   if (req.body.permissions !== undefined) user.permissions = req.body.permissions;
   if (req.body.isActive !== undefined) user.isActive = req.body.isActive;
   if (req.body.email !== undefined) user.email = req.body.email;
   if (req.body.phone !== undefined) user.phone = req.body.phone;
+  if (req.body.address !== undefined) user.address = req.body.address;
   if (req.body.password) {
     if (req.body.password.length < 6) {
       res.status(400);
@@ -317,8 +395,8 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
     throw new Error('Order not found');
   }
 
-  const { status } = req.body;
-  const validStatuses = ['Pending', 'Processing', 'Shipped', 'Delivered'];
+  const { status, note } = req.body;
+  const validStatuses = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
 
   if (!status || !validStatuses.includes(status)) {
     res.status(400);
@@ -332,6 +410,7 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
     Processing: ['Shipped', 'Cancelled'],
     Shipped: ['Delivered'],
     Delivered: [],
+    Cancelled: [],
   };
 
   if (!statusTransitions[order.status]?.includes(status)) {
@@ -343,9 +422,33 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
 
   order.status = status;
 
+  // Add status history
+  if (!order.statusHistory) order.statusHistory = [];
+  order.statusHistory.push({
+    status,
+    date: Date.now(),
+    note: note || `Status updated to ${status}`,
+  });
+
   if (status === 'Delivered') {
     order.isPaid = true;
     order.paidAt = order.paidAt || new Date();
+    order.deliveredAt = Date.now();
+  }
+
+  if (status === 'Cancelled') {
+    order.cancelledAt = Date.now();
+    order.cancelReason = note || '';
+
+    // Restore stock
+    const Product = require('../models/Product');
+    for (const item of order.orderItems) {
+      await Product.findByIdAndUpdate(
+        item.product,
+        { $inc: { countInStock: item.qty } },
+        { new: true }
+      );
+    }
   }
 
   const updatedOrder = await order.save();
@@ -418,9 +521,26 @@ const getAnalytics = asyncHandler(async (req, res) => {
     { $sort: { count: -1 } },
   ]);
 
-  const topCategories = await Product.aggregate([
-    { $group: { _id: '$category', count: { $sum: 1 }, avgPrice: { $avg: '$price' } } },
-    { $sort: { count: -1 } },
+  const topCategories = await Order.aggregate([
+    { $unwind: '$orderItems' },
+    {
+      $lookup: {
+        from: 'products',
+        localField: 'orderItems.product',
+        foreignField: '_id',
+        as: 'product',
+      },
+    },
+    { $unwind: '$product' },
+    {
+      $group: {
+        _id: '$product.category',
+        revenue: { $sum: { $multiply: ['$orderItems.price', '$orderItems.qty'] } },
+        unitsSold: { $sum: '$orderItems.qty' },
+        orderCount: { $sum: 1 },
+      },
+    },
+    { $sort: { revenue: -1 } },
     { $limit: 10 },
   ]);
 
@@ -487,6 +607,112 @@ const getAnalytics = asyncHandler(async (req, res) => {
   });
 });
 
+// @desc    Bulk update stock for multiple products
+// @route   PUT /api/admin/inventory/bulk
+// @access  Private/Admin
+const bulkUpdateStock = asyncHandler(async (req, res) => {
+  const { updates } = req.body;
+
+  if (!Array.isArray(updates) || updates.length === 0) {
+    res.status(400);
+    throw new Error('updates array is required');
+  }
+
+  const results = [];
+  for (const update of updates) {
+    const { productId, stock, note } = update;
+    if (productId === undefined || stock === undefined) continue;
+
+    const product = await Product.findById(productId);
+    if (!product) continue;
+
+    const previousStock = product.countInStock;
+    product.countInStock = Math.max(0, Number(stock));
+    product.stockHistory.push({
+      type: 'set',
+      quantity: product.countInStock - previousStock,
+      previousStock,
+      newStock: product.countInStock,
+      note: note || 'Bulk update',
+      createdBy: req.user._id,
+    });
+    await product.save();
+    results.push({ productId, success: true, newStock: product.countInStock });
+  }
+
+  res.json({ updated: results.length, results });
+});
+
+// @desc    Adjust stock (+/-) for a product
+// @route   PUT /api/admin/inventory/:id/adjust
+// @access  Private/Admin
+const adjustStock = asyncHandler(async (req, res) => {
+  const { adjustment, type, note } = req.body;
+
+  if (adjustment === undefined || !type) {
+    res.status(400);
+    throw new Error('adjustment and type are required');
+  }
+
+  if (!['set', 'adjust', 'restock'].includes(type)) {
+    res.status(400);
+    throw new Error('type must be set, adjust, or restock');
+  }
+
+  const product = await Product.findById(req.params.id);
+  if (!product) {
+    res.status(404);
+    throw new Error('Product not found');
+  }
+
+  const previousStock = product.countInStock;
+  let newStock;
+
+  if (type === 'set') {
+    newStock = Math.max(0, Number(adjustment));
+  } else if (type === 'adjust') {
+    newStock = Math.max(0, previousStock + Number(adjustment));
+  } else {
+    newStock = previousStock + Math.abs(Number(adjustment));
+  }
+
+  product.countInStock = newStock;
+  product.stockHistory.push({
+    type,
+    quantity: newStock - previousStock,
+    previousStock,
+    newStock,
+    note: note || `Stock ${type}: ${adjustment}`,
+    createdBy: req.user._id,
+  });
+
+  // Auto-update status based on stock
+  if (newStock === 0) {
+    product.status = 'out of stock';
+  } else if (product.status === 'out of stock') {
+    product.status = 'active';
+  }
+
+  await product.save();
+  res.json(product);
+});
+
+// @desc    Get stock history for a product
+// @route   GET /api/admin/inventory/:id/history
+// @access  Private/Admin
+const getStockHistory = asyncHandler(async (req, res) => {
+  const product = await Product.findById(req.params.id)
+    .select('name sku countInStock stockHistory')
+    .populate('stockHistory.createdBy', 'name');
+
+  if (!product) {
+    res.status(404);
+    throw new Error('Product not found');
+  }
+
+  res.json(product);
+});
+
 module.exports = {
   getAdminStats,
   getAllUsers,
@@ -498,4 +724,7 @@ module.exports = {
   updateOrderStatus,
   cancelOrder,
   getAnalytics,
+  bulkUpdateStock,
+  adjustStock,
+  getStockHistory,
 };

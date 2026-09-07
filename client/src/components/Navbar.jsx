@@ -72,6 +72,7 @@ const Navbar = () => {
   const [banners, setBanners] = useState([]);
   const [activeBanner, setActiveBanner] = useState(null);
   const [bannerIdx, setBannerIdx] = useState(0);
+  const [navItems, setNavItems] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -79,6 +80,14 @@ const Navbar = () => {
       if (Array.isArray(data) && data.length > 0) {
         setBanners(data);
         setActiveBanner(data[0]);
+      }
+    }).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    api.getNavigationByPosition('header').then((data) => {
+      if (Array.isArray(data) && data.length > 0) {
+        setNavItems(data);
       }
     }).catch(() => {});
   }, []);
@@ -106,28 +115,29 @@ const Navbar = () => {
     }
   };
 
-  const links = [
-    { to: '/', label: 'Home', icon: (
-      <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-      </svg>
-    )},
-    { to: '/shop', label: 'Shop', icon: (
-      <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-      </svg>
-    )},
-    { to: '/shop?flash=true', label: 'Deals', icon: (
-      <svg className="w-[18px] h-[18px]" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
-      </svg>
-    )},
-    { to: '/shop/Electronics', label: 'New Arrivals', icon: (
-      <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-      </svg>
-    )},
-  ];
+  // Build nav links from API data, with fallback to defaults
+  const getDefaultIcon = (label) => {
+    const icons = {
+      'Home': <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>,
+      'Shop': <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>,
+      'Deals': <svg className="w-[18px] h-[18px]" fill="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>,
+      'New Arrivals': <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>,
+    };
+    return icons[label] || <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>;
+  };
+
+  const links = navItems.length > 0
+    ? navItems.map((item) => ({
+        to: item.url,
+        label: item.label,
+        icon: item.icon ? <span className="material-symbols-outlined text-[18px]">{item.icon}</span> : getDefaultIcon(item.label),
+      }))
+    : [
+        { to: '/', label: 'Home', icon: getDefaultIcon('Home') },
+        { to: '/shop', label: 'Shop', icon: getDefaultIcon('Shop') },
+        { to: '/shop?flash=true', label: 'Deals', icon: getDefaultIcon('Deals') },
+        { to: '/shop?sort=newest', label: 'New Arrivals', icon: getDefaultIcon('New Arrivals') },
+      ];
 
   return (
     <>
@@ -143,9 +153,9 @@ const Navbar = () => {
               <p className="text-white text-sm font-bold">{activeBanner.title}</p>
               <p className="text-white/80 text-xs">{activeBanner.subtitle}</p>
             </div>
-            <a href={activeBanner.link || '/shop'} className="bg-white text-primary font-semibold px-4 py-2 rounded-lg text-xs hover:bg-white/90 transition-colors shrink-0">
+            <Link to={activeBanner.link || '/shop'} className="bg-white text-primary font-semibold px-4 py-2 rounded-lg text-xs hover:bg-white/90 transition-colors shrink-0">
               {activeBanner.ctaText || 'Shop Now'}
-            </a>
+            </Link>
           </div>
         </div>
       )}

@@ -198,9 +198,9 @@ const RegisterPage = () => {
                 />
                 <span className="text-sm text-on-surface-variant leading-snug">
                   I agree to the{' '}
-                  <span className="text-primary font-semibold hover:underline cursor-pointer">Terms of Service</span>
+                  <Link to="/terms" className="text-primary font-semibold hover:underline">Terms of Service</Link>
                   {' '}and{' '}
-                  <span className="text-primary font-semibold hover:underline cursor-pointer">Privacy Policy</span>
+                  <Link to="/privacy" className="text-primary font-semibold hover:underline">Privacy Policy</Link>
                 </span>
               </label>
               {errors.terms && <p className="text-xs text-error mt-1.5 font-medium">{errors.terms}</p>}

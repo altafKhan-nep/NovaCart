@@ -5,6 +5,7 @@ const productSchema = mongoose.Schema(
     sku: {
       type: String,
       default: '',
+      sparse: true,
     },
     name: {
       type: String,
@@ -32,11 +33,30 @@ const productSchema = mongoose.Schema(
       type: Number,
       default: 0,
     },
+    costPrice: {
+      type: Number,
+      default: 0,
+    },
     countInStock: {
       type: Number,
       required: true,
       default: 0,
     },
+    minStockLevel: {
+      type: Number,
+      default: 5,
+    },
+    stockHistory: [
+      {
+        type: { type: String, enum: ['set', 'adjust', 'order', 'cancel', 'restock'], required: true },
+        quantity: { type: Number, required: true },
+        previousStock: { type: Number, required: true },
+        newStock: { type: Number, required: true },
+        note: { type: String, default: '' },
+        createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        date: { type: Date, default: Date.now },
+      },
+    ],
     rating: {
       type: Number,
       default: 0,
@@ -79,6 +99,8 @@ const productSchema = mongoose.Schema(
     timestamps: true,
   }
 );
+
+productSchema.index({ sku: 1 }, { unique: true, sparse: true });
 
 const Product = mongoose.model('Product', productSchema);
 

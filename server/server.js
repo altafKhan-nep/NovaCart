@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -180,6 +181,9 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/navigation', navigationRoutes);
 app.use('/api/promotions', promotionRoutes);
 app.use('/api/settings', settingsRoutes);
+
+// --- Static files ---
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // --- Error handling ---
 app.use(notFound);

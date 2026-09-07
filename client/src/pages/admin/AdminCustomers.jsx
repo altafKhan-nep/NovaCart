@@ -238,12 +238,12 @@ const CustomerProfilePanel = ({ customer, onClose, recentOrders, totalSpent }) =
                 <p className="text-xs text-on-surface-variant">Status</p>
                 <span
                   className={`inline-block text-xs font-bold px-2.5 py-1 rounded-full ${
-                    customer.isDisabled
-                      ? 'bg-red-100 text-red-800'
-                      : 'bg-emerald-100 text-emerald-800'
+                    customer.isActive
+                      ? 'bg-emerald-100 text-emerald-800'
+                      : 'bg-red-100 text-red-800'
                   }`}
                 >
-                  {customer.isDisabled ? 'Disabled' : 'Active'}
+                  {customer.isActive ? 'Active' : 'Disabled'}
                 </span>
               </div>
             </div>
@@ -505,7 +505,7 @@ const AdminCustomers = () => {
 
   const showToast = (message, type = 'success') => setToast({ message, type });
 
-  const totalActive = customers.filter((c) => !c.isDisabled).length;
+  const totalActive = customers.filter((c) => c.isActive !== false).length;
   const totalAdmins = customers.filter((c) =>
     ['super_admin', 'admin', 'content_manager', 'order_manager'].includes(c.role)
   ).length;
@@ -517,8 +517,8 @@ const AdminCustomers = () => {
 
   const filtered = customers.filter((c) => {
     if (roleFilter && c.role !== roleFilter) return false;
-    if (statusFilter === 'active' && c.isDisabled) return false;
-    if (statusFilter === 'disabled' && !c.isDisabled) return false;
+    if (statusFilter === 'active' && c.isActive === false) return false;
+    if (statusFilter === 'disabled' && c.isActive !== false) return false;
     if (search) {
       const q = search.toLowerCase();
       const name = (c.name || '').toLowerCase();
@@ -622,24 +622,24 @@ const AdminCustomers = () => {
   const handleToggleDisable = async () => {
     if (!disableTarget) return;
     const id = disableTarget._id || disableTarget.id;
-    const newDisabled = !disableTarget.isDisabled;
+    const newActive = disableTarget.isActive === false;
     try {
-      await api.updateUser(id, { isDisabled: newDisabled });
+      await api.updateUser(id, { isActive: newActive });
       setCustomers((prev) =>
         prev.map((c) => {
           if ((c._id || c.id) === id) {
-            return { ...c, isDisabled: newDisabled };
+            return { ...c, isActive: newActive };
           }
           return c;
         })
       );
       setSelectedCustomer((prev) => {
         if (prev && (prev._id || prev.id) === id) {
-          return { ...prev, isDisabled: newDisabled };
+          return { ...prev, isActive: newActive };
         }
         return prev;
       });
-      showToast(newDisabled ? 'Customer disabled' : 'Customer enabled');
+      showToast(newActive ? 'Customer enabled' : 'Customer disabled');
       setDisableTarget(null);
     } catch {
       showToast('Failed to update customer status', 'error');
@@ -652,13 +652,13 @@ const AdminCustomers = () => {
 
       <ConfirmDialog
         open={!!disableTarget}
-        title={disableTarget?.isDisabled ? 'Enable Customer' : 'Disable Customer'}
+        title={disableTarget?.isActive !== false ? 'Disable Customer' : 'Enable Customer'}
         message={
-          disableTarget?.isDisabled
-            ? `Are you sure you want to enable "${disableTarget?.name}"? They will regain full access to their account.`
-            : `Are you sure you want to disable "${disableTarget?.name}"? This will prevent them from logging in and placing orders.`
+          disableTarget?.isActive !== false
+            ? `Are you sure you want to disable "${disableTarget?.name}"? This will prevent them from logging in and placing orders.`
+            : `Are you sure you want to enable "${disableTarget?.name}"? They will regain full access to their account.`
         }
-        confirmLabel={disableTarget?.isDisabled ? 'Enable' : 'Disable'}
+        confirmLabel={disableTarget?.isActive !== false ? 'Disable' : 'Enable'}
         onConfirm={handleToggleDisable}
         onCancel={() => setDisableTarget(null)}
       />
@@ -872,12 +872,12 @@ const AdminCustomers = () => {
                           <td className="py-3.5 px-3">
                             <span
                               className={`inline-block text-xs font-bold px-2.5 py-1 rounded-full ${
-                                customer.isDisabled
+                                customer.isActive === false
                                   ? 'bg-red-100 text-red-800'
                                   : 'bg-emerald-100 text-emerald-800'
                               }`}
                             >
-                              {customer.isDisabled ? 'Disabled' : 'Active'}
+                              {customer.isActive === false ? 'Disabled' : 'Active'}
                             </span>
                           </td>
                           <td className="py-3.5 px-3">
@@ -899,14 +899,14 @@ const AdminCustomers = () => {
                               <button
                                 onClick={() => setDisableTarget(customer)}
                                 className={`p-1.5 rounded-lg text-on-surface-variant transition-colors ${
-                                  customer.isDisabled
+                                  customer.isActive === false
                                     ? 'hover:bg-emerald-100 hover:text-emerald-800'
                                     : 'hover:bg-error-container/30 hover:text-error'
                                 }`}
-                                title={customer.isDisabled ? 'Enable' : 'Disable'}
+                                title={customer.isActive === false ? 'Enable' : 'Disable'}
                               >
                                 <span className="material-symbols-outlined text-lg">
-                                  {customer.isDisabled ? 'enable' : 'disable'}
+                                  {customer.isActive === false ? 'enable' : 'disable'}
                                 </span>
                               </button>
                             </div>

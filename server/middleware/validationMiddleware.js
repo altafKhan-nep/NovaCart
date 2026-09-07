@@ -140,7 +140,7 @@ const validateCategory = (data) => {
 
 const validatePromotion = (data) => {
   const errors = [];
-  const validTypes = ['percentage', 'fixed', 'free_shipping', 'buy_x_get_y'];
+  const validTypes = ['percentage', 'fixed', 'free_shipping'];
 
   if (!data.name || typeof data.name !== 'string' || data.name.trim().length === 0) {
     errors.push('Name is required');
@@ -160,7 +160,9 @@ const validatePromotion = (data) => {
 
   if (data.value === undefined || data.value === null || data.value === '') {
     errors.push('Value is required');
-  } else if (typeof data.value !== 'number' || data.value <= 0) {
+  } else if (typeof data.value !== 'number' || data.value < 0) {
+    errors.push('Value must be a positive number');
+  } else if (data.type !== 'free_shipping' && data.value <= 0) {
     errors.push('Value must be greater than 0');
   }
 

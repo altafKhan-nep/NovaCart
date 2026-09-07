@@ -50,6 +50,78 @@ const formatDate = (date) => {
   });
 };
 
+const StockHistoryModal = ({ product, onClose }) => {
+  const [history, setHistory] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.getStockHistory(product._id || product.id)
+      .then(setHistory)
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [product._id, product.id]);
+
+  const typeColors = {
+    set: 'bg-blue-100 text-blue-800',
+    adjust: 'bg-amber-100 text-amber-800',
+    order: 'bg-red-100 text-red-800',
+    cancel: 'bg-emerald-100 text-emerald-800',
+    restock: 'bg-green-100 text-green-800',
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg mx-4 max-h-[80vh] flex flex-col animate-fade-up">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+          <div>
+            <h3 className="text-lg font-bold text-gray-900">Stock History</h3>
+            <p className="text-sm text-gray-500">{product.name}</p>
+          </div>
+          <button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 transition-colors">
+            <span className="material-symbols-outlined">close</span>
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto p-6">
+          {loading ? (
+            <div className="space-y-3">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="h-16 bg-gray-100 rounded-lg animate-pulse" />
+              ))}
+            </div>
+          ) : !history?.stockHistory?.length ? (
+            <div className="text-center py-8 text-gray-400">
+              <span className="material-symbols-outlined text-4xl mb-2">history</span>
+              <p className="text-sm">No stock history yet</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {history.stockHistory.slice().reverse().map((entry, i) => (
+                <div key={i} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full capitalize ${typeColors[entry.type] || 'bg-gray-100 text-gray-700'}`}>
+                    {entry.type}
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-700 truncate">{entry.note || entry.type}</p>
+                    <p className="text-xs text-gray-400">{formatDate(entry.date)}</p>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className="text-sm font-bold text-gray-900">
+                      {entry.previousStock} → {entry.newStock}
+                    </p>
+                    <p className={`text-xs font-semibold ${entry.quantity > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      {entry.quantity > 0 ? '+' : ''}{entry.quantity}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const AdminInventory = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -63,16 +135,20 @@ const AdminInventory = () => {
   const [bulkStock, setBulkStock] = useState('');
   const [editingStock, setEditingStock] = useState(null);
   const [stockValue, setStockValue] = useState('');
+  const [adjustMode, setAdjustMode] = useState('set');
   const [saving, setSaving] = useState(false);
   const [categories, setCategories] = useState([]);
   const [page, setPage] = useState(1);
+  const [sortField, setSortField] = useState('name');
+  const [sortDir, setSortDir] = useState('asc');
+  const [historyProduct, setHistoryProduct] = useState(null);
   const perPage = 20;
 
   const fetchProducts = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      const res = await api.getProducts({ limit: 500 });
+      const res = await api.getProducts({ pageSize: 500 });
       const data = Array.isArray(res) ? res : res.products || res.data || [];
       setProducts(data);
     } catch (err) {
@@ -87,7 +163,7 @@ const AdminInventory = () => {
       const res = await api.getCategoriesTree();
       const data = Array.isArray(res) ? res : res.categories || res.data || [];
       setCategories(data);
-    } catch {
+    } catch (err) {
       // fallback
     }
   }, []);
@@ -114,8 +190,31 @@ const AdminInventory = () => {
     return true;
   });
 
-  const totalPages = Math.ceil(filtered.length / perPage);
-  const paginated = filtered.slice((page - 1) * perPage, page * perPage);
+  const sorted = [...filtered].sort((a, b) => {
+    let valA, valB;
+    if (sortField === 'name') {
+      valA = (a.name || '').toLowerCase();
+      valB = (b.name || '').toLowerCase();
+    } else if (sortField === 'stock') {
+      valA = a.countInStock || 0;
+      valB = b.countInStock || 0;
+    } else if (sortField === 'sku') {
+      valA = (a.sku || '').toLowerCase();
+      valB = (b.sku || '').toLowerCase();
+    } else if (sortField === 'category') {
+      valA = (a.category || '').toLowerCase();
+      valB = (b.category || '').toLowerCase();
+    } else {
+      valA = new Date(a.updatedAt || 0).getTime();
+      valB = new Date(b.updatedAt || 0).getTime();
+    }
+    if (valA < valB) return sortDir === 'asc' ? -1 : 1;
+    if (valA > valB) return sortDir === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+  const totalPages = Math.ceil(sorted.length / perPage);
+  const paginated = sorted.slice((page - 1) * perPage, page * perPage);
 
   useEffect(() => {
     setPage(1);
@@ -147,16 +246,17 @@ const AdminInventory = () => {
     }
     setSaving(true);
     try {
-      await Promise.all(
-        Array.from(selectedIds).map((id) =>
-          api.updateProduct(id, { countInStock: val })
-        )
-      );
+      const updates = Array.from(selectedIds).map((id) => ({
+        productId: id,
+        stock: val,
+        note: 'Bulk update',
+      }));
+      await api.bulkUpdateStock(updates);
       showToast(`Updated stock for ${selectedIds.size} products`);
       setSelectedIds(new Set());
       setBulkStock('');
       fetchProducts();
-    } catch {
+    } catch (err) {
       showToast('Failed to update stock', 'error');
     } finally {
       setSaving(false);
@@ -170,17 +270,32 @@ const AdminInventory = () => {
       return;
     }
     try {
-      await api.updateProduct(productId, { countInStock: val });
+      await api.adjustStock(productId, val, adjustMode, `Quick ${adjustMode}`);
       setProducts((prev) =>
-        prev.map((p) =>
-          (p._id || p.id) === productId ? { ...p, countInStock: val } : p
-        )
+        prev.map((p) => {
+          if ((p._id || p.id) === productId) {
+            let newStock;
+            if (adjustMode === 'set') newStock = val;
+            else if (adjustMode === 'adjust') newStock = Math.max(0, (p.countInStock || 0) + val);
+            else newStock = (p.countInStock || 0) + Math.abs(val);
+            return { ...p, countInStock: newStock };
+          }
+          return p;
+        })
       );
       setEditingStock(null);
-      setStockValue('');
       showToast('Stock updated');
-    } catch {
+    } catch (err) {
       showToast('Failed to update stock', 'error');
+    }
+  };
+
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortField(field);
+      setSortDir('asc');
     }
   };
 
@@ -379,23 +494,73 @@ const AdminInventory = () => {
                       <th className="pb-3 px-4 text-left text-xs font-bold text-on-surface-variant uppercase tracking-wider">
                         Image
                       </th>
-                      <th className="pb-3 px-4 text-left text-xs font-bold text-on-surface-variant uppercase tracking-wider">
-                        Name
+                      <th
+                        onClick={() => handleSort('name')}
+                        className="pb-3 px-4 text-left text-xs font-bold text-on-surface-variant uppercase tracking-wider cursor-pointer hover:text-on-surface transition-colors select-none"
+                      >
+                        <div className="flex items-center gap-1">
+                          Name
+                          {sortField === 'name' && (
+                            <span className="material-symbols-outlined text-sm text-primary">
+                              {sortDir === 'asc' ? 'arrow_upward' : 'arrow_downward'}
+                            </span>
+                          )}
+                        </div>
                       </th>
-                      <th className="pb-3 px-4 text-left text-xs font-bold text-on-surface-variant uppercase tracking-wider">
-                        SKU
+                      <th
+                        onClick={() => handleSort('sku')}
+                        className="pb-3 px-4 text-left text-xs font-bold text-on-surface-variant uppercase tracking-wider cursor-pointer hover:text-on-surface transition-colors select-none"
+                      >
+                        <div className="flex items-center gap-1">
+                          SKU
+                          {sortField === 'sku' && (
+                            <span className="material-symbols-outlined text-sm text-primary">
+                              {sortDir === 'asc' ? 'arrow_upward' : 'arrow_downward'}
+                            </span>
+                          )}
+                        </div>
                       </th>
-                      <th className="pb-3 px-4 text-left text-xs font-bold text-on-surface-variant uppercase tracking-wider">
-                        Category
+                      <th
+                        onClick={() => handleSort('category')}
+                        className="pb-3 px-4 text-left text-xs font-bold text-on-surface-variant uppercase tracking-wider cursor-pointer hover:text-on-surface transition-colors select-none"
+                      >
+                        <div className="flex items-center gap-1">
+                          Category
+                          {sortField === 'category' && (
+                            <span className="material-symbols-outlined text-sm text-primary">
+                              {sortDir === 'asc' ? 'arrow_upward' : 'arrow_downward'}
+                            </span>
+                          )}
+                        </div>
                       </th>
-                      <th className="pb-3 px-4 text-left text-xs font-bold text-on-surface-variant uppercase tracking-wider">
-                        Stock
+                      <th
+                        onClick={() => handleSort('stock')}
+                        className="pb-3 px-4 text-left text-xs font-bold text-on-surface-variant uppercase tracking-wider cursor-pointer hover:text-on-surface transition-colors select-none"
+                      >
+                        <div className="flex items-center gap-1">
+                          Stock
+                          {sortField === 'stock' && (
+                            <span className="material-symbols-outlined text-sm text-primary">
+                              {sortDir === 'asc' ? 'arrow_upward' : 'arrow_downward'}
+                            </span>
+                          )}
+                        </div>
                       </th>
                       <th className="pb-3 px-4 text-left text-xs font-bold text-on-surface-variant uppercase tracking-wider">
                         Status
                       </th>
-                      <th className="pb-3 px-4 text-left text-xs font-bold text-on-surface-variant uppercase tracking-wider">
-                        Last Updated
+                      <th
+                        onClick={() => handleSort('updatedAt')}
+                        className="pb-3 px-4 text-left text-xs font-bold text-on-surface-variant uppercase tracking-wider cursor-pointer hover:text-on-surface transition-colors select-none"
+                      >
+                        <div className="flex items-center gap-1">
+                          Last Updated
+                          {sortField === 'updatedAt' && (
+                            <span className="material-symbols-outlined text-sm text-primary">
+                              {sortDir === 'asc' ? 'arrow_upward' : 'arrow_downward'}
+                            </span>
+                          )}
+                        </div>
                       </th>
                       <th className="pb-3 px-4 text-right text-xs font-bold text-on-surface-variant uppercase tracking-wider w-24">
                         Actions
@@ -453,9 +618,17 @@ const AdminInventory = () => {
                           <td className="py-3 px-4">
                             {isEditing ? (
                               <div className="flex items-center gap-1.5">
+                                <select
+                                  value={adjustMode}
+                                  onChange={(e) => setAdjustMode(e.target.value)}
+                                  className="w-16 bg-surface-container-low rounded px-1 py-1 text-[10px] font-bold text-on-surface border border-surface-container outline-none"
+                                >
+                                  <option value="set">Set</option>
+                                  <option value="adjust">+/-</option>
+                                  <option value="restock">Add</option>
+                                </select>
                                 <input
                                   type="number"
-                                  min="0"
                                   value={stockValue}
                                   onChange={(e) => setStockValue(e.target.value)}
                                   className="w-20 bg-surface-container-low rounded px-2 py-1 text-sm text-on-surface border border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
@@ -487,19 +660,25 @@ const AdminInventory = () => {
                                 </button>
                               </div>
                             ) : (
-                              <button
-                                onClick={() => {
-                                  setEditingStock(id);
-                                  setStockValue(String(stock));
-                                }}
-                                className="flex items-center gap-2 group cursor-pointer"
-                                title="Click to edit stock"
-                              >
-                                <span className={`w-2 h-2 rounded-full ${getStockDot(stock)}`} />
-                                <span className={`text-sm font-bold ${getStockColor(stock).split(' ')[0]} group-hover:underline`}>
-                                  {stock}
-                                </span>
-                              </button>
+                              <div className="flex items-center gap-2">
+                                <button
+                                  onClick={() => {
+                                    setEditingStock(id);
+                                    setStockValue(String(stock));
+                                    setAdjustMode('set');
+                                  }}
+                                  className="flex items-center gap-2 group cursor-pointer"
+                                  title="Click to edit stock"
+                                >
+                                  <span className={`w-2 h-2 rounded-full ${getStockDot(stock)}`} />
+                                  <span className={`text-sm font-bold ${getStockColor(stock).split(' ')[0]} group-hover:underline`}>
+                                    {stock}
+                                  </span>
+                                </button>
+                                {product.minStockLevel !== undefined && stock > 0 && stock <= product.minStockLevel && (
+                                  <span className="text-[10px] text-amber-600 font-semibold">Min: {product.minStockLevel}</span>
+                                )}
+                              </div>
                             )}
                           </td>
                           <td className="py-3 px-4">
@@ -524,11 +703,19 @@ const AdminInventory = () => {
                                 onClick={() => {
                                   setEditingStock(id);
                                   setStockValue(String(stock));
+                                  setAdjustMode('set');
                                 }}
                                 className="p-1.5 rounded-lg text-on-surface-variant hover:bg-primary-container/30 hover:text-primary transition-colors"
                                 title="Quick edit stock"
                               >
                                 <span className="material-symbols-outlined text-lg">edit</span>
+                              </button>
+                              <button
+                                onClick={() => setHistoryProduct(product)}
+                                className="p-1.5 rounded-lg text-on-surface-variant hover:bg-blue-100 hover:text-blue-800 transition-colors"
+                                title="Stock History"
+                              >
+                                <span className="material-symbols-outlined text-lg">history</span>
                               </button>
                             </div>
                           </td>
@@ -594,6 +781,14 @@ const AdminInventory = () => {
           )}
         </div>
       </div>
+
+      {/* Stock History Modal */}
+      {historyProduct && (
+        <StockHistoryModal
+          product={historyProduct}
+          onClose={() => setHistoryProduct(null)}
+        />
+      )}
     </AdminLayout>
   );
 };

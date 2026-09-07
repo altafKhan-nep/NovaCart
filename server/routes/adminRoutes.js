@@ -11,6 +11,9 @@ const {
   updateOrderStatus,
   cancelOrder,
   getAnalytics,
+  bulkUpdateStock,
+  adjustStock,
+  getStockHistory,
 } = require('../controllers/adminController');
 const { protect, requirePermission } = require('../middleware/authMiddleware');
 
@@ -27,5 +30,9 @@ router.put('/orders/:id/status', protect, requirePermission('orders:edit'), upda
 router.put('/orders/:id/cancel', protect, requirePermission('orders:cancel'), cancelOrder);
 
 router.get('/analytics', protect, requirePermission('analytics:view'), getAnalytics);
+
+router.put('/inventory/bulk', protect, requirePermission('products:edit'), bulkUpdateStock);
+router.put('/inventory/:id/adjust', protect, requirePermission('products:edit'), adjustStock);
+router.get('/inventory/:id/history', protect, requirePermission('products:view'), getStockHistory);
 
 module.exports = router;

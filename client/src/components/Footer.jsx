@@ -16,9 +16,9 @@ const FooterBannerStrip = () => {
       <div className="max-w-container-max mx-auto px-4 md:px-margin-desktop py-4">
         <div className="flex items-center gap-4 overflow-x-auto scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           {banners.map((banner) => (
-            <a
+            <Link
               key={banner._id}
-              href={banner.link || '/shop'}
+              to={banner.link || '/shop'}
               className="flex items-center gap-3 shrink-0 px-4 py-2 rounded-xl border border-surface-container/50 hover:shadow-md transition-all duration-200 hover:border-primary/20 group"
               style={{ background: banner.bgColor || '#fbf9f5' }}
             >
@@ -32,7 +32,7 @@ const FooterBannerStrip = () => {
               <span className="text-[10px] font-semibold text-primary group-hover:underline whitespace-nowrap">
                 {banner.ctaText || 'Learn More'}
               </span>
-            </a>
+            </Link>
           ))}
         </div>
       </div>
@@ -41,6 +41,27 @@ const FooterBannerStrip = () => {
 };
 
 const Footer = () => {
+  const [email, setEmail] = useState('');
+  const [subscribed, setSubscribed] = useState(false);
+  const [footerLinks, setFooterLinks] = useState([]);
+
+  useEffect(() => {
+    api.getNavigationByPosition('footer').then((data) => {
+      if (Array.isArray(data) && data.length > 0) {
+        setFooterLinks(data);
+      }
+    }).catch(() => {});
+  }, []);
+
+  const handleSubscribe = (e) => {
+    e.preventDefault();
+    if (email.trim()) {
+      setSubscribed(true);
+      setEmail('');
+      setTimeout(() => setSubscribed(false), 3000);
+    }
+  };
+
   return (
     <>
       <FooterBannerStrip />
@@ -61,16 +82,21 @@ const Footer = () => {
                 Designed for Joy. Curated products that bring delight to your everyday life.
               </p>
               <div className="flex items-center gap-2 mt-4">
-                {['Instagram', 'Twitter', 'Facebook'].map((social) => (
-                  <span
-                    key={social}
-                    className="w-8 h-8 rounded-lg bg-surface-container-low flex items-center justify-center text-on-surface-variant hover:bg-primary-container hover:text-on-primary-container transition-colors cursor-pointer"
-                    aria-label={social}
+                {[
+                  { name: 'Instagram', icon: 'photo_camera', href: '#' },
+                  { name: 'Twitter', icon: 'chat', href: '#' },
+                  { name: 'Facebook', icon: 'group', href: '#' },
+                ].map((social) => (
+                  <a
+                    key={social.name}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-8 h-8 rounded-lg bg-surface-container-low flex items-center justify-center text-on-surface-variant hover:bg-primary-container hover:text-on-primary-container transition-colors"
+                    aria-label={social.name}
                   >
-                    <span className="material-symbols-outlined text-lg">
-                      {social === 'Instagram' ? 'photo_camera' : social === 'Twitter' ? 'chat' : 'group'}
-                    </span>
-                  </span>
+                    <span className="material-symbols-outlined text-lg">{social.icon}</span>
+                  </a>
                 ))}
               </div>
             </div>
@@ -85,6 +111,8 @@ const Footer = () => {
                   { label: 'Fashion', to: '/shop/Fashion' },
                   { label: 'Home Decor', to: '/shop/Home%20Decor' },
                   { label: 'Toys', to: '/shop/Toys' },
+                  { label: 'Sports', to: '/shop/Sports' },
+                  { label: 'Books', to: '/shop/Books' },
                 ].map((link) => (
                   <li key={link.label}>
                     <Link to={link.to} className="text-sm text-on-surface-variant hover:text-primary transition-colors">
@@ -95,17 +123,31 @@ const Footer = () => {
               </ul>
             </div>
 
-            {/* Help */}
+            {/* Help — dynamic from Navigation API */}
             <div>
               <h3 className="text-sm font-bold text-on-surface mb-3 uppercase tracking-wider">Help</h3>
               <ul className="space-y-2">
-                {['Customer Service', 'Shipping & Returns', 'FAQ', 'Size Guide'].map((item) => (
-                  <li key={item}>
-                    <span className="text-sm text-on-surface-variant hover:text-primary transition-colors cursor-pointer">
-                      {item}
-                    </span>
-                  </li>
-                ))}
+                {footerLinks.length > 0
+                  ? footerLinks.map((link) => (
+                      <li key={link._id}>
+                        <Link to={link.url} className="text-sm text-on-surface-variant hover:text-primary transition-colors">
+                          {link.label}
+                        </Link>
+                      </li>
+                    ))
+                  : [
+                      { label: 'Help Center', to: '/help' },
+                      { label: 'Contact Support', to: '/support' },
+                      { label: 'Shipping & Returns', to: '/help#shipping-delivery' },
+                      { label: 'FAQ', to: '/help#general-faq' },
+                    ].map((item) => (
+                      <li key={item.label}>
+                        <Link to={item.to} className="text-sm text-on-surface-variant hover:text-primary transition-colors">
+                          {item.label}
+                        </Link>
+                      </li>
+                    ))
+                }
               </ul>
             </div>
 
@@ -113,16 +155,21 @@ const Footer = () => {
             <div>
               <h3 className="text-sm font-bold text-on-surface mb-3 uppercase tracking-wider">Stay Updated</h3>
               <p className="text-sm text-on-surface-variant mb-3">Get the latest deals and new arrivals.</p>
-              <div className="flex gap-2">
+              <form onSubmit={handleSubscribe} className="flex gap-2">
                 <input
                   type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="Your email"
                   className="flex-1 bg-surface-container-low text-sm rounded-lg px-3 py-2 border border-surface-container outline-none focus:border-primary-container transition-colors"
                 />
-                <button className="bg-primary text-on-primary text-sm font-semibold px-3 py-2 rounded-lg hover:bg-primary-container transition-colors">
+                <button type="submit" className="bg-primary text-on-primary text-sm font-semibold px-3 py-2 rounded-lg hover:bg-primary-container transition-colors">
                   <span className="material-symbols-outlined text-lg">send</span>
                 </button>
-              </div>
+              </form>
+              {subscribed && (
+                <p className="text-xs text-green-600 mt-2 font-medium">Thanks for subscribing!</p>
+              )}
             </div>
           </div>
 
@@ -131,9 +178,9 @@ const Footer = () => {
               &copy; {new Date().getFullYear()} NovaCart. All rights reserved.
             </p>
             <div className="flex items-center gap-4 text-xs text-on-surface-variant">
-              <span className="hover:text-primary cursor-pointer transition-colors">Privacy Policy</span>
-              <span className="hover:text-primary cursor-pointer transition-colors">Terms of Service</span>
-              <span className="hover:text-primary cursor-pointer transition-colors">Sustainability</span>
+              <Link to="/privacy" className="hover:text-primary transition-colors">Privacy Policy</Link>
+              <Link to="/terms" className="hover:text-primary transition-colors">Terms of Service</Link>
+              <Link to="/help" className="hover:text-primary transition-colors">Help</Link>
             </div>
           </div>
         </div>

@@ -114,6 +114,133 @@ const products = [
     images: ['https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=600'],
     colors: ['#ff7f50', '#40E0D0', '#e9c400'], features: ['100 pieces', 'Non-toxic', 'Educational'],
   },
+  // ===== KIDS' CLOTHING COLLECTION =====
+  {
+    name: 'Green Sleeveless Top with Heart Print Pants', slug: 'green-sleeveless-heart-pants', category: 'Fashion',
+    description: 'Adorable green sleeveless cotton top paired with colorful heart-print jogger pants. Perfect for casual outings and playdates. Soft, breathable fabric for all-day comfort.',
+    price: 24.99, countInStock: 25, rating: 4.8, numReviews: 12, badge: 'New',
+    images: [
+      'https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=600',
+      'https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=600',
+      'https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=600',
+    ],
+    colors: ['#4CAF50', '#FF6B6B', '#FFD93D'], features: ['Cotton', 'Breathable', 'Machine washable'],
+  },
+  {
+    name: 'Heart Print Bow Dress with Matching Pants', slug: 'heart-bow-dress-pants', category: 'Fashion',
+    description: 'Charming white sleeveless dress with colorful heart print and pink bow details, paired with matching wide-leg pants. A complete coordinated look for your little one.',
+    price: 29.99, countInStock: 20, rating: 4.9, numReviews: 8, badge: 'New',
+    images: [
+      'https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=600',
+      'https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=600',
+      'https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=600',
+    ],
+    colors: ['#FFFFFF', '#FF69B4', '#FFD93D'], features: ['Bow detail', 'Matching set', 'Soft fabric'],
+  },
+  {
+    name: 'Zebra Print Co-Ord Set - Brown', slug: 'zebra-print-coord-brown', category: 'Fashion',
+    description: 'Trendy brown and white zebra print co-ord set featuring a collared button-down shirt with rolled-up sleeves and matching wide-leg pants. Stylish and comfortable for everyday wear.',
+    price: 34.99, countInStock: 15, rating: 4.7, numReviews: 15, badge: 'Trending',
+    images: [
+      'https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=600',
+      'https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=600',
+      'https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=600',
+    ],
+    colors: ['#8B4513', '#FFFFFF', '#D2691E'], features: ['Co-ord set', 'Button-down', 'Wide-leg pants'],
+  },
+  {
+    name: 'Mustard Yellow Top with Heart Print Pants', slug: 'mustard-heart-pants', category: 'Fashion',
+    description: 'Vibrant mustard yellow V-neck top with bell sleeves paired with cream heart-print wide-leg pants. A cheerful and comfortable outfit for special occasions.',
+    price: 27.99, countInStock: 18, rating: 4.6, numReviews: 10, badge: 'New',
+    images: [
+      'https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=600',
+      'https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=600',
+      'https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=600',
+    ],
+    colors: ['#FFB300', '#FFF8E1', '#FF6B6B'], features: ['Bell sleeves', 'V-neck', 'Heart print'],
+  },
+  {
+    name: 'Olive Green Zebra Print Lounge Set', slug: 'olive-zebra-lounge-set', category: 'Fashion',
+    description: 'Comfortable olive green and white zebra print lounge set with button-down top and relaxed-fit pants. Perfect for lounging at home or casual outings.',
+    price: 32.99, countInStock: 12, rating: 4.5, numReviews: 6, badge: 'New',
+    images: [
+      'https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=600',
+      'https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=600',
+    ],
+    colors: ['#556B2F', '#FFFFFF', '#8B4513'], features: ['Lounge set', 'Relaxed fit', 'Button-down'],
+  },
+  {
+    name: 'Multi-Heart Print Jumpsuit', slug: 'multi-heart-jumpsuit', category: 'Fashion',
+    description: 'Adorable sleeveless jumpsuit with colorful heart print all over. Features a button-up front and elastic waist for easy dressing. A complete outfit in one piece.',
+    price: 26.99, countInStock: 22, rating: 4.8, numReviews: 9, badge: 'Bestseller',
+    images: [
+      'https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=600',
+      'https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=600',
+      'https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=600',
+    ],
+    colors: ['#FF6B6B', '#FFD93D', '#4CAF50'], features: ['Jumpsuit', 'Button-up', 'Elastic waist'],
+  },
+  {
+    name: 'Pink Heart Print Palazzo Set', slug: 'pink-heart-palazzo', category: 'Fashion',
+    description: 'Pretty pink and white heart print sleeveless top with matching palazzo pants. Lightweight and breezy, perfect for summer days.',
+    price: 28.99, countInStock: 16, rating: 4.7, numReviews: 11, badge: 'New',
+    images: [
+      'https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=600',
+      'https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=600',
+      'https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=600',
+    ],
+    colors: ['#FFB6C1', '#FFFFFF', '#FF69B4'], features: ['Palazzo pants', 'Lightweight', 'Summer ready'],
+  },
+  {
+    name: 'Classic White Heart Print Set', slug: 'classic-white-heart-set', category: 'Fashion',
+    description: 'Timeless white sleeveless top with delicate heart print paired with matching pants. A versatile outfit that can be dressed up or down.',
+    price: 25.99, countInStock: 20, rating: 4.6, numReviews: 7,
+    images: [
+      'https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=600',
+      'https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=600',
+    ],
+    colors: ['#FFFFFF', '#FF6B6B', '#FFD93D'], features: ['Classic design', 'Versatile', 'Easy care'],
+  },
+  {
+    name: 'Sunset Orange Coord Set', slug: 'sunset-orange-coord', category: 'Fashion',
+    description: 'Vibrant orange sleeveless top with matching printed pants. A bold and beautiful outfit for the fashion-forward little one.',
+    price: 31.99, countInStock: 14, rating: 4.4, numReviews: 5, badge: 'New',
+    images: [
+      'https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=600',
+      'https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=600',
+    ],
+    colors: ['#FF6B35', '#FFD93D', '#FFFFFF'], features: ['Bold color', 'Coord set', 'Printed pants'],
+  },
+  {
+    name: 'Pastel Heart Print Collection Set', slug: 'pastel-heart-collection', category: 'Fashion',
+    description: 'Soft pastel-colored heart print top with matching pants. Gentle on the skin with a relaxed fit for maximum comfort.',
+    price: 23.99, countInStock: 28, rating: 4.9, numReviews: 14, badge: 'Bestseller',
+    images: [
+      'https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=600',
+      'https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=600',
+      'https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=600',
+    ],
+    colors: ['#E8D5E0', '#B5D8CC', '#F7E6C8'], features: ['Pastel colors', 'Soft fabric', 'Relaxed fit'],
+  },
+  {
+    name: 'Tropical Print Summer Set', slug: 'tropical-summer-set', category: 'Fashion',
+    description: 'Fun tropical-inspired print top with matching pants. Bright colors and playful patterns for a summer-ready look.',
+    price: 29.99, countInStock: 19, rating: 4.5, numReviews: 8,
+    images: [
+      'https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=600',
+      'https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=600',
+    ],
+    colors: ['#2E8B57', '#FF6B6B', '#FFD93D'], features: ['Tropical print', 'Summer style', 'Playful pattern'],
+  },
+  {
+    name: 'Floral Dreams Co-Ord Set', slug: 'floral-dreams-coord', category: 'Fashion',
+    description: 'Beautiful floral print co-ord set with a comfortable top and matching bottoms. Perfect for garden parties and special occasions.',
+    price: 33.99, countInStock: 11, rating: 4.8, numReviews: 6, badge: 'New',
+    images: [
+      'https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=600',
+    ],
+    colors: ['#FFB6C1', '#98FB98', '#FFD93D'], features: ['Floral print', 'Co-ord set', 'Special occasion'],
+  },
 ];
 
 const banners = [
@@ -129,10 +256,10 @@ const banners = [
 ];
 
 const categories = [
-  { name: 'Electronics', slug: 'electronics', description: 'Gadgets, devices, and tech essentials', icon: 'devices', isActive: true, order: 0, productCount: 6 },
-  { name: 'Fashion', slug: 'fashion', description: 'Trendy clothing and accessories', icon: 'apparel', isActive: true, order: 1, productCount: 2 },
-  { name: 'Home Decor', slug: 'home-decor', description: 'Beautiful items for your living space', icon: 'deck', isActive: true, order: 2, productCount: 4 },
-  { name: 'Toys', slug: 'toys', description: 'Fun and educational toys for all ages', icon: 'toys', isActive: true, order: 3, productCount: 2 },
+  { name: 'Electronics', slug: 'electronics', description: 'Gadgets, devices, and tech essentials', icon: 'devices', image: 'https://images.unsplash.com/photo-1468495244123-6c6c332eeece?w=600', isActive: true, order: 0, productCount: 6 },
+  { name: 'Fashion', slug: 'fashion', description: 'Trendy clothing and accessories', icon: 'apparel', image: 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=600', isActive: true, order: 1, productCount: 14 },
+  { name: 'Home Decor', slug: 'home-decor', description: 'Beautiful items for your living space', icon: 'deck', image: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?w=600', isActive: true, order: 2, productCount: 4 },
+  { name: 'Toys', slug: 'toys', description: 'Fun and educational toys for all ages', icon: 'toys', image: 'https://images.unsplash.com/photo-1558060370-d644479cb6f7?w=600', isActive: true, order: 3, productCount: 2 },
 ];
 
 const navigationItems = [

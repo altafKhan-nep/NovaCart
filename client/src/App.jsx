@@ -25,6 +25,10 @@ import AdminAnalytics from './pages/admin/AdminAnalytics';
 import AdminSettings from './pages/admin/AdminSettings';
 import ProtectedRoute from './components/ProtectedRoute';
 import ScrollToTop from './components/ScrollToTop';
+import HelpPage from './pages/HelpPage';
+import SupportPage from './pages/SupportPage';
+import PrivacyPage from './pages/PrivacyPage';
+import TermsPage from './pages/TermsPage';
 
 function App() {
   return (
@@ -48,7 +52,6 @@ const AdminShell = () => (
     <Route path="items" element={<AdminProducts />} />
     <Route path="items/new" element={<AdminProducts />} />
     <Route path="items/:id/edit" element={<AdminProducts />} />
-    <Route path="products" element={<AdminProducts />} />
     <Route path="orders" element={<AdminOrders />} />
     <Route path="customers" element={<AdminCustomers />} />
     <Route path="categories" element={<AdminCategories />} />
@@ -77,6 +80,10 @@ const MainShell = () => (
         <Route path="/checkout" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>} />
         <Route path="/order-success/:id" element={<OrderSuccessPage />} />
         <Route path="/account" element={<ProtectedRoute><UserDashboard /></ProtectedRoute>} />
+        <Route path="/help" element={<HelpPage />} />
+        <Route path="/support" element={<SupportPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/terms" element={<TermsPage />} />
       </Routes>
     </div>
     <Footer />

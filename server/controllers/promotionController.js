@@ -14,7 +14,7 @@ const createPromotion = asyncHandler(async (req, res) => {
 
   const {
     name, code, description, type, value, minPurchase, maxDiscount,
-    usageLimit, applicableProducts, applicableCategories, isActive,
+    usageLimit, maxPerUser, applicableProducts, applicableCategories, isActive,
     startDate, endDate,
   } = req.body;
 
@@ -38,7 +38,9 @@ const createPromotion = asyncHandler(async (req, res) => {
     minPurchase: minPurchase || 0,
     maxDiscount: maxDiscount || 0,
     usageLimit: usageLimit || 0,
+    maxPerUser: maxPerUser || 0,
     usedCount: 0,
+    usedByUsers: [],
     applicableProducts: applicableProducts || [],
     applicableCategories: applicableCategories || [],
     isActive: isActive !== undefined ? isActive : true,
@@ -128,7 +130,7 @@ const updatePromotion = asyncHandler(async (req, res) => {
     }
   }
 
-  if (req.body.value !== undefined && (typeof req.body.value !== 'number' || req.body.value <= 0)) {
+  if (req.body.value !== undefined && req.body.type !== 'free_shipping' && (typeof req.body.value !== 'number' || req.body.value <= 0)) {
     res.status(400);
     throw new Error('Value must be greater than 0');
   }
@@ -140,7 +142,7 @@ const updatePromotion = asyncHandler(async (req, res) => {
 
   const fields = [
     'name', 'code', 'description', 'type', 'value', 'minPurchase',
-    'maxDiscount', 'usageLimit', 'applicableProducts', 'applicableCategories',
+    'maxDiscount', 'usageLimit', 'maxPerUser', 'applicableProducts', 'applicableCategories',
     'isActive', 'startDate', 'endDate',
   ];
 
@@ -225,6 +227,17 @@ const validatePromotion = asyncHandler(async (req, res) => {
   if (promotion.usageLimit > 0 && promotion.usedCount >= promotion.usageLimit) {
     res.status(400);
     throw new Error('This promotion has reached its usage limit');
+  }
+
+  // Per-user usage check
+  if (req.user && promotion.maxPerUser > 0) {
+    const userUsageCount = promotion.usedByUsers.filter(
+      (uid) => uid.toString() === req.user._id.toString()
+    ).length;
+    if (userUsageCount >= promotion.maxPerUser) {
+      res.status(400);
+      throw new Error(`You have already used this code ${promotion.maxPerUser} time(s)`);
+    }
   }
 
   if (promotion.minPurchase > 0 && cartTotal && cartTotal < promotion.minPurchase) {

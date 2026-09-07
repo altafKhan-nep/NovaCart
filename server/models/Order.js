@@ -24,7 +24,10 @@ const orderSchema = mongoose.Schema(
       fullName: { type: String, required: true },
       street: { type: String, required: true },
       city: { type: String, required: true },
+      state: { type: String, default: '' },
       zip: { type: String, required: true },
+      country: { type: String, default: 'India' },
+      phone: { type: String, default: '' },
     },
     paymentMethod: {
       type: String,
@@ -46,6 +49,10 @@ const orderSchema = mongoose.Schema(
       required: true,
       default: 0.0,
     },
+    discountPrice: {
+      type: Number,
+      default: 0.0,
+    },
     totalPrice: {
       type: Number,
       required: true,
@@ -57,12 +64,41 @@ const orderSchema = mongoose.Schema(
       default: 'Pending',
       enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'],
     },
+    statusHistory: [
+      {
+        status: { type: String, required: true },
+        date: { type: Date, default: Date.now },
+        note: { type: String, default: '' },
+      },
+    ],
     isPaid: {
       type: Boolean,
       default: false,
     },
     paidAt: {
       type: Date,
+    },
+    deliveredAt: {
+      type: Date,
+    },
+    cancelledAt: {
+      type: Date,
+    },
+    cancelReason: {
+      type: String,
+      default: '',
+    },
+    trackingNumber: {
+      type: String,
+      default: '',
+    },
+    notes: {
+      type: String,
+      default: '',
+    },
+    promoCode: {
+      type: String,
+      default: '',
     },
   },
   {

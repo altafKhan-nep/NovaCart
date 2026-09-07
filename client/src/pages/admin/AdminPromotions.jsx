@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import { api } from '../../api';
 
-const PROMO_TYPES = ['percentage', 'fixed', 'free_shipping', 'buy_x_get_y'];
+const PROMO_TYPES = ['percentage', 'fixed', 'free_shipping'];
 
 const INITIAL_FORM = {
   name: '',
@@ -13,6 +13,7 @@ const INITIAL_FORM = {
   minPurchase: '',
   maxDiscount: '',
   usageLimit: '',
+  maxPerUser: 0,
   applicableCategories: [],
   startDate: '',
   endDate: '',
@@ -89,6 +90,7 @@ const PromoFormPanel = ({ open, promotion, categories, onSave, onClose }) => {
         minPurchase: promotion.minPurchase ?? '',
         maxDiscount: promotion.maxDiscount ?? '',
         usageLimit: promotion.usageLimit ?? '',
+        maxPerUser: promotion.maxPerUser ?? 0,
         applicableCategories: promotion.applicableCategories?.map((c) => c._id || c) || [],
         startDate: promotion.startDate ? promotion.startDate.slice(0, 10) : '',
         endDate: promotion.endDate ? promotion.endDate.slice(0, 10) : '',
@@ -134,6 +136,7 @@ const PromoFormPanel = ({ open, promotion, categories, onSave, onClose }) => {
         minPurchase: form.minPurchase ? Number(form.minPurchase) : undefined,
         maxDiscount: form.maxDiscount ? Number(form.maxDiscount) : undefined,
         usageLimit: form.usageLimit ? Number(form.usageLimit) : undefined,
+        maxPerUser: form.maxPerUser ? Number(form.maxPerUser) : 0,
       };
       await onSave(payload);
     } finally {
@@ -215,9 +218,7 @@ const PromoFormPanel = ({ open, promotion, categories, onSave, onClose }) => {
                       ? 'Percentage Discount'
                       : t === 'fixed'
                       ? 'Fixed Amount'
-                      : t === 'free_shipping'
-                      ? 'Free Shipping'
-                      : 'Buy X Get Y'}
+                      : 'Free Shipping'}
                   </option>
                 ))}
               </select>
@@ -276,6 +277,20 @@ const PromoFormPanel = ({ open, promotion, categories, onSave, onClose }) => {
                 onChange={(e) => handleChange('usageLimit', e.target.value)}
                 className={inputClass('usageLimit')}
                 placeholder="Unlimited"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-semibold text-on-surface mb-1.5">Per-User Limit</label>
+              <input
+                type="number"
+                min="0"
+                value={form.maxPerUser || 0}
+                onChange={(e) => handleChange('maxPerUser', e.target.value)}
+                className={inputClass('maxPerUser')}
+                placeholder="0 = Unlimited per user"
               />
             </div>
           </div>
@@ -424,11 +439,6 @@ const TYPE_CONFIG = {
     label: 'Free Ship',
     badgeClass: 'bg-teal-100 text-teal-800',
     color: 'teal',
-  },
-  buy_x_get_y: {
-    label: 'BXGY',
-    badgeClass: 'bg-purple-100 text-purple-800',
-    color: 'purple',
   },
 };
 
