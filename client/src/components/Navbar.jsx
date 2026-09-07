@@ -2,6 +2,7 @@ import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import { api } from '../api';
 
 const TopBar = () => {
   const [visible, setVisible] = useState(() => !localStorage.getItem('novacart_banner_dismissed'));
