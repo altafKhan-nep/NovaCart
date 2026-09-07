@@ -246,6 +246,10 @@ export const api = {
     const res = await fetch(`${API_URL}/categories`);
     return handleResponse(res);
   },
+  getPublicCategories: async () => {
+    const res = await fetch(`${API_URL}/categories/public`);
+    return handleResponse(res);
+  },
   createCategory: async (data) => {
     const res = await fetch(`${API_URL}/categories`, {
       method: 'POST',

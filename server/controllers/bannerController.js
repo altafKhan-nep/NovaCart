@@ -12,7 +12,7 @@ const createBanner = asyncHandler(async (req, res) => {
     throw new Error(validation.errors.join(', '));
   }
 
-  const { title, subtitle, description, image, link, ctaText, position, isActive, startDate, endDate, bgColor } = req.body;
+  const { title, subtitle, description, image, link, ctaText, position, targetPages, isActive, startDate, endDate, bgColor } = req.body;
 
   const maxOrder = await Banner.findOne({ position: position || 'hero' }).sort({ order: -1 });
 
@@ -24,6 +24,7 @@ const createBanner = asyncHandler(async (req, res) => {
     link: link || '/',
     ctaText: ctaText || 'Shop Now',
     position: position || 'hero',
+    targetPages: targetPages || [],
     isActive: isActive !== undefined ? isActive : true,
     order: maxOrder ? maxOrder.order + 1 : 0,
     startDate: startDate || null,
@@ -55,7 +56,7 @@ const getBanners = asyncHandler(async (req, res) => {
 // @access  Public
 const getActiveBannersByPosition = asyncHandler(async (req, res) => {
   const now = new Date();
-  const banners = await Banner.find({
+  const filter = {
     position: req.params.position,
     isActive: true,
     $or: [
@@ -66,7 +67,13 @@ const getActiveBannersByPosition = asyncHandler(async (req, res) => {
       { endDate: { $gte: now } },
       { endDate: null },
     ],
-  }).sort({ order: 1 });
+  };
+
+  if (req.query.page) {
+    filter.targetPages = { $in: [req.query.page] };
+  }
+
+  const banners = await Banner.find(filter).sort({ order: 1 });
 
   res.json(banners);
 });
@@ -104,7 +111,7 @@ const updateBanner = asyncHandler(async (req, res) => {
     throw new Error('Banner not found');
   }
 
-  const fields = ['title', 'subtitle', 'description', 'image', 'link', 'ctaText', 'position', 'isActive', 'startDate', 'endDate', 'bgColor', 'order'];
+  const fields = ['title', 'subtitle', 'description', 'image', 'link', 'ctaText', 'position', 'targetPages', 'isActive', 'startDate', 'endDate', 'bgColor', 'order'];
   fields.forEach((field) => {
     if (req.body[field] !== undefined) {
       banner[field] = req.body[field];

@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api';
+import CategoryDrawer from './CategoryDrawer';
 
 const TopBar = () => {
   const [visible, setVisible] = useState(() => !localStorage.getItem('novacart_banner_dismissed'));
@@ -66,6 +67,7 @@ const Navbar = () => {
   const { user, logout, isAdmin } = useAuth();
   const [query, setQuery] = useState('');
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [banners, setBanners] = useState([]);
   const [activeBanner, setActiveBanner] = useState(null);
@@ -73,7 +75,7 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    api.getActiveBanners('hero').then((data) => {
+    api.getActiveBanners('promo').then((data) => {
       if (Array.isArray(data) && data.length > 0) {
         setBanners(data);
         setActiveBanner(data[0]);
@@ -155,12 +157,23 @@ const Navbar = () => {
             : 'bg-surface/95 backdrop-blur-md'
         }`}
       >
-        <div className="max-w-[1400px] mx-auto px-4 md:px-6 lg:px-10">
-          <div className="flex items-center justify-between h-16 lg:h-[72px] gap-4 lg:gap-8">
+        <div className="max-w-[1400px] mx-auto flex items-center h-16 lg:h-[72px]">
+          {/* Hamburger — attached to left edge */}
+          <button
+            onClick={() => setDrawerOpen(true)}
+            className="hidden lg:flex p-3 text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors -ml-1"
+            aria-label="Browse Categories"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+
+          <div className="flex items-center justify-between flex-1 gap-4 lg:gap-8 px-2 md:px-4 lg:px-6">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2.5 shrink-0 group">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
-                <svg className="w-5 h-5 text-on-primary" fill="currentColor" viewBox="0 0 24 24">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#a43c12] to-[#ff7f50] flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
+                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M18.36 9l.6 3H5.04l.6-3h12.72M20 4H4v2h16V4zm0 3H4l-1 5v2h1v6h10v-6h4v6h2v-6h1v-2l-1-5zM6 18v-4h6v4H6z"/>
                 </svg>
               </div>
@@ -380,6 +393,8 @@ const Navbar = () => {
           </div>
         )}
       </header>
+
+      <CategoryDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
     </>
   );
 };

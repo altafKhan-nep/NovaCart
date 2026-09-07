@@ -4,12 +4,50 @@ import { api } from '../api';
 import CategorySidebar from '../components/CategorySidebar';
 import ProductCard from '../components/ProductCard';
 
+const SidebarBanners = () => {
+  const [banners, setBanners] = useState([]);
+
+  useEffect(() => {
+    api.getActiveBanners('sidebar').then(setBanners).catch(() => {});
+  }, []);
+
+  if (banners.length === 0) return null;
+
+  return (
+    <div className="hidden xl:flex flex-col gap-4 w-64 shrink-0">
+      {banners.slice(0, 2).map((banner) => (
+        <a
+          key={banner._id}
+          href={banner.link || '/shop'}
+          className="group rounded-2xl overflow-hidden border border-surface-container/50 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-1"
+          style={{ background: banner.bgColor || '#fbf9f5' }}
+        >
+          {banner.image && (
+            <div className="aspect-[4/3] overflow-hidden">
+              <img src={banner.image} alt={banner.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            </div>
+          )}
+          <div className="p-3">
+            <h3 className="text-xs font-bold text-on-surface mb-0.5">{banner.title}</h3>
+            {banner.subtitle && <p className="text-[11px] text-on-surface-variant">{banner.subtitle}</p>}
+            <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary mt-1.5 group-hover:gap-1.5 transition-all">
+              {banner.ctaText || 'Shop Now'}
+              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </span>
+          </div>
+        </a>
+      ))}
+    </div>
+  );
+};
+
 const ProductListingPage = () => {
   const { category } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(1);
@@ -17,10 +55,6 @@ const ProductListingPage = () => {
   const keyword = searchParams.get('keyword') || '';
   const flash = searchParams.get('flash') === 'true';
   const sort = searchParams.get('sort') || '';
-
-  useEffect(() => {
-    api.getCategories().then(setCategories).catch(() => {});
-  }, []);
 
   useEffect(() => {
     const params = { pageNumber: page, pageSize: 9 };
@@ -46,7 +80,7 @@ const ProductListingPage = () => {
 
   return (
     <main className="flex flex-1 w-full px-3 md:px-6 lg:px-8 pr-4 md:pr-margin-desktop py-6 gap-6">
-      <CategorySidebar categories={categories} activeCategory={category} />
+      <CategorySidebar activeCategory={category} />
 
       <div className="flex-1 flex flex-col min-w-0">
         {/* Breadcrumb */}
@@ -131,6 +165,8 @@ const ProductListingPage = () => {
           </div>
         )}
       </div>
+
+      <SidebarBanners />
     </main>
   );
 };

@@ -308,15 +308,18 @@ const CategoryFormModal = ({ open, category, categories, onSave, onClose }) => {
             <label className="block text-sm font-semibold text-on-surface mb-1.5">
               Status
             </label>
-            <select
-              value={form.isActive}
-              onChange={(e) => handleChange('isActive', e.target.checked)}
-              className="sr-only peer"
-            />
-            <div className="w-9 h-5 bg-surface-container-high rounded-full peer peer-checked:bg-primary transition-colors after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full" />
-            <span className="text-sm font-semibold text-on-surface">
-              {form.isActive ? 'Active' : 'Inactive'}
-            </span>
+            <button
+              type="button"
+              onClick={() => handleChange('isActive', !form.isActive)}
+              className="flex items-center gap-3 cursor-pointer group"
+            >
+              <div className={`relative w-10 h-5 rounded-full transition-colors ${form.isActive ? 'bg-primary' : 'bg-surface-container-high'}`}>
+                <div className={`absolute top-[2px] left-[2px] bg-white rounded-full h-4 w-4 transition-transform shadow-sm ${form.isActive ? 'translate-x-5' : ''}`} />
+              </div>
+              <span className="text-sm font-medium text-on-surface">
+                {form.isActive ? 'Active' : 'Inactive'}
+              </span>
+            </button>
           </div>
 
           <div className="border-t border-surface-container/60 pt-5 flex items-center justify-end gap-3">

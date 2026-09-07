@@ -77,6 +77,37 @@ const getCategories = asyncHandler(async (req, res) => {
   res.json(tree);
 });
 
+// @desc    Get public categories (flat, active only, with real productCount)
+// @route   GET /api/categories/public
+// @access  Public
+const getPublicCategories = asyncHandler(async (req, res) => {
+  const categories = await Category.find({ isActive: true }).sort({ order: 1, name: 1 });
+
+  const productCounts = await Product.aggregate([
+    { $match: { $or: [{ isActive: true }, { isActive: { $exists: false } }] } },
+    { $group: { _id: '$category', count: { $sum: 1 } } },
+  ]);
+
+  const countMap = {};
+  productCounts.forEach((p) => {
+    if (p._id) countMap[p._id] = p.count;
+  });
+
+  const result = categories.map((cat) => ({
+    _id: cat._id,
+    name: cat.name,
+    slug: cat.slug,
+    description: cat.description,
+    image: cat.image,
+    icon: cat.icon,
+    parent: cat.parent,
+    order: cat.order,
+    productCount: countMap[cat.name] || 0,
+  }));
+
+  res.json(result);
+});
+
 // @desc    Get category by ID
 // @route   GET /api/categories/:id
 // @access  Public
@@ -209,6 +240,7 @@ const reorderCategories = asyncHandler(async (req, res) => {
 module.exports = {
   createCategory,
   getCategories,
+  getPublicCategories,
   getCategoryById,
   updateCategory,
   deleteCategory,

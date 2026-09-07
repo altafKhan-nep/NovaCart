@@ -7,6 +7,28 @@ import { formatPrice, discountPercent } from '../utils/helpers';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ProductCard from '../components/ProductCard';
 
+const SidebarBanners = () => {
+  const [banners, setBanners] = useState([]);
+  useEffect(() => {
+    api.getActiveBanners('sidebar').then(setBanners).catch(() => {});
+  }, []);
+  if (banners.length === 0) return null;
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+      {banners.slice(0, 3).map((banner) => (
+        <a key={banner._id} href={banner.link || '/shop'} className="group rounded-2xl overflow-hidden border border-surface-container/50 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-1" style={{ background: banner.bgColor || '#fbf9f5' }}>
+          {banner.image && <div className="aspect-[16/9] overflow-hidden"><img src={banner.image} alt={banner.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" /></div>}
+          <div className="p-3">
+            <h3 className="text-xs font-bold text-on-surface mb-0.5">{banner.title}</h3>
+            {banner.subtitle && <p className="text-[11px] text-on-surface-variant">{banner.subtitle}</p>}
+            <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary mt-1.5">{banner.ctaText || 'Shop Now'}</span>
+          </div>
+        </a>
+      ))}
+    </div>
+  );
+};
+
 const featureIcons = ['verified', 'local_shipping', 'support_agent', 'eco', 'security', 'inventory_2'];
 const featureColors = [
   'bg-secondary-container/20 text-secondary',
@@ -213,6 +235,9 @@ const ProductDetailPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Sidebar Banners */}
+      <SidebarBanners />
 
       {/* Features */}
       <div className="mb-16 relative z-10">

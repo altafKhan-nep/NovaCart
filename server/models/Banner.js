@@ -9,6 +9,7 @@ const bannerSchema = mongoose.Schema(
     link: { type: String, default: '/' },
     ctaText: { type: String, default: 'Shop Now' },
     position: { type: String, enum: ['hero', 'promo', 'footer', 'sidebar'], default: 'hero' },
+    targetPages: [{ type: String, enum: ['home', 'shop', 'product'] }],
     isActive: { type: Boolean, default: true },
     order: { type: Number, default: 0 },
     startDate: { type: Date },

@@ -4,6 +4,15 @@ import { api } from '../../api';
 
 const POSITIONS = ['hero', 'promo', 'footer', 'sidebar'];
 
+const POSITION_INFO = {
+  hero: { label: 'Hero', desc: 'Homepage main carousel — full-width rotating slides with big images', icon: 'star' },
+  promo: { label: 'Promo', desc: 'Promotional strip below navbar + promo cards on pages', icon: 'local_offer' },
+  sidebar: { label: 'Sidebar', desc: 'Sidebar banner on shop listing & product detail pages', icon: 'side_panel' },
+  footer: { label: 'Footer', desc: 'Trust/brand banner strip above the footer on all pages', icon: 'web_asset' },
+};
+
+const TARGET_PAGES = ['home', 'shop', 'product'];
+
 const INITIAL_FORM = {
   title: '',
   subtitle: '',
@@ -12,6 +21,7 @@ const INITIAL_FORM = {
   link: '',
   ctaText: '',
   position: 'hero',
+  targetPages: [],
   bgColor: '',
   startDate: '',
   endDate: '',
@@ -91,6 +101,7 @@ const BannerFormModal = ({ open, banner, onSave, onClose }) => {
         link: banner.link || '',
         ctaText: banner.ctaText || '',
         position: banner.position || 'hero',
+        targetPages: banner.targetPages || [],
         bgColor: banner.bgColor || '',
         startDate: banner.startDate
           ? new Date(banner.startDate).toISOString().slice(0, 10)
@@ -255,42 +266,86 @@ const BannerFormModal = ({ open, banner, onSave, onClose }) => {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-semibold text-on-surface mb-1.5">
-                Position
-              </label>
-              <select
-                value={form.position}
-                onChange={(e) => handleChange('position', e.target.value)}
-                className={inputClass('position')}
-              >
-                {POSITIONS.map((pos) => (
-                  <option key={pos} value={pos}>
-                    {pos.charAt(0).toUpperCase() + pos.slice(1)}
-                  </option>
-                ))}
-              </select>
+          <div>
+            <label className="block text-sm font-semibold text-on-surface mb-1.5">
+              Position
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              {POSITIONS.map((pos) => {
+                const info = POSITION_INFO[pos];
+                return (
+                  <button
+                    key={pos}
+                    type="button"
+                    onClick={() => handleChange('position', pos)}
+                    className={`flex items-start gap-2.5 p-3 rounded-xl border text-left transition-all ${
+                      form.position === pos
+                        ? 'border-primary bg-primary/5 ring-1 ring-primary/20'
+                        : 'border-surface-container hover:border-outline-variant bg-surface-container-low'
+                    }`}
+                  >
+                    <span className={`material-symbols-outlined text-lg mt-0.5 ${form.position === pos ? 'text-primary' : 'text-on-surface-variant'}`}>
+                      {info.icon}
+                    </span>
+                    <div>
+                      <p className={`text-sm font-semibold ${form.position === pos ? 'text-primary' : 'text-on-surface'}`}>{info.label}</p>
+                      <p className="text-[11px] text-on-surface-variant leading-tight mt-0.5">{info.desc}</p>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
-            <div>
-              <label className="block text-sm font-semibold text-on-surface mb-1.5">
-                Background Color
-              </label>
-              <div className="flex items-center gap-2">
-                <input
-                  type="color"
-                  value={form.bgColor || '#ffffff'}
-                  onChange={(e) => handleChange('bgColor', e.target.value)}
-                  className="w-10 h-[42px] rounded-lg border border-surface-container cursor-pointer shrink-0"
-                />
-                <input
-                  type="text"
-                  value={form.bgColor}
-                  onChange={(e) => handleChange('bgColor', e.target.value)}
-                  className={inputClass('bgColor')}
-                  placeholder="#ffffff"
-                />
-              </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-on-surface mb-1.5">
+              Show On Pages
+            </label>
+            <p className="text-xs text-on-surface-variant mb-2">Leave empty to show on all pages</p>
+            <div className="flex flex-wrap gap-2">
+              {TARGET_PAGES.map((page) => {
+                const selected = form.targetPages.includes(page);
+                return (
+                  <button
+                    key={page}
+                    type="button"
+                    onClick={() => {
+                      const next = selected
+                        ? form.targetPages.filter((p) => p !== page)
+                        : [...form.targetPages, page];
+                      handleChange('targetPages', next);
+                    }}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
+                      selected
+                        ? 'bg-primary text-on-primary border-primary'
+                        : 'bg-surface-container-low text-on-surface-variant border-surface-container hover:border-outline-variant'
+                    }`}
+                  >
+                    {page.charAt(0).toUpperCase() + page.slice(1)}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-on-surface mb-1.5">
+              Background Color
+            </label>
+            <div className="flex items-center gap-2">
+              <input
+                type="color"
+                value={form.bgColor || '#ffffff'}
+                onChange={(e) => handleChange('bgColor', e.target.value)}
+                className="w-10 h-[42px] rounded-lg border border-surface-container cursor-pointer shrink-0"
+              />
+              <input
+                type="text"
+                value={form.bgColor}
+                onChange={(e) => handleChange('bgColor', e.target.value)}
+                className={inputClass('bgColor')}
+                placeholder="#ffffff"
+              />
             </div>
           </div>
 
