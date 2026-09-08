@@ -203,7 +203,7 @@ const CategoryDrawer = ({ open, onClose }) => {
             {/* Close button */}
             <button
               onClick={onClose}
-              className="w-8 h-8 rounded-full flex items-center justify-center text-white/60 hover:bg-white/15 hover:text-white transition-all duration-200 shrink-0"
+              className="w-10 h-10 md:w-8 md:h-8 rounded-full flex items-center justify-center text-white/60 hover:bg-white/15 hover:text-white transition-all duration-200 shrink-0"
               aria-label="Close menu"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -399,12 +399,12 @@ const CategoryDrawer = ({ open, onClose }) => {
           )}
 
           {/* Help links */}
-          <div className="flex items-center justify-center gap-5 pt-1.5">
-            <button onClick={() => { onClose(); navigate('/help'); }} className="text-[11px] text-on-surface-variant/30 hover:text-primary transition-colors duration-200">Help</button>
+          <div className="flex items-center justify-center gap-5 pt-1.5 pb-1">
+            <button onClick={() => { onClose(); navigate('/help'); }} className="text-[11px] text-on-surface-variant/30 hover:text-primary transition-colors duration-200 py-2 px-1">Help</button>
             <span className="w-1 h-1 rounded-full bg-on-surface-variant/15" />
-            <button onClick={() => { onClose(); navigate('/privacy'); }} className="text-[11px] text-on-surface-variant/30 hover:text-primary transition-colors duration-200">Privacy</button>
+            <button onClick={() => { onClose(); navigate('/privacy'); }} className="text-[11px] text-on-surface-variant/30 hover:text-primary transition-colors duration-200 py-2 px-1">Privacy</button>
             <span className="w-1 h-1 rounded-full bg-on-surface-variant/15" />
-            <button onClick={() => { onClose(); navigate('/terms'); }} className="text-[11px] text-on-surface-variant/30 hover:text-primary transition-colors duration-200">Terms</button>
+            <button onClick={() => { onClose(); navigate('/terms'); }} className="text-[11px] text-on-surface-variant/30 hover:text-primary transition-colors duration-200 py-2 px-1">Terms</button>
           </div>
         </div>
       </div>

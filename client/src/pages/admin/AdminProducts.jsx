@@ -349,7 +349,7 @@ const ProductFormModal = ({ open, product, categories, onSave, onClose }) => {
                   <input type="text" value={form.name} onChange={(e) => handleChange('name', e.target.value)} className={inputClass('name')} placeholder="e.g. Wireless Headphones" />
                   {errors.name && <p className="text-[11px] text-error mt-1">{errors.name}</p>}
                 </div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-bold text-on-surface-variant mb-1.5">Slug</label>
                     <input type="text" value={form.slug} onChange={(e) => handleChange('slug', e.target.value)} className={inputClass('slug')} placeholder="auto-generated" />
@@ -359,7 +359,7 @@ const ProductFormModal = ({ open, product, categories, onSave, onClose }) => {
                     <input type="text" value={form.sku} onChange={(e) => handleChange('sku', e.target.value)} className={inputClass('sku')} placeholder="Auto-generated if empty" />
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-bold text-on-surface-variant mb-1.5">Category *</label>
                     <select value={form.category} onChange={(e) => handleChange('category', e.target.value)} className={inputClass('category')}>
@@ -392,7 +392,7 @@ const ProductFormModal = ({ open, product, categories, onSave, onClose }) => {
             <SectionHeader icon="paid" title="Pricing & Stock" subtitle="Price, original price, stock quantity, badge" open={openSections.pricing} onToggle={() => toggleSection('pricing')} />
             {openSections.pricing && (
               <div className="pb-5 space-y-4 pl-12">
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div>
                     <label className="block text-xs font-bold text-on-surface-variant mb-1.5">Price *</label>
                     <div className="relative">
@@ -440,7 +440,7 @@ const ProductFormModal = ({ open, product, categories, onSave, onClose }) => {
             {openSections.images && (
               <div className="pb-5 space-y-4 pl-12">
                 {validImages.length > 0 && (
-                  <div className="grid grid-cols-4 gap-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     {validImages.map((img, i) => (
                       <ImagePreview key={i} url={img} index={i} onRemove={() => removeImageField(i)} />
                     ))}
@@ -1158,21 +1158,21 @@ const AdminProducts = () => {
                             <div className="flex items-center justify-end gap-1">
                               <Link
                                 to={`/product/${product.slug || id}`}
-                                className="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors"
+                                className="p-2 md:p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors"
                                 title="View"
                               >
                                 <span className="material-symbols-outlined text-lg">visibility</span>
                               </Link>
                               <button
                                 onClick={() => openEdit(product)}
-                                className="p-1.5 rounded-lg text-on-surface-variant hover:bg-primary-container/30 hover:text-primary transition-colors"
+                                className="p-2 md:p-1.5 rounded-lg text-on-surface-variant hover:bg-primary-container/30 hover:text-primary transition-colors"
                                 title="Edit"
                               >
                                 <span className="material-symbols-outlined text-lg">edit</span>
                               </button>
                               <button
                                 onClick={() => setDeleteTarget({ id, bulk: false })}
-                                className="p-1.5 rounded-lg text-on-surface-variant hover:bg-error-container/30 hover:text-error transition-colors"
+                                className="p-2 md:p-1.5 rounded-lg text-on-surface-variant hover:bg-error-container/30 hover:text-error transition-colors"
                                 title="Delete"
                               >
                                 <span className="material-symbols-outlined text-lg">delete</span>

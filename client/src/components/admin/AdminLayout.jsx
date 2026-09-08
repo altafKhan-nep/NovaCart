@@ -222,7 +222,7 @@ const AdminLayout = ({ children }) => {
           </Link>
           <button
             onClick={closeMobileSidebar}
-            className="p-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors"
+            className="p-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors"
             aria-label="Close sidebar"
           >
             <span className="material-symbols-outlined">close</span>

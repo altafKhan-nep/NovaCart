@@ -46,7 +46,7 @@ const TopBar = () => {
           </Link>
           <button
             onClick={dismiss}
-            className="ml-1 p-0.5 rounded hover:bg-surface-container-high transition-colors text-on-surface-variant"
+            className="ml-1 p-2 rounded-lg hover:bg-surface-container-high transition-colors text-on-surface-variant"
             aria-label="Close"
           >
             <span className="material-symbols-outlined text-[15px]">close</span>
@@ -324,7 +324,7 @@ const Navbar = () => {
                     <button
                       type="button"
                       onClick={() => setQuery('')}
-                      className="p-1.5 mr-1 rounded-full hover:bg-surface-container-high text-on-surface-variant transition-colors"
+                      className="p-2 mr-1 rounded-full hover:bg-surface-container-high text-on-surface-variant transition-colors"
                     >
                       <span className="material-symbols-outlined text-lg">close</span>
                     </button>

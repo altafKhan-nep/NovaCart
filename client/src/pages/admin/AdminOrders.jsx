@@ -770,7 +770,7 @@ const AdminOrders = () => {
                             <div className="flex items-center justify-end gap-1">
                               <button
                                 onClick={() => { setSelectedOrder(order); setPanelOpen(true); }}
-                                className="p-1.5 rounded-lg text-on-surface-variant hover:bg-primary-container/30 hover:text-primary transition-colors"
+                                className="p-2 md:p-1.5 rounded-lg text-on-surface-variant hover:bg-primary-container/30 hover:text-primary transition-colors"
                                 title="View Details"
                               >
                                 <span className="material-symbols-outlined text-lg">visibility</span>
@@ -778,7 +778,7 @@ const AdminOrders = () => {
                               {(STATUS_FLOW[status] || []).length > 0 && (
                                 <button
                                   onClick={() => { setSelectedOrder(order); setPanelOpen(true); }}
-                                  className="p-1.5 rounded-lg text-on-surface-variant hover:bg-blue-100 hover:text-blue-800 transition-colors"
+                                  className="p-2 md:p-1.5 rounded-lg text-on-surface-variant hover:bg-blue-100 hover:text-blue-800 transition-colors"
                                   title="Update Status"
                                 >
                                   <span className="material-symbols-outlined text-lg">edit_note</span>
@@ -787,7 +787,7 @@ const AdminOrders = () => {
                               {canCancel && (
                                 <button
                                   onClick={() => setCancelTarget(id)}
-                                  className="p-1.5 rounded-lg text-on-surface-variant hover:bg-error-container/30 hover:text-error transition-colors"
+                                  className="p-2 md:p-1.5 rounded-lg text-on-surface-variant hover:bg-error-container/30 hover:text-error transition-colors"
                                   title="Cancel Order"
                                 >
                                   <span className="material-symbols-outlined text-lg">cancel</span>

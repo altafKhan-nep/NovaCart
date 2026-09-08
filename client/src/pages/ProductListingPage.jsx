@@ -164,7 +164,7 @@ const ProductListingPage = () => {
             <button
               disabled={page === 1}
               onClick={() => setPage(page - 1)}
-              className="w-9 h-9 rounded-lg flex items-center justify-center border border-surface-container text-on-surface-variant hover:bg-surface-container-high transition-colors disabled:opacity-40"
+              className="w-10 h-10 md:w-9 md:h-9 rounded-lg flex items-center justify-center border border-surface-container text-on-surface-variant hover:bg-surface-container-high transition-colors disabled:opacity-40"
             >
               <span className="material-symbols-outlined text-lg">chevron_left</span>
             </button>
@@ -172,7 +172,7 @@ const ProductListingPage = () => {
               <button
                 key={p}
                 onClick={() => setPage(p)}
-                className={`w-9 h-9 rounded-lg flex items-center justify-center text-sm font-semibold transition-colors ${
+                className={`w-10 h-10 md:w-9 md:h-9 rounded-lg flex items-center justify-center text-sm font-semibold transition-colors ${
                   p === page
                     ? 'bg-primary text-on-primary shadow-sm'
                     : 'border border-surface-container text-on-surface-variant hover:bg-surface-container-high'
@@ -184,7 +184,7 @@ const ProductListingPage = () => {
             <button
               disabled={page === pages}
               onClick={() => setPage(page + 1)}
-              className="w-9 h-9 rounded-lg flex items-center justify-center border border-surface-container text-on-surface-variant hover:bg-surface-container-high transition-colors disabled:opacity-40"
+              className="w-10 h-10 md:w-9 md:h-9 rounded-lg flex items-center justify-center border border-surface-container text-on-surface-variant hover:bg-surface-container-high transition-colors disabled:opacity-40"
             >
               <span className="material-symbols-outlined text-lg">chevron_right</span>
             </button>

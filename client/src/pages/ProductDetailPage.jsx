@@ -326,8 +326,8 @@ const SpecTable = ({ product }) => {
     { label: 'In the Box', value: `${product.name}, User Manual, Warranty Card` },
   ];
   return (
-    <div className="rounded-xl border border-outline-variant/40 overflow-hidden">
-      <table className="w-full text-sm">
+    <div className="rounded-xl border border-outline-variant/40 overflow-hidden overflow-x-auto">
+      <table className="w-full text-sm min-w-[320px]">
         <tbody>
           {specs.map((s, i) => (
             <tr key={i} className={i % 2 === 0 ? 'bg-surface-container-low' : 'bg-surface-container-lowest'}>
@@ -632,10 +632,10 @@ const ProductDetailPage = () => {
               </div>
 
               {/* Wishlist + Share */}
-              <div className="flex items-center gap-4 mb-4">
+              <div className="flex items-center gap-2 sm:gap-4 mb-4">
                 <button
                   onClick={handleWishlist}
-                  className="flex items-center gap-2 text-sm font-medium text-on-surface-variant hover:text-error transition-colors group"
+                  className="flex items-center gap-2 text-sm font-medium text-on-surface-variant hover:text-error transition-colors group py-2 px-3 -ml-3 rounded-lg hover:bg-error/5"
                 >
                   <span
                     className={`material-symbols-outlined text-[20px] transition-all ${wishlisted ? 'text-error' : 'text-on-surface-variant/40 group-hover:text-error/70'}`}
@@ -648,7 +648,7 @@ const ProductDetailPage = () => {
                 <span className="w-px h-4 bg-outline-variant/30" />
                 <button
                   onClick={handleShare}
-                  className="flex items-center gap-2 text-sm font-medium text-on-surface-variant hover:text-primary transition-colors group"
+                  className="flex items-center gap-2 text-sm font-medium text-on-surface-variant hover:text-primary transition-colors group py-2 px-3 rounded-lg hover:bg-primary/5"
                 >
                   <span className="material-symbols-outlined text-[20px] text-on-surface-variant/40 group-hover:text-primary/70">share</span>
                   Share

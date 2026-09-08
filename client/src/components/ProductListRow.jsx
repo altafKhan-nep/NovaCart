@@ -52,7 +52,7 @@ const ProductListRow = ({ product }) => {
         )}
         <button
           onClick={handleWishlist}
-          className="absolute top-1.5 right-1.5 w-7 h-7 rounded-full bg-surface-container-lowest/80 backdrop-blur-sm flex items-center justify-center shadow-sm hover:bg-surface-container-lowest hover:shadow transition-all"
+          className="absolute top-1 right-1 w-9 h-9 md:w-7 md:h-7 rounded-full bg-surface-container-lowest/80 backdrop-blur-sm flex items-center justify-center shadow-sm hover:bg-surface-container-lowest hover:shadow transition-all"
           aria-label="Add to wishlist"
         >
           <span className={`material-symbols-outlined text-[16px] ${isWishlisted ? 'text-error' : 'text-on-surface-variant/40'}`}>
