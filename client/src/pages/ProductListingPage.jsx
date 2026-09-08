@@ -3,6 +3,7 @@ import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { api } from '../api';
 import CategorySidebar from '../components/CategorySidebar';
 import ProductCard from '../components/ProductCard';
+import ProductListRow from '../components/ProductListRow';
 
 const SidebarBanners = () => {
   const [banners, setBanners] = useState([]);
@@ -51,6 +52,7 @@ const ProductListingPage = () => {
   const [products, setProducts] = useState([]);
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(1);
+  const [totalResults, setTotalResults] = useState(0);
 
   const keyword = searchParams.get('keyword') || '';
   const flash = searchParams.get('flash') === 'true';
@@ -61,11 +63,16 @@ const ProductListingPage = () => {
     if (keyword) params.keyword = keyword;
     if (category) params.category = category;
     if (flash) params.flash = true;
-    if (sort) params[sort] = true;
+    if (sort) {
+      params[sort] = true;
+    } else if (keyword) {
+      params.relevance = true;
+    }
 
     api.getProducts(params).then((data) => {
       setProducts(data.products);
       setPages(data.pages);
+      setTotalResults(data.count || data.products?.length || 0);
     }).catch(() => {});
   }, [category, keyword, flash, sort, page]);
 
@@ -73,10 +80,13 @@ const ProductListingPage = () => {
     const params = new URLSearchParams(window.location.search);
     if (value) params.set('sort', value);
     else params.delete('sort');
+    params.delete('page');
     navigate(`${window.location.pathname}?${params.toString()}`);
+    setPage(1);
   };
 
   const title = flash ? 'Flash Deals' : keyword ? `Search: "${keyword}"` : category ? category : 'All Products';
+  const isSearch = !!keyword;
 
   return (
     <main className="flex flex-1 w-full px-3 md:px-6 lg:px-8 pr-4 md:pr-margin-desktop py-6 gap-6">
@@ -100,9 +110,14 @@ const ProductListingPage = () => {
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-on-surface leading-tight">{title}</h1>
-            {keyword && (
+            {isSearch && totalResults > 0 && (
               <p className="text-sm text-on-surface-variant mt-1">
-                Showing results for &ldquo;{keyword}&rdquo;
+                Showing {((page - 1) * 9) + 1}–{Math.min(page * 9, totalResults)} of {totalResults.toLocaleString()} results for &ldquo;{keyword}&rdquo;
+              </p>
+            )}
+            {!isSearch && products.length > 0 && (
+              <p className="text-sm text-on-surface-variant mt-1">
+                {products.length} products
               </p>
             )}
           </div>
@@ -111,20 +126,31 @@ const ProductListingPage = () => {
             onChange={(e) => setSort(e.target.value)}
             className="bg-surface-container-low text-on-surface text-sm rounded-lg px-4 py-2.5 border border-surface-container font-medium outline-none focus:border-primary-container transition-colors cursor-pointer"
           >
-            <option value="">Sort by: Featured</option>
+            <option value="">Sort by: Relevance</option>
+            <option value="popular">Popularity</option>
             <option value="lowest">Price: Low to High</option>
             <option value="highest">Price: High to Low</option>
+            <option value="newest">Newest First</option>
+            <option value="bestseller">Bestseller</option>
           </select>
         </div>
 
-        {/* Products Grid */}
+        {/* Products */}
         {products.length === 0 ? (
           <div className="text-center py-20 bg-surface-container-lowest rounded-xl border border-surface-container/60">
             <span className="material-symbols-outlined text-5xl text-on-surface-variant/30">search_off</span>
             <h2 className="text-lg font-bold text-on-surface mt-4">No products found</h2>
             <p className="text-sm text-on-surface-variant mt-1">Try a different search or category.</p>
           </div>
+        ) : isSearch ? (
+          /* Flipkart-style list view for search results */
+          <div className="flex flex-col gap-3">
+            {products.map((product) => (
+              <ProductListRow key={product._id} product={product} />
+            ))}
+          </div>
         ) : (
+          /* Grid view for category / browse */
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {products.map((product) => (
               <ProductCard key={product._id} product={product} />

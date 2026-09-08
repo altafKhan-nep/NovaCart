@@ -5,6 +5,7 @@ const productSchema = mongoose.Schema(
     sku: {
       type: String,
       default: '',
+      unique: true,
       sparse: true,
     },
     name: {
@@ -99,8 +100,6 @@ const productSchema = mongoose.Schema(
     timestamps: true,
   }
 );
-
-productSchema.index({ sku: 1 }, { unique: true, sparse: true });
 
 const Product = mongoose.model('Product', productSchema);
 

@@ -108,10 +108,57 @@ const ConfirmDialog = ({ open, title, message, onConfirm, onCancel }) => {
   );
 };
 
+const SectionHeader = ({ icon, title, subtitle, open, onToggle }) => (
+  <button
+    type="button"
+    onClick={onToggle}
+    className="w-full flex items-center gap-3 py-3 group"
+  >
+    <div className="w-9 h-9 rounded-xl bg-primary/8 flex items-center justify-center shrink-0">
+      <span className="material-symbols-outlined text-primary text-xl">{icon}</span>
+    </div>
+    <div className="flex-1 text-left">
+      <h3 className="text-sm font-bold text-on-surface">{title}</h3>
+      {subtitle && <p className="text-[11px] text-on-surface-variant/60 mt-0.5">{subtitle}</p>}
+    </div>
+    <span className={`material-symbols-outlined text-on-surface-variant/40 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}>
+      expand_more
+    </span>
+  </button>
+);
+
+const ImagePreview = ({ url, onRemove, index }) => {
+  const [error, setError] = useState(false);
+  if (!url || error) return null;
+  return (
+    <div className="relative group rounded-xl overflow-hidden border border-outline-variant/20">
+      <img
+        src={url}
+        alt={`Preview ${index + 1}`}
+        className="w-full h-28 object-cover"
+        onError={() => setError(true)}
+      />
+      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
+        <button
+          type="button"
+          onClick={onRemove}
+          className="opacity-0 group-hover:opacity-100 bg-white/90 text-error p-1.5 rounded-full transition-all shadow-md"
+        >
+          <span className="material-symbols-outlined text-sm">close</span>
+        </button>
+      </div>
+      <span className="absolute top-1.5 left-1.5 bg-black/60 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-md">
+        {index + 1}
+      </span>
+    </div>
+  );
+};
+
 const ProductFormModal = ({ open, product, categories, onSave, onClose }) => {
   const [form, setForm] = useState(INITIAL_FORM);
   const [errors, setErrors] = useState({});
   const [saving, setSaving] = useState(false);
+  const [openSections, setOpenSections] = useState({ basic: true, pricing: true, images: true, colors: false, features: false, flags: false });
 
   useEffect(() => {
     if (product) {
@@ -137,6 +184,8 @@ const ProductFormModal = ({ open, product, categories, onSave, onClose }) => {
     }
     setErrors({});
   }, [product, open]);
+
+  const toggleSection = (key) => setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }));
 
   const handleChange = (field, value) => {
     setForm((prev) => {
@@ -176,13 +225,10 @@ const ProductFormModal = ({ open, product, categories, onSave, onClose }) => {
   };
 
   const handleColorToggle = (color) => {
-    setForm((prev) => {
-      const exists = prev.colors.includes(color);
-      return {
-        ...prev,
-        colors: exists ? prev.colors.filter((c) => c !== color) : [...prev.colors, color],
-      };
-    });
+    setForm((prev) => ({
+      ...prev,
+      colors: prev.colors.includes(color) ? prev.colors.filter((c) => c !== color) : [...prev.colors, color],
+    }));
   };
 
   const PRESET_COLORS = [
@@ -226,9 +272,11 @@ const ProductFormModal = ({ open, product, categories, onSave, onClose }) => {
   };
 
   const inputClass = (field) =>
-    `w-full bg-surface-container-low rounded-lg px-3 py-2.5 text-sm text-on-surface border ${
-      errors[field] ? 'border-error focus:border-error' : 'border-surface-container focus:border-primary'
-    } focus:ring-2 focus:ring-primary/20 outline-none transition-all`;
+    `w-full bg-surface-container-low rounded-xl px-3.5 py-2.5 text-sm text-on-surface border ${
+      errors[field] ? 'border-error focus:border-error' : 'border-outline-variant/30 focus:border-primary'
+    } focus:ring-2 focus:ring-primary/10 outline-none transition-all placeholder:text-on-surface-variant/30`;
+
+  const validImages = form.images.filter(Boolean);
 
   if (!open) return null;
 
@@ -236,308 +284,311 @@ const ProductFormModal = ({ open, product, categories, onSave, onClose }) => {
     <div className="fixed inset-0 z-50 flex justify-end">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
       <div className="relative w-full max-w-2xl bg-surface-container-lowest shadow-2xl overflow-y-auto animate-slide-in-right">
-        <div className="sticky top-0 bg-surface-container-lowest border-b border-surface-container px-6 py-4 flex items-center justify-between z-10">
-          <h2 className="text-lg font-bold text-on-surface">
-            {product ? 'Edit Product' : 'Add Product'}
-          </h2>
+        {/* Header */}
+        <div className="sticky top-0 bg-surface-container-lowest/95 backdrop-blur-md border-b border-outline-variant/10 px-6 py-4 flex items-center justify-between z-10">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <span className="material-symbols-outlined text-primary text-xl">
+                {product ? 'edit_square' : 'add_box'}
+              </span>
+            </div>
+            <div>
+              <h2 className="text-base font-bold text-on-surface">
+                {product ? 'Edit Product' : 'Add New Product'}
+              </h2>
+              <p className="text-[11px] text-on-surface-variant/50">
+                {product ? 'Update product details' : 'Fill in the product information'}
+              </p>
+            </div>
+          </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-surface-container-high text-on-surface-variant transition-colors"
+            className="p-2 rounded-xl hover:bg-surface-container-high text-on-surface-variant transition-colors"
           >
             <span className="material-symbols-outlined">close</span>
           </button>
         </div>
 
-        <div className="p-6 space-y-5">
-          <div>
-            <label className="block text-sm font-semibold text-on-surface mb-1.5">Product Name *</label>
-            <input
-              type="text"
-              value={form.name}
-              onChange={(e) => handleChange('name', e.target.value)}
-              className={inputClass('name')}
-              placeholder="e.g. Wireless Headphones"
-            />
-            {errors.name && <p className="text-xs text-error mt-1">{errors.name}</p>}
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-on-surface mb-1.5">Slug</label>
-            <input
-              type="text"
-              value={form.slug}
-              onChange={(e) => handleChange('slug', e.target.value)}
-              className={inputClass('slug')}
-              placeholder="auto-generated-from-name"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-on-surface mb-1.5">SKU</label>
-            <input
-              type="text"
-              value={form.sku}
-              onChange={(e) => handleChange('sku', e.target.value)}
-              className={inputClass('sku')}
-              placeholder="Auto-generated if empty"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-on-surface mb-1.5">Status</label>
-            <select
-              value={form.status}
-              onChange={(e) => handleChange('status', e.target.value)}
-              className={inputClass('status')}
-            >
-              <option value="active">Active</option>
-              <option value="draft">Draft</option>
-              <option value="out of stock">Out of Stock</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-on-surface mb-1.5">Category *</label>
-            <select
-              value={form.category}
-              onChange={(e) => handleChange('category', e.target.value)}
-              className={inputClass('category')}
-            >
-              <option value="">Select category</option>
-              {categories.map((cat) => (
-                <option key={cat._id || cat.id} value={cat._id || cat.id}>
-                  {cat.name}
-                </option>
-              ))}
-            </select>
-            {errors.category && <p className="text-xs text-error mt-1">{errors.category}</p>}
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-on-surface mb-1.5">Description</label>
-            <textarea
-              value={form.description}
-              onChange={(e) => handleChange('description', e.target.value)}
-              rows={4}
-              className={inputClass('description')}
-              placeholder="Product description..."
-            />
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-semibold text-on-surface mb-1.5">Price *</label>
-              <input
-                type="number"
-                step="0.01"
-                min="0"
-                value={form.price}
-                onChange={(e) => handleChange('price', e.target.value)}
-                className={inputClass('price')}
-                placeholder="0.00"
-              />
-              {errors.price && <p className="text-xs text-error mt-1">{errors.price}</p>}
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-on-surface mb-1.5">Original Price</label>
-              <input
-                type="number"
-                step="0.01"
-                min="0"
-                value={form.originalPrice}
-                onChange={(e) => handleChange('originalPrice', e.target.value)}
-                className={inputClass('originalPrice')}
-                placeholder="0.00"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-semibold text-on-surface mb-1.5">Stock Quantity *</label>
-              <input
-                type="number"
-                min="0"
-                value={form.countInStock}
-                onChange={(e) => handleChange('countInStock', e.target.value)}
-                className={inputClass('countInStock')}
-                placeholder="0"
-              />
-              {errors.countInStock && <p className="text-xs text-error mt-1">{errors.countInStock}</p>}
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-on-surface mb-1.5">Badge</label>
-              <input
-                type="text"
-                value={form.badge}
-                onChange={(e) => handleChange('badge', e.target.value)}
-                className={inputClass('badge')}
-                placeholder="e.g. New, Sale"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-on-surface mb-1.5">Images</label>
-            {form.images.map((img, i) => (
-              <div key={i} className="flex gap-2 mb-2">
-                <input
-                  type="url"
-                  value={img}
-                  onChange={(e) => handleImageChange(i, e.target.value)}
-                  className="flex-1 bg-surface-container-low rounded-lg px-3 py-2 text-sm text-on-surface border border-surface-container focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
-                  placeholder="https://example.com/image.jpg"
-                />
-                {form.images.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => removeImageField(i)}
-                    className="p-2 rounded-lg hover:bg-error-container/30 text-on-surface-variant hover:text-error transition-colors"
-                  >
-                    <span className="material-symbols-outlined text-lg">close</span>
-                  </button>
-                )}
-              </div>
-            ))}
-            <button
-              type="button"
-              onClick={addImageField}
-              className="text-sm font-semibold text-primary hover:underline flex items-center gap-1"
-            >
-              <span className="material-symbols-outlined text-lg">add</span>
-              Add Image
-            </button>
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-on-surface mb-2">Colors</label>
-            <div className="flex flex-wrap gap-2">
-              {PRESET_COLORS.map((color) => (
-                <button
-                  key={color}
-                  type="button"
-                  onClick={() => handleColorToggle(color)}
-                  className={`w-8 h-8 rounded-full border-2 transition-all ${
-                    form.colors.includes(color)
-                      ? 'border-primary scale-110 shadow-md'
-                      : 'border-surface-container hover:border-on-surface-variant'
-                  }`}
-                  style={{ backgroundColor: color }}
-                  title={color}
-                />
-              ))}
-            </div>
-            <div className="flex gap-2 mt-2">
-              <input
-                type="text"
-                id="customColor"
-                className="flex-1 bg-surface-container-low rounded-lg px-3 py-2 text-sm text-on-surface border border-surface-container focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
-                placeholder="#hex or color name"
-              />
-              <button
-                type="button"
-                onClick={() => {
-                  const input = document.getElementById('customColor');
-                  if (input.value.trim()) {
-                    handleColorToggle(input.value.trim());
-                    input.value = '';
-                  }
-                }}
-                className="px-3 py-2 text-sm font-semibold bg-surface-container-high rounded-lg hover:bg-surface-container-highest transition-colors"
-              >
-                Add
-              </button>
-            </div>
-            {form.colors.length > 0 && (
-              <div className="flex flex-wrap gap-1 mt-2">
-                {form.colors.map((c) => (
-                  <span
-                    key={c}
-                    className="inline-flex items-center gap-1 bg-surface-container-high text-on-surface-variant text-xs px-2 py-1 rounded-full"
-                  >
-                    <span className="w-3 h-3 rounded-full border" style={{ backgroundColor: c }} />
-                    {c}
-                    <button onClick={() => handleColorToggle(c)} className="hover:text-error">
-                      <span className="material-symbols-outlined text-sm">close</span>
-                    </button>
-                  </span>
-                ))}
+        <div className="p-6 space-y-1">
+          {/* ─── Basic Info ─── */}
+          <div className="border-b border-outline-variant/10">
+            <SectionHeader icon="info" title="Basic Information" subtitle="Name, slug, SKU, status, category" open={openSections.basic} onToggle={() => toggleSection('basic')} />
+            {openSections.basic && (
+              <div className="pb-5 space-y-4 pl-12">
+                <div>
+                  <label className="block text-xs font-bold text-on-surface-variant mb-1.5">Product Name *</label>
+                  <input type="text" value={form.name} onChange={(e) => handleChange('name', e.target.value)} className={inputClass('name')} placeholder="e.g. Wireless Headphones" />
+                  {errors.name && <p className="text-[11px] text-error mt-1">{errors.name}</p>}
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-on-surface-variant mb-1.5">Slug</label>
+                    <input type="text" value={form.slug} onChange={(e) => handleChange('slug', e.target.value)} className={inputClass('slug')} placeholder="auto-generated" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-on-surface-variant mb-1.5">SKU</label>
+                    <input type="text" value={form.sku} onChange={(e) => handleChange('sku', e.target.value)} className={inputClass('sku')} placeholder="Auto-generated if empty" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-on-surface-variant mb-1.5">Category *</label>
+                    <select value={form.category} onChange={(e) => handleChange('category', e.target.value)} className={inputClass('category')}>
+                      <option value="">Select category</option>
+                      {categories.map((cat) => (
+                        <option key={cat._id || cat.id} value={cat._id || cat.id}>{cat.name}</option>
+                      ))}
+                    </select>
+                    {errors.category && <p className="text-[11px] text-error mt-1">{errors.category}</p>}
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-on-surface-variant mb-1.5">Status</label>
+                    <select value={form.status} onChange={(e) => handleChange('status', e.target.value)} className={inputClass('status')}>
+                      <option value="active">Active</option>
+                      <option value="draft">Draft</option>
+                      <option value="out of stock">Out of Stock</option>
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-on-surface-variant mb-1.5">Description</label>
+                  <textarea value={form.description} onChange={(e) => handleChange('description', e.target.value)} rows={3} className={inputClass('description')} placeholder="Product description..." />
+                </div>
               </div>
             )}
           </div>
 
-          <div>
-            <label className="block text-sm font-semibold text-on-surface mb-1.5">Features</label>
-            {form.features.map((feat, i) => (
-              <div key={i} className="flex gap-2 mb-2">
-                <input
-                  type="text"
-                  value={feat}
-                  onChange={(e) => handleFeatureChange(i, e.target.value)}
-                  className="flex-1 bg-surface-container-low rounded-lg px-3 py-2 text-sm text-on-surface border border-surface-container focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
-                  placeholder={`Feature ${i + 1}`}
-                />
-                {form.features.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => removeFeatureField(i)}
-                    className="p-2 rounded-lg hover:bg-error-container/30 text-on-surface-variant hover:text-error transition-colors"
-                  >
-                    <span className="material-symbols-outlined text-lg">close</span>
-                  </button>
+          {/* ─── Pricing & Stock ─── */}
+          <div className="border-b border-outline-variant/10">
+            <SectionHeader icon="paid" title="Pricing & Stock" subtitle="Price, original price, stock quantity, badge" open={openSections.pricing} onToggle={() => toggleSection('pricing')} />
+            {openSections.pricing && (
+              <div className="pb-5 space-y-4 pl-12">
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-on-surface-variant mb-1.5">Price *</label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant/40 text-sm font-bold">$</span>
+                      <input type="number" step="0.01" min="0" value={form.price} onChange={(e) => handleChange('price', e.target.value)} className={`${inputClass('price')} pl-7`} placeholder="0.00" />
+                    </div>
+                    {errors.price && <p className="text-[11px] text-error mt-1">{errors.price}</p>}
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-on-surface-variant mb-1.5">Original Price</label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant/40 text-sm font-bold">$</span>
+                      <input type="number" step="0.01" min="0" value={form.originalPrice} onChange={(e) => handleChange('originalPrice', e.target.value)} className={`${inputClass('originalPrice')} pl-7`} placeholder="0.00" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-on-surface-variant mb-1.5">Stock *</label>
+                    <input type="number" min="0" value={form.countInStock} onChange={(e) => handleChange('countInStock', e.target.value)} className={inputClass('countInStock')} placeholder="0" />
+                    {errors.countInStock && <p className="text-[11px] text-error mt-1">{errors.countInStock}</p>}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-on-surface-variant mb-1.5">Badge</label>
+                  <input type="text" value={form.badge} onChange={(e) => handleChange('badge', e.target.value)} className={inputClass('badge')} placeholder="e.g. New, Sale, Hot" />
+                </div>
+                {form.price > 0 && form.originalPrice > form.price && (
+                  <div className="flex items-center gap-2 bg-green-50 text-green-700 text-xs font-semibold px-3 py-2 rounded-xl">
+                    <span className="material-symbols-outlined text-sm">local_offer</span>
+                    {Math.round(((form.originalPrice - form.price) / form.originalPrice) * 100)}% discount — customers save ${(form.originalPrice - form.price).toFixed(2)}
+                  </div>
                 )}
               </div>
-            ))}
-            <button
-              type="button"
-              onClick={addFeatureField}
-              className="text-sm font-semibold text-primary hover:underline flex items-center gap-1"
-            >
-              <span className="material-symbols-outlined text-lg">add</span>
-              Add Feature
-            </button>
+            )}
           </div>
 
-          <div className="flex flex-wrap items-center gap-6">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={form.flashDeal}
-                onChange={(e) => handleChange('flashDeal', e.target.checked)}
-                className="w-4 h-4 rounded border-surface-container text-primary focus:ring-primary/20"
-              />
-              <span className="text-sm font-semibold text-on-surface">Flash Deal</span>
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={form.newArrival}
-                onChange={(e) => handleChange('newArrival', e.target.checked)}
-                className="w-4 h-4 rounded border-surface-container text-primary focus:ring-primary/20"
-              />
-              <span className="text-sm font-semibold text-on-surface">New Arrival</span>
-            </label>
+          {/* ─── Images ─── */}
+          <div className="border-b border-outline-variant/10">
+            <SectionHeader
+              icon="image"
+              title="Product Images"
+              subtitle={`${validImages.length} image(s) added`}
+              open={openSections.images}
+              onToggle={() => toggleSection('images')}
+            />
+            {openSections.images && (
+              <div className="pb-5 space-y-3 pl-12">
+                {validImages.length > 0 && (
+                  <div className="grid grid-cols-4 gap-2">
+                    {validImages.map((img, i) => (
+                      <ImagePreview key={i} url={img} index={i} onRemove={() => removeImageField(i)} />
+                    ))}
+                  </div>
+                )}
+                {form.images.map((img, i) => (
+                  <div key={i} className="flex gap-2">
+                    <input
+                      type="url"
+                      value={img}
+                      onChange={(e) => handleImageChange(i, e.target.value)}
+                      className="flex-1 bg-surface-container-low rounded-xl px-3.5 py-2.5 text-sm text-on-surface border border-outline-variant/30 focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition-all placeholder:text-on-surface-variant/30"
+                      placeholder="https://example.com/image.jpg"
+                    />
+                    {form.images.length > 1 && (
+                      <button type="button" onClick={() => removeImageField(i)} className="p-2.5 rounded-xl hover:bg-error-container/30 text-on-surface-variant hover:text-error transition-colors">
+                        <span className="material-symbols-outlined text-lg">close</span>
+                      </button>
+                    )}
+                  </div>
+                ))}
+                <button type="button" onClick={addImageField} className="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:text-primary/80 transition-colors">
+                  <span className="material-symbols-outlined text-[16px]">add_circle</span>
+                  Add another image
+                </button>
+              </div>
+            )}
           </div>
 
-          <div className="border-t border-surface-container pt-5 flex items-center justify-end gap-3">
-            <button
-              onClick={onClose}
-              className="px-4 py-2.5 text-sm font-semibold rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors"
-            >
-              Cancel
-            </button>
+          {/* ─── Colors ─── */}
+          <div className="border-b border-outline-variant/10">
+            <SectionHeader
+              icon="palette"
+              title="Colors"
+              subtitle={form.colors.length > 0 ? `${form.colors.length} color(s) selected` : 'No colors selected'}
+              open={openSections.colors}
+              onToggle={() => toggleSection('colors')}
+            />
+            {openSections.colors && (
+              <div className="pb-5 space-y-3 pl-12">
+                <div className="flex flex-wrap gap-2">
+                  {PRESET_COLORS.map((color) => (
+                    <button
+                      key={color}
+                      type="button"
+                      onClick={() => handleColorToggle(color)}
+                      className={`w-9 h-9 rounded-full border-2 transition-all ${
+                        form.colors.includes(color)
+                          ? 'border-primary scale-110 shadow-md ring-2 ring-primary/20'
+                          : 'border-outline-variant/30 hover:border-on-surface-variant/40 hover:scale-105'
+                      }`}
+                      style={{ backgroundColor: color }}
+                      title={color}
+                    />
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    id="customColor"
+                    className="flex-1 bg-surface-container-low rounded-xl px-3.5 py-2.5 text-sm text-on-surface border border-outline-variant/30 focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition-all placeholder:text-on-surface-variant/30"
+                    placeholder="#hex or color name"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const input = document.getElementById('customColor');
+                      if (input.value.trim()) { handleColorToggle(input.value.trim()); input.value = ''; }
+                    }}
+                    className="px-4 py-2.5 text-xs font-bold bg-surface-container-high rounded-xl hover:bg-surface-container-highest transition-colors"
+                  >
+                    Add
+                  </button>
+                </div>
+                {form.colors.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5">
+                    {form.colors.map((c) => (
+                      <span key={c} className="inline-flex items-center gap-1.5 bg-surface-container-high text-on-surface-variant text-[11px] font-semibold px-2.5 py-1 rounded-full">
+                        <span className="w-3.5 h-3.5 rounded-full border border-outline-variant/30 shrink-0" style={{ backgroundColor: c }} />
+                        {c}
+                        <button onClick={() => handleColorToggle(c)} className="hover:text-error ml-0.5">
+                          <span className="material-symbols-outlined text-[13px]">close</span>
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* ─── Features ─── */}
+          <div className="border-b border-outline-variant/10">
+            <SectionHeader
+              icon="checklist"
+              title="Features"
+              subtitle={form.features.filter(Boolean).length > 0 ? `${form.features.filter(Boolean).length} feature(s) added` : 'No features added'}
+              open={openSections.features}
+              onToggle={() => toggleSection('features')}
+            />
+            {openSections.features && (
+              <div className="pb-5 space-y-2 pl-12">
+                {form.features.map((feat, i) => (
+                  <div key={i} className="flex gap-2">
+                    <span className="w-6 h-6 rounded-lg bg-primary/8 flex items-center justify-center text-[10px] font-bold text-primary shrink-0 mt-1.5">
+                      {i + 1}
+                    </span>
+                    <input
+                      type="text"
+                      value={feat}
+                      onChange={(e) => handleFeatureChange(i, e.target.value)}
+                      className="flex-1 bg-surface-container-low rounded-xl px-3.5 py-2.5 text-sm text-on-surface border border-outline-variant/30 focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition-all placeholder:text-on-surface-variant/30"
+                      placeholder={`Feature ${i + 1}`}
+                    />
+                    {form.features.length > 1 && (
+                      <button type="button" onClick={() => removeFeatureField(i)} className="p-2.5 rounded-xl hover:bg-error-container/30 text-on-surface-variant hover:text-error transition-colors">
+                        <span className="material-symbols-outlined text-lg">close</span>
+                      </button>
+                    )}
+                  </div>
+                ))}
+                <button type="button" onClick={addFeatureField} className="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:text-primary/80 transition-colors ml-8">
+                  <span className="material-symbols-outlined text-[16px]">add_circle</span>
+                  Add feature
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* ─── Flags ─── */}
+          <div>
+            <SectionHeader icon="flag" title="Flags" subtitle="Flash deal, new arrival" open={openSections.flags} onToggle={() => toggleSection('flags')} />
+            {openSections.flags && (
+              <div className="pb-5 space-y-3 pl-12">
+                <label className="flex items-center gap-3 cursor-pointer group p-3 rounded-xl border border-outline-variant/15 hover:border-primary/20 hover:bg-primary/5 transition-all">
+                  <div className={`w-10 h-6 rounded-full transition-colors relative ${form.flashDeal ? 'bg-primary' : 'bg-surface-container-high'}`}>
+                    <div className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow-sm transition-transform ${form.flashDeal ? 'translate-x-5' : 'translate-x-1'}`} />
+                  </div>
+                  <div>
+                    <span className="text-sm font-bold text-on-surface group-hover:text-primary transition-colors">Flash Deal</span>
+                    <p className="text-[11px] text-on-surface-variant/50">Show this product in flash deals section</p>
+                  </div>
+                </label>
+                <label className="flex items-center gap-3 cursor-pointer group p-3 rounded-xl border border-outline-variant/15 hover:border-primary/20 hover:bg-primary/5 transition-all">
+                  <div className={`w-10 h-6 rounded-full transition-colors relative ${form.newArrival ? 'bg-primary' : 'bg-surface-container-high'}`}>
+                    <div className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow-sm transition-transform ${form.newArrival ? 'translate-x-5' : 'translate-x-1'}`} />
+                  </div>
+                  <div>
+                    <span className="text-sm font-bold text-on-surface group-hover:text-primary transition-colors">New Arrival</span>
+                    <p className="text-[11px] text-on-surface-variant/50">Mark this product as a new arrival</p>
+                  </div>
+                </label>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="sticky bottom-0 bg-surface-container-lowest/95 backdrop-blur-md border-t border-outline-variant/10 px-6 py-4 flex items-center justify-between">
+          <button onClick={onClose} className="text-sm font-semibold text-on-surface-variant hover:text-on-surface transition-colors">
+            Cancel
+          </button>
+          <div className="flex items-center gap-2">
             <button
               onClick={() => handleSubmit(true)}
               disabled={saving}
-              className="px-4 py-2.5 text-sm font-semibold rounded-lg bg-surface-container-high text-on-surface hover:bg-surface-container-highest transition-colors disabled:opacity-50"
+              className="px-4 py-2.5 text-sm font-semibold rounded-xl bg-surface-container-high text-on-surface hover:bg-surface-container-highest transition-colors disabled:opacity-50"
             >
               {saving ? 'Saving...' : 'Save as Draft'}
             </button>
             <button
               onClick={() => handleSubmit(false)}
               disabled={saving}
-              className="px-4 py-2.5 text-sm font-semibold rounded-lg bg-primary text-on-primary hover:bg-primary/90 transition-colors disabled:opacity-50"
+              className="px-5 py-2.5 text-sm font-bold rounded-xl bg-primary text-on-primary hover:bg-primary/90 shadow-sm hover:shadow-md transition-all disabled:opacity-50 flex items-center gap-1.5"
             >
-              {saving ? 'Saving...' : 'Save Product'}
+              <span className="material-symbols-outlined text-[18px]">{product ? 'save' : 'add'}</span>
+              {saving ? 'Saving...' : product ? 'Update Product' : 'Create Product'}
             </button>
           </div>
         </div>

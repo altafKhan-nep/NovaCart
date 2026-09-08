@@ -27,9 +27,14 @@ const getProducts = async (req, res) => {
   const sort = {};
 
   if (req.query.lowest) sort.price = 1;
-  if (req.query.highest) sort.price = -1;
-  if (req.query.newest) sort.createdAt = -1;
-  if (req.query.popular) sort.numReviews = -1;
+  else if (req.query.highest) sort.price = -1;
+  else if (req.query.newest) sort.createdAt = -1;
+  else if (req.query.popular) sort.numReviews = -1;
+  else if (req.query.bestseller) sort.numReviews = -1;
+  else if (req.query.relevance && keyword.name) {
+    sort.rating = -1;
+    sort.numReviews = -1;
+  }
 
   const count = await Product.countDocuments({ ...keyword, ...category, ...flash });
   const products = await Product.find({ ...keyword, ...category, ...flash })

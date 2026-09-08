@@ -7,7 +7,7 @@ const POSITIONS = ['hero', 'promo', 'footer', 'sidebar'];
 const POSITION_INFO = {
   hero: { label: 'Hero', desc: 'Homepage main carousel — full-width rotating slides with big images', icon: 'star' },
   promo: { label: 'Promo', desc: 'Promotional strip below navbar + promo cards on pages', icon: 'local_offer' },
-  sidebar: { label: 'Sidebar', desc: 'Sidebar banner on shop listing & product detail pages', icon: 'side_panel' },
+  sidebar: { label: 'Sidebar', desc: 'Sidebar banner on shop listing & product detail pages', icon: 'view_sidebar' },
   footer: { label: 'Footer', desc: 'Trust/brand banner strip above the footer on all pages', icon: 'web_asset' },
 };
 
@@ -90,6 +90,8 @@ const BannerFormModal = ({ open, banner, onSave, onClose }) => {
   const [form, setForm] = useState(INITIAL_FORM);
   const [errors, setErrors] = useState({});
   const [saving, setSaving] = useState(false);
+  const [imageTab, setImageTab] = useState('url');
+  const [dragOver, setDragOver] = useState(false);
 
   useEffect(() => {
     if (banner) {
@@ -126,6 +128,9 @@ const BannerFormModal = ({ open, banner, onSave, onClose }) => {
     const e = {};
     if (!form.title.trim()) e.title = 'Title is required';
     if (!form.image.trim()) e.image = 'Image URL is required';
+    if (form.startDate && form.endDate && new Date(form.startDate) > new Date(form.endDate)) {
+      e.endDate = 'End date must be after start date';
+    }
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -147,6 +152,29 @@ const BannerFormModal = ({ open, banner, onSave, onClose }) => {
         : 'border-surface-container focus:border-primary'
     } focus:ring-2 focus:ring-primary/20 outline-none transition-all`;
 
+  const handleImageUpload = (file) => {
+    if (!file || !file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      handleChange('image', e.target.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setDragOver(false);
+    const file = e.dataTransfer.files[0];
+    handleImageUpload(file);
+  };
+
+  const PPOSITION_PRESETS = {
+    hero: { bg: 'from-blue-500/20 to-purple-500/20', label: 'Hero Carousel' },
+    promo: { bg: 'from-orange-500/20 to-red-500/20', label: 'Promo Strip' },
+    sidebar: { bg: 'from-teal-500/20 to-green-500/20', label: 'Sidebar' },
+    footer: { bg: 'from-gray-500/20 to-gray-600/20', label: 'Footer Strip' },
+  };
+
   if (!open) return null;
 
   return (
@@ -155,11 +183,17 @@ const BannerFormModal = ({ open, banner, onSave, onClose }) => {
         className="absolute inset-0 bg-black/40 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="relative w-full max-w-xl bg-surface-container-lowest shadow-2xl overflow-y-auto animate-slide-in-right">
-        <div className="sticky top-0 bg-surface-container-lowest border-b border-surface-container/60 px-6 py-4 flex items-center justify-between z-10">
-          <h2 className="text-lg font-bold text-on-surface">
-            {banner ? 'Edit Banner' : 'Add Banner'}
-          </h2>
+      <div className="relative w-full max-w-2xl bg-surface-container-lowest shadow-2xl overflow-y-auto animate-slide-in-right">
+        {/* Header */}
+        <div className="sticky top-0 bg-surface-container-lowest/95 backdrop-blur-md border-b border-surface-container/60 px-6 py-4 flex items-center justify-between z-10">
+          <div>
+            <h2 className="text-lg font-bold text-on-surface">
+              {banner ? 'Edit Banner' : 'Create Banner'}
+            </h2>
+            <p className="text-xs text-on-surface-variant mt-0.5">
+              {banner ? 'Update banner settings and content' : 'Add a new promotional banner'}
+            </p>
+          </div>
           <button
             onClick={onClose}
             className="p-2 rounded-lg hover:bg-surface-container-high text-on-surface-variant transition-colors"
@@ -168,128 +202,283 @@ const BannerFormModal = ({ open, banner, onSave, onClose }) => {
           </button>
         </div>
 
-        <div className="p-6 space-y-5">
-          <div>
-            <label className="block text-sm font-semibold text-on-surface mb-1.5">
-              Title *
-            </label>
-            <input
-              type="text"
-              value={form.title}
-              onChange={(e) => handleChange('title', e.target.value)}
-              className={inputClass('title')}
-              placeholder="e.g. Summer Sale"
-            />
-            {errors.title && (
-              <p className="text-xs text-error mt-1">{errors.title}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-on-surface mb-1.5">
-              Subtitle
-            </label>
-            <input
-              type="text"
-              value={form.subtitle}
-              onChange={(e) => handleChange('subtitle', e.target.value)}
-              className={inputClass('subtitle')}
-              placeholder="e.g. Up to 50% off"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-on-surface mb-1.5">
-              Description
-            </label>
-            <textarea
-              value={form.description}
-              onChange={(e) => handleChange('description', e.target.value)}
-              rows={3}
-              className={inputClass('description')}
-              placeholder="Banner description..."
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-on-surface mb-1.5">
-              Image URL *
-            </label>
-            <input
-              type="url"
-              value={form.image}
-              onChange={(e) => handleChange('image', e.target.value)}
-              className={inputClass('image')}
-              placeholder="https://example.com/banner.jpg"
-            />
-            {errors.image && (
-              <p className="text-xs text-error mt-1">{errors.image}</p>
-            )}
-            {form.image && (
-              <div className="mt-2 w-full h-32 rounded-lg bg-surface-container overflow-hidden border border-surface-container/60">
+        <div className="p-6 space-y-6">
+          {/* Live Preview */}
+          {form.image && (
+            <div className="rounded-xl overflow-hidden border border-surface-container/60">
+              <div
+                className={`relative aspect-[16/7] bg-gradient-to-br ${PPOSITION_PRESETS[form.position]?.bg || 'from-gray-100 to-gray-200'}`}
+                style={form.bgColor ? { backgroundColor: form.bgColor } : {}}
+              >
                 <img
+                  key={form.image}
                   src={form.image}
                   alt="Preview"
                   className="w-full h-full object-cover"
                   onError={(e) => {
                     e.target.style.display = 'none';
+                    e.target.nextSibling.style.display = 'flex';
                   }}
                 />
+                <div className="hidden absolute inset-0 items-center justify-center bg-surface-container">
+                  <div className="text-center">
+                    <span className="material-symbols-outlined text-5xl text-on-surface-variant/30 block">broken_image</span>
+                    <p className="text-xs text-on-surface-variant mt-1">Image failed to load</p>
+                  </div>
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-5">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/20 text-white backdrop-blur-sm uppercase">
+                      {form.position}
+                    </span>
+                    {form.startDate && (
+                      <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-white/20 text-white backdrop-blur-sm">
+                        {form.startDate} → {form.endDate || 'Ongoing'}
+                      </span>
+                    )}
+                  </div>
+                  <h3 className="text-xl font-bold text-white drop-shadow-lg">
+                    {form.title || 'Banner Title'}
+                  </h3>
+                  {form.subtitle && (
+                    <p className="text-sm text-white/90 drop-shadow-md mt-1">
+                      {form.subtitle}
+                    </p>
+                  )}
+                  {form.ctaText && (
+                    <span className="inline-block mt-3 px-4 py-1.5 bg-white text-gray-900 text-xs font-bold rounded-lg">
+                      {form.ctaText}
+                    </span>
+                  )}
+                </div>
               </div>
-            )}
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-semibold text-on-surface mb-1.5">
-                Link URL
-              </label>
-              <input
-                type="url"
-                value={form.link}
-                onChange={(e) => handleChange('link', e.target.value)}
-                className={inputClass('link')}
-                placeholder="https://..."
-              />
             </div>
+          )}
+
+          {/* Content Section */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="material-symbols-outlined text-lg text-primary">text_fields</span>
+              <h3 className="text-sm font-bold text-on-surface uppercase tracking-wide">Content</h3>
+            </div>
+
             <div>
               <label className="block text-sm font-semibold text-on-surface mb-1.5">
-                CTA Text
+                Title <span className="text-error">*</span>
               </label>
               <input
                 type="text"
-                value={form.ctaText}
-                onChange={(e) => handleChange('ctaText', e.target.value)}
-                className={inputClass('ctaText')}
-                placeholder="Shop Now"
+                value={form.title}
+                onChange={(e) => handleChange('title', e.target.value)}
+                className={inputClass('title')}
+                placeholder="e.g. Summer Sale — Up to 50% Off"
+              />
+              {errors.title && (
+                <p className="text-xs text-error mt-1 flex items-center gap-1">
+                  <span className="material-symbols-outlined text-sm">error</span>
+                  {errors.title}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-on-surface mb-1.5">
+                Subtitle
+              </label>
+              <input
+                type="text"
+                value={form.subtitle}
+                onChange={(e) => handleChange('subtitle', e.target.value)}
+                className={inputClass('subtitle')}
+                placeholder="e.g. Limited time offer"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-on-surface mb-1.5">
+                Description
+              </label>
+              <textarea
+                value={form.description}
+                onChange={(e) => handleChange('description', e.target.value)}
+                rows={2}
+                className={inputClass('description')}
+                placeholder="Brief description for internal reference..."
               />
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-semibold text-on-surface mb-1.5">
-              Position
-            </label>
-            <div className="grid grid-cols-2 gap-2">
+          {/* Image Section */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="material-symbols-outlined text-lg text-primary">image</span>
+              <h3 className="text-sm font-bold text-on-surface uppercase tracking-wide">Image</h3>
+            </div>
+
+            <div className="flex gap-1 p-1 bg-surface-container-low rounded-lg">
+              {['url', 'upload'].map((tab) => (
+                <button
+                  key={tab}
+                  type="button"
+                  onClick={() => setImageTab(tab)}
+                  className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-md text-xs font-semibold transition-all ${
+                    imageTab === tab
+                      ? 'bg-white text-on-surface shadow-sm'
+                      : 'text-on-surface-variant hover:text-on-surface'
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-sm">
+                    {tab === 'url' ? 'link' : 'upload'}
+                  </span>
+                  {tab === 'url' ? 'URL' : 'Upload'}
+                </button>
+              ))}
+            </div>
+
+            {imageTab === 'url' ? (
+              <div>
+                <input
+                  type="url"
+                  value={form.image}
+                  onChange={(e) => handleChange('image', e.target.value)}
+                  className={inputClass('image')}
+                  placeholder="https://example.com/banner.jpg"
+                />
+                {errors.image && (
+                  <p className="text-xs text-error mt-1 flex items-center gap-1">
+                    <span className="material-symbols-outlined text-sm">error</span>
+                    {errors.image}
+                  </p>
+                )}
+              </div>
+            ) : (
+              <>
+              <div
+                onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+                onDragLeave={() => setDragOver(false)}
+                onDrop={handleDrop}
+                className={`relative border-2 border-dashed rounded-xl p-6 text-center transition-all cursor-pointer ${
+                  dragOver
+                    ? 'border-primary bg-primary/5'
+                    : 'border-surface-container hover:border-outline-variant'
+                }`}
+                onClick={() => document.getElementById('banner-file-input').click()}
+              >
+                <input
+                  id="banner-file-input"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => handleImageUpload(e.target.files[0])}
+                />
+                <span className="material-symbols-outlined text-4xl text-on-surface-variant/40 mb-2 block">
+                  cloud_upload
+                </span>
+                <p className="text-sm font-medium text-on-surface-variant">
+                  Drag & drop or <span className="text-primary">browse</span>
+                </p>
+                <p className="text-xs text-on-surface-variant/60 mt-1">
+                  PNG, JPG, GIF up to 5MB
+                </p>
+              </div>
+              {form.image && form.image.startsWith('data:') && (
+                <div className="mt-3 relative rounded-lg overflow-hidden border border-surface-container/60">
+                  <img
+                    key={form.image}
+                    src={form.image}
+                    alt="Uploaded preview"
+                    className="w-full h-32 object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); handleChange('image', ''); }}
+                    className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/50 flex items-center justify-center text-white hover:bg-black/70 transition-colors"
+                  >
+                    <span className="material-symbols-outlined text-sm">close</span>
+                  </button>
+                </div>
+              )}
+              </>
+            )}
+          </div>
+
+          {/* Link & CTA */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="material-symbols-outlined text-lg text-primary">ads_click</span>
+              <h3 className="text-sm font-bold text-on-surface uppercase tracking-wide">Call to Action</h3>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-semibold text-on-surface mb-1.5">
+                  Link URL
+                </label>
+                <input
+                  type="url"
+                  value={form.link}
+                  onChange={(e) => handleChange('link', e.target.value)}
+                  className={inputClass('link')}
+                  placeholder="/shop or https://..."
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-on-surface mb-1.5">
+                  Button Text
+                </label>
+                <input
+                  type="text"
+                  value={form.ctaText}
+                  onChange={(e) => handleChange('ctaText', e.target.value)}
+                  className={inputClass('ctaText')}
+                  placeholder="Shop Now"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Position */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="material-symbols-outlined text-lg text-primary">dashboard</span>
+              <h3 className="text-sm font-bold text-on-surface uppercase tracking-wide">Position</h3>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
               {POSITIONS.map((pos) => {
                 const info = POSITION_INFO[pos];
+                const isSelected = form.position === pos;
                 return (
                   <button
                     key={pos}
                     type="button"
                     onClick={() => handleChange('position', pos)}
-                    className={`flex items-start gap-2.5 p-3 rounded-xl border text-left transition-all ${
-                      form.position === pos
-                        ? 'border-primary bg-primary/5 ring-1 ring-primary/20'
-                        : 'border-surface-container hover:border-outline-variant bg-surface-container-low'
+                    className={`relative flex items-start gap-3 p-4 rounded-xl border-2 text-left transition-all ${
+                      isSelected
+                        ? 'border-primary bg-primary/5 shadow-sm'
+                        : 'border-surface-container hover:border-outline-variant bg-surface-container-low hover:bg-surface-container'
                     }`}
                   >
-                    <span className={`material-symbols-outlined text-lg mt-0.5 ${form.position === pos ? 'text-primary' : 'text-on-surface-variant'}`}>
-                      {info.icon}
-                    </span>
+                    {isSelected && (
+                      <div className="absolute top-2 right-2">
+                        <span className="material-symbols-outlined text-sm text-primary">check_circle</span>
+                      </div>
+                    )}
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
+                      isSelected ? 'bg-primary/10' : 'bg-surface-container-high'
+                    }`}>
+                      <span className={`material-symbols-outlined text-xl ${isSelected ? 'text-primary' : 'text-on-surface-variant'}`}>
+                        {info.icon}
+                      </span>
+                    </div>
                     <div>
-                      <p className={`text-sm font-semibold ${form.position === pos ? 'text-primary' : 'text-on-surface'}`}>{info.label}</p>
-                      <p className="text-[11px] text-on-surface-variant leading-tight mt-0.5">{info.desc}</p>
+                      <p className={`text-sm font-bold ${isSelected ? 'text-primary' : 'text-on-surface'}`}>
+                        {info.label}
+                      </p>
+                      <p className="text-[11px] text-on-surface-variant leading-tight mt-0.5">
+                        {info.desc}
+                      </p>
                     </div>
                   </button>
                 );
@@ -297,11 +486,13 @@ const BannerFormModal = ({ open, banner, onSave, onClose }) => {
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-semibold text-on-surface mb-1.5">
-              Show On Pages
-            </label>
-            <p className="text-xs text-on-surface-variant mb-2">Leave empty to show on all pages</p>
+          {/* Target Pages */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="material-symbols-outlined text-lg text-primary">pages</span>
+              <h3 className="text-sm font-bold text-on-surface uppercase tracking-wide">Show On Pages</h3>
+            </div>
+            <p className="text-xs text-on-surface-variant">Leave empty to show on all pages</p>
             <div className="flex flex-wrap gap-2">
               {TARGET_PAGES.map((page) => {
                 const selected = form.targetPages.includes(page);
@@ -315,66 +506,125 @@ const BannerFormModal = ({ open, banner, onSave, onClose }) => {
                         : [...form.targetPages, page];
                       handleChange('targetPages', next);
                     }}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
+                    className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold border-2 transition-all ${
                       selected
-                        ? 'bg-primary text-on-primary border-primary'
+                        ? 'bg-primary text-white border-primary shadow-sm'
                         : 'bg-surface-container-low text-on-surface-variant border-surface-container hover:border-outline-variant'
                     }`}
                   >
+                    <span className="material-symbols-outlined text-sm">
+                      {page === 'home' ? 'home' : page === 'shop' ? 'store' : 'inventory_2'}
+                    </span>
                     {page.charAt(0).toUpperCase() + page.slice(1)}
+                    {selected && <span className="material-symbols-outlined text-sm">check</span>}
                   </button>
                 );
               })}
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-semibold text-on-surface mb-1.5">
-              Background Color
-            </label>
-            <div className="flex items-center gap-2">
-              <input
-                type="color"
-                value={form.bgColor || '#ffffff'}
-                onChange={(e) => handleChange('bgColor', e.target.value)}
-                className="w-10 h-[42px] rounded-lg border border-surface-container cursor-pointer shrink-0"
-              />
-              <input
-                type="text"
-                value={form.bgColor}
-                onChange={(e) => handleChange('bgColor', e.target.value)}
-                className={inputClass('bgColor')}
-                placeholder="#ffffff"
-              />
+          {/* Appearance */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="material-symbols-outlined text-lg text-primary">palette</span>
+              <h3 className="text-sm font-bold text-on-surface uppercase tracking-wide">Appearance</h3>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-on-surface mb-1.5">
+                Background Color
+              </label>
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <input
+                    type="color"
+                    value={form.bgColor || '#ffffff'}
+                    onChange={(e) => handleChange('bgColor', e.target.value)}
+                    className="w-12 h-12 rounded-lg border-2 border-surface-container cursor-pointer shrink-0"
+                  />
+                </div>
+                <input
+                  type="text"
+                  value={form.bgColor}
+                  onChange={(e) => handleChange('bgColor', e.target.value)}
+                  className={inputClass('bgColor')}
+                  placeholder="#ffffff"
+                />
+                <div className="flex gap-1.5">
+                  {['#ffffff', '#fbf9f5', '#f0fffe', '#fff5f0', '#1b1c1a'].map((color) => (
+                    <button
+                      key={color}
+                      type="button"
+                      onClick={() => handleChange('bgColor', color)}
+                      className={`w-8 h-8 rounded-lg border-2 transition-all ${
+                        form.bgColor === color ? 'border-primary scale-110' : 'border-surface-container hover:scale-105'
+                      }`}
+                      style={{ backgroundColor: color }}
+                      title={color}
+                    />
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-semibold text-on-surface mb-1.5">
-                Start Date
-              </label>
-              <input
-                type="date"
-                value={form.startDate}
-                onChange={(e) => handleChange('startDate', e.target.value)}
-                className={inputClass('startDate')}
-              />
+          {/* Schedule */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="material-symbols-outlined text-lg text-primary">calendar_month</span>
+              <h3 className="text-sm font-bold text-on-surface uppercase tracking-wide">Schedule</h3>
             </div>
-            <div>
-              <label className="block text-sm font-semibold text-on-surface mb-1.5">
-                End Date
-              </label>
-              <input
-                type="date"
-                value={form.endDate}
-                onChange={(e) => handleChange('endDate', e.target.value)}
-                className={inputClass('endDate')}
-              />
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-semibold text-on-surface mb-1.5">
+                  Start Date
+                </label>
+                <input
+                  type="date"
+                  value={form.startDate}
+                  onChange={(e) => handleChange('startDate', e.target.value)}
+                  className={inputClass('startDate')}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-on-surface mb-1.5">
+                  End Date
+                </label>
+                <input
+                  type="date"
+                  value={form.endDate}
+                  onChange={(e) => handleChange('endDate', e.target.value)}
+                  className={inputClass('endDate')}
+                />
+                {errors.endDate && (
+                  <p className="text-xs text-error mt-1 flex items-center gap-1">
+                    <span className="material-symbols-outlined text-sm">error</span>
+                    {errors.endDate}
+                  </p>
+                )}
+              </div>
             </div>
+            <p className="text-xs text-on-surface-variant">
+              Leave dates empty for an always-active banner
+            </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          {/* Visibility */}
+          <div className="flex items-center justify-between p-4 bg-surface-container-low rounded-xl">
+            <div className="flex items-center gap-3">
+              <span className={`material-symbols-outlined text-xl ${form.isActive ? 'text-green-500' : 'text-on-surface-variant'}`}>
+                {form.isActive ? 'visibility' : 'visibility_off'}
+              </span>
+              <div>
+                <p className="text-sm font-semibold text-on-surface">
+                  {form.isActive ? 'Banner Visible' : 'Banner Hidden'}
+                </p>
+                <p className="text-xs text-on-surface-variant">
+                  {form.isActive ? 'This banner is live on the site' : 'This banner is hidden from users'}
+                </p>
+              </div>
+            </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input
                 type="checkbox"
@@ -382,30 +632,36 @@ const BannerFormModal = ({ open, banner, onSave, onClose }) => {
                 onChange={(e) => handleChange('isActive', e.target.checked)}
                 className="sr-only peer"
               />
-              <div className="w-11 h-6 bg-surface-container-high rounded-full peer peer-checked:bg-primary transition-colors after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full" />
+              <div className="w-12 h-7 bg-surface-container-high rounded-full peer peer-checked:bg-green-500 transition-colors after:content-[''] after:absolute after:top-[3px] after:left-[3px] after:bg-white after:rounded-full after:h-[22px] after:w-[22px] after:transition-all peer-checked:after:translate-x-5" />
             </label>
-            <span className="text-sm font-semibold text-on-surface">
-              {form.isActive ? 'Visible' : 'Hidden'}
-            </span>
           </div>
 
+          {/* Actions */}
           <div className="border-t border-surface-container/60 pt-5 flex items-center justify-end gap-3">
             <button
               onClick={onClose}
-              className="px-4 py-2.5 text-sm font-semibold rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors"
+              className="px-5 py-2.5 text-sm font-semibold rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={handleSubmit}
               disabled={saving}
-              className="px-4 py-2.5 text-sm font-semibold rounded-lg bg-primary text-on-primary hover:bg-primary/90 transition-colors disabled:opacity-50"
+              className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-lg bg-primary text-white hover:bg-primary/90 transition-all disabled:opacity-50 shadow-sm"
             >
-              {saving
-                ? 'Saving...'
-                : banner
-                ? 'Update Banner'
-                : 'Create Banner'}
+              {saving ? (
+                <>
+                  <span className="material-symbols-outlined text-lg animate-spin">progress_activity</span>
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <span className="material-symbols-outlined text-lg">
+                    {banner ? 'save' : 'add'}
+                  </span>
+                  {banner ? 'Update Banner' : 'Create Banner'}
+                </>
+              )}
             </button>
           </div>
         </div>
@@ -617,7 +873,7 @@ const AdminBanners = () => {
           ? 'local_offer'
           : pos === 'footer'
           ? 'web_asset'
-          : 'side_panel',
+          : 'view_sidebar',
     })),
   ];
 
