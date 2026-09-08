@@ -17,7 +17,30 @@ export const formatDate = (date) => {
   return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 };
 
-export const formatCurrency = (amount) => {
+export const formatDateShort = (date) => {
+  if (!date) return '';
+  const d = new Date(date);
+  return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+};
+
+export const formatDateTime = (date) => {
+  if (!date) return '';
+  const d = new Date(date);
+  return d.toLocaleDateString('en-US', {
+    year: 'numeric', month: 'short', day: 'numeric',
+    hour: '2-digit', minute: '2-digit',
+  });
+};
+
+export const formatCurrency = (amount, compact = false) => {
+  if (compact && Math.abs(amount) >= 1000) {
+    const suffixes = ['', 'K', 'M', 'B'];
+    const tier = Math.log10(Math.abs(amount)) / 3 | 0;
+    const suffix = suffixes[tier];
+    const scale = Math.pow(10, tier * 3);
+    const scaled = amount / scale;
+    return `$${scaled.toFixed(1)}${suffix}`;
+  }
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
 };
 

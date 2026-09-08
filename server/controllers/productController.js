@@ -2,6 +2,8 @@ const Product = require('../models/Product');
 const asyncHandler = require('../utils/asyncHandler');
 const { validateProduct } = require('../middleware/validationMiddleware');
 
+const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 // @desc    Fetch all products
 // @route   GET /api/products
 // @access  Public
@@ -12,7 +14,7 @@ const getProducts = async (req, res) => {
   const keyword = req.query.keyword
     ? {
         name: {
-          $regex: req.query.keyword,
+          $regex: escapeRegex(req.query.keyword),
           $options: 'i',
         },
       }

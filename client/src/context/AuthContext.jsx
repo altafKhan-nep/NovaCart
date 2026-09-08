@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import { api } from '../api';
 
 const AuthContext = createContext();
@@ -65,14 +65,14 @@ export const AuthProvider = ({ children }) => {
       .finally(() => setLoading(false));
   }, []);
 
-  const login = async (email, password) => {
+  const login = useCallback(async (email, password) => {
     const data = await api.login(email, password);
     setUser({ ...data, token: data.token });
     persistUser({ ...data, token: data.token });
     return data;
-  };
+  }, [persistUser]);
 
-  const register = async (name, email, password) => {
+  const register = useCallback(async (name, email, password) => {
     const data = await api.register(name, email, password);
     setUser({ ...data, token: data.token });
     persistUser({ ...data, token: data.token });
@@ -80,16 +80,16 @@ export const AuthProvider = ({ children }) => {
     setUser((prev) => ({ ...prev, ...profile }));
     persistUser({ ...prev, ...profile, token: data.token });
     return data;
-  };
+  }, [persistUser]);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(CACHED_USER_KEY);
     localStorage.removeItem(CACHE_TIMESTAMP_KEY);
     setUser(null);
-  };
+  }, []);
 
-  const refreshProfile = async () => {
+  const refreshProfile = useCallback(async () => {
     const profile = await api.getProfile();
     setUser((prev) => {
       const merged = { ...prev, ...profile };
@@ -97,13 +97,13 @@ export const AuthProvider = ({ children }) => {
       return merged;
     });
     return profile;
-  };
+  }, [persistUser]);
 
-  const toggleWishlist = async (productId) => {
+  const toggleWishlist = useCallback(async (productId) => {
     const data = await api.addToWishlist(productId);
     setUser((prev) => ({ ...prev, wishlist: data.wishlist }));
     return data;
-  };
+  }, []);
 
   const hasPermission = useCallback((permission) => {
     if (!user) return false;
@@ -120,16 +120,16 @@ export const AuthProvider = ({ children }) => {
   const isAdminRole = user?.role && user.role !== 'customer';
   const isAdmin = user?.isAdmin || (user?.role && user.role !== 'customer');
 
+  const value = useMemo(() => ({
+    user, loading, login, register, logout, refreshProfile, toggleWishlist,
+    isAdmin,
+    role: user?.role,
+    permissions: user?.permissions || [],
+    hasPermission,
+  }), [user, loading, login, register, logout, refreshProfile, toggleWishlist, isAdmin, hasPermission]);
+
   return (
-    <AuthContext.Provider value={{
-      user, loading, login, register, logout, refreshProfile, toggleWishlist,
-      isAdmin,
-      role: user?.role,
-      permissions: user?.permissions || [],
-      hasPermission,
-      hasAnyPermission,
-      isAdminRole,
-    }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

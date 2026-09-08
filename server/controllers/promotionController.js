@@ -72,9 +72,10 @@ const getPromotions = asyncHandler(async (req, res) => {
     filter.type = req.query.type;
   }
   if (req.query.keyword) {
+    const escaped = req.query.keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     filter.$or = [
-      { name: { $regex: req.query.keyword, $options: 'i' } },
-      { code: { $regex: req.query.keyword, $options: 'i' } },
+      { name: { $regex: escaped, $options: 'i' } },
+      { code: { $regex: escaped, $options: 'i' } },
     ];
   }
 
@@ -185,13 +186,19 @@ const getActivePromotions = asyncHandler(async (req, res) => {
   const now = new Date();
   const promotions = await Promotion.find({
     isActive: true,
-    $or: [
-      { startDate: { $lte: now } },
-      { startDate: null },
-    ],
-    $or: [
-      { endDate: { $gte: now } },
-      { endDate: null },
+    $and: [
+      {
+        $or: [
+          { startDate: { $lte: now } },
+          { startDate: null },
+        ],
+      },
+      {
+        $or: [
+          { endDate: { $gte: now } },
+          { endDate: null },
+        ],
+      },
     ],
   }).sort({ createdAt: -1 });
 

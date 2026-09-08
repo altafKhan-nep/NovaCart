@@ -508,7 +508,7 @@ const AdminOrders = () => {
   const handleCancelOrder = async () => {
     if (!cancelTarget) return;
     try {
-      await api.cancelOrder(cancelTarget);
+      await api.cancelOrderAsAdmin(cancelTarget);
       setOrders((prev) =>
         prev.map((o) => {
           if ((o._id || o.id) === cancelTarget) {

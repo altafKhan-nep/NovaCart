@@ -204,7 +204,7 @@ export const api = {
     });
     return handleResponse(res);
   },
-  cancelOrder: async (id) => {
+  cancelOrderAsAdmin: async (id) => {
     const res = await fetch(`${API_URL}/admin/orders/${id}/cancel`, {
       method: 'PUT',
       headers: getHeaders(true),

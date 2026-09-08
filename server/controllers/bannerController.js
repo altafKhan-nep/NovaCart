@@ -59,13 +59,19 @@ const getActiveBannersByPosition = asyncHandler(async (req, res) => {
   const filter = {
     position: req.params.position,
     isActive: true,
-    $or: [
-      { startDate: { $lte: now } },
-      { startDate: null },
-    ],
-    $or: [
-      { endDate: { $gte: now } },
-      { endDate: null },
+    $and: [
+      {
+        $or: [
+          { startDate: { $lte: now } },
+          { startDate: null },
+        ],
+      },
+      {
+        $or: [
+          { endDate: { $gte: now } },
+          { endDate: null },
+        ],
+      },
     ],
   };
 

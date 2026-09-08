@@ -101,7 +101,7 @@ const userSchema = mongoose.Schema(
       city: String,
       state: String,
       zip: String,
-      country: { type: String, default: 'India' },
+      country: { type: String, default: '' },
       phone: String,
     },
     lastLogin: { type: Date },

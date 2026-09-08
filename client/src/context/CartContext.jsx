@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useReducer, useState } from 'react';
+import { createContext, useContext, useEffect, useReducer, useState, useMemo, useCallback } from 'react';
 import { api } from '../api';
 
 const CartContext = createContext();
@@ -80,15 +80,15 @@ export const CartProvider = ({ children }) => {
     }).catch(() => {});
   }, []);
 
-  const addToCart = (item) => dispatch({ type: 'ADD_ITEM', payload: item });
-  const removeFromCart = (id) => dispatch({ type: 'REMOVE_ITEM', payload: id });
-  const updateQty = (id, qty) => {
+  const addToCart = useCallback((item) => dispatch({ type: 'ADD_ITEM', payload: item }), []);
+  const removeFromCart = useCallback((id) => dispatch({ type: 'REMOVE_ITEM', payload: id }), []);
+  const updateQty = useCallback((id, qty) => {
     if (qty < 1) return;
     dispatch({ type: 'UPDATE_QTY', payload: { product: id, qty } });
-  };
-  const applyPromo = (code, discount) => dispatch({ type: 'SET_PROMO', payload: { code, discount } });
-  const clearPromo = () => dispatch({ type: 'CLEAR_PROMO' });
-  const clearCart = () => dispatch({ type: 'CLEAR' });
+  }, []);
+  const applyPromo = useCallback((code, discount) => dispatch({ type: 'SET_PROMO', payload: { code, discount } }), []);
+  const clearPromo = useCallback(() => dispatch({ type: 'CLEAR_PROMO' }), []);
+  const clearCart = useCallback(() => dispatch({ type: 'CLEAR' }), []);
 
   const cartItems = state.cartItems;
   const itemsCount = cartItems.reduce((acc, item) => acc + item.qty, 0);
@@ -107,16 +107,18 @@ export const CartProvider = ({ children }) => {
   const discountPrice = state.promoDiscount || 0;
   const totalPrice = Number((itemsPrice + shippingPrice + taxPrice - discountPrice).toFixed(2));
 
+  const value = useMemo(() => ({
+    cartItems, itemsCount, itemsPrice, shippingPrice, taxPrice,
+    discountPrice, totalPrice, settings,
+    promoCode: state.promoCode,
+    promoDiscount: state.promoDiscount,
+    addToCart, removeFromCart, updateQty, applyPromo, clearPromo, clearCart,
+  }), [cartItems, itemsCount, itemsPrice, shippingPrice, taxPrice,
+    discountPrice, totalPrice, settings, state.promoCode, state.promoDiscount,
+    addToCart, removeFromCart, updateQty, applyPromo, clearPromo, clearCart]);
+
   return (
-    <CartContext.Provider
-      value={{
-        cartItems, itemsCount, itemsPrice, shippingPrice, taxPrice,
-        discountPrice, totalPrice, settings,
-        promoCode: state.promoCode,
-        promoDiscount: state.promoDiscount,
-        addToCart, removeFromCart, updateQty, applyPromo, clearPromo, clearCart,
-      }}
-    >
+    <CartContext.Provider value={value}>
       {children}
     </CartContext.Provider>
   );

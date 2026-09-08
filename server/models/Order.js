@@ -26,7 +26,7 @@ const orderSchema = mongoose.Schema(
       city: { type: String, required: true },
       state: { type: String, default: '' },
       zip: { type: String, required: true },
-      country: { type: String, default: 'India' },
+      country: { type: String, default: '' },
       phone: { type: String, default: '' },
     },
     paymentMethod: {
@@ -137,5 +137,9 @@ const orderSchema = mongoose.Schema(
 );
 
 const Order = mongoose.model('Order', orderSchema);
+
+orderSchema.index({ user: 1, createdAt: -1 });
+orderSchema.index({ status: 1 });
+orderSchema.index({ createdAt: -1 });
 
 module.exports = Order;
