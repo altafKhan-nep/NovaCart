@@ -1,5 +1,4 @@
 import { Component } from 'react';
-import { Link } from 'react-router-dom';
 
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -42,13 +41,13 @@ class ErrorBoundary extends Component {
                 <span className="material-symbols-outlined text-lg">refresh</span>
                 Try Again
               </button>
-              <Link
-                to="/"
+              <a
+                href="/"
                 className="btn-ghost font-semibold px-6 py-3 rounded-xl flex items-center justify-center gap-2 text-sm w-full sm:w-auto"
               >
-                <span className="material-symbols-outlined text-lg">home</span>
+                <span className="material-symbols-outlined text-lg">                home</span>
                 Go Home
-              </Link>
+              </a>
             </div>
             {this.state.error && (
               <details className="mt-8 text-left">

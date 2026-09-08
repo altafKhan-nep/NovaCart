@@ -125,6 +125,7 @@ const HeroSection = () => {
 };
 
 const PremiumSlide = ({ slide, isActive, index, activeIdx }) => {
+  const { t } = useLanguage();
   const delay = (index - activeIdx) * 80;
 
   return (
