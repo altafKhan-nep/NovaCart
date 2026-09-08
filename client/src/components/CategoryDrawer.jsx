@@ -100,6 +100,15 @@ const FALLBACK_ICON = ({ className }) => (
 
 const getIcon = (name) => CategoryIcons[name] || FALLBACK_ICON;
 
+const SectionLabel = ({ children, count }) => (
+  <div className="flex items-center justify-between px-5 pt-4 pb-2">
+    <span className="text-[10px] font-bold text-on-surface-variant/35 uppercase tracking-[0.15em]">{children}</span>
+    {count != null && (
+      <span className="text-[10px] font-medium text-on-surface-variant/25 tabular-nums">{count}</span>
+    )}
+  </div>
+);
+
 const CategoryDrawer = ({ open, onClose }) => {
   const navigate = useNavigate();
   const { user, isAdmin } = useAuth();
