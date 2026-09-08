@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { useLanguage } from '../context/LanguageContext';
 import { api } from '../api';
 
 const HeroSection = () => {
@@ -8,6 +9,7 @@ const HeroSection = () => {
   const [isPaused, setIsPaused] = useState(false);
   const [progress, setProgress] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const { t } = useLanguage();
 
   useEffect(() => {
     api.getActiveBanners('hero').then((data) => {
@@ -174,7 +176,7 @@ const PremiumSlide = ({ slide, isActive, index, activeIdx }) => {
                 className="group relative inline-flex items-center gap-2.5 bg-primary text-on-primary text-sm font-bold px-7 py-3.5 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-[0_12px_30px_-5px_rgba(164,60,18,0.5)] hover:scale-[1.03] active:scale-[0.97]"
               >
                 <span className="absolute inset-0 bg-gradient-to-r from-primary-container/0 via-white/10 to-primary-container/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-                <span className="relative z-10">Shop Now</span>
+                <span className="relative z-10">{t('hero.shopNow')}</span>
                 <span className="material-symbols-outlined text-lg relative z-10 group-hover:translate-x-0.5 transition-transform duration-300">arrow_forward</span>
               </Link>
 
@@ -183,7 +185,7 @@ const PremiumSlide = ({ slide, isActive, index, activeIdx }) => {
                 className="group inline-flex items-center gap-2 bg-surface-container-lowest/40 backdrop-blur-md border border-outline-variant/15 text-on-surface text-sm font-semibold px-6 py-3.5 rounded-2xl hover:bg-surface-container-lowest/60 hover:border-primary/20 hover:scale-[1.03] active:scale-[0.97] transition-all duration-300"
               >
                 <span className="material-symbols-outlined text-lg text-primary group-hover:animate-[wiggle_0.3s_ease-in-out]">flash_on</span>
-                <span>Flash Deals</span>
+                <span>{t('products.flashDeals')}</span>
               </Link>
             </div>
 
@@ -216,11 +218,13 @@ const PremiumSlide = ({ slide, isActive, index, activeIdx }) => {
   );
 };
 
-const PremiumFallback = () => (
-  <section
-    className="relative rounded-3xl overflow-hidden min-h-[340px] md:min-h-[420px]"
-    style={{ boxShadow: '0 25px 60px -12px rgba(164, 60, 18, 0.15), 0 8px 20px -4px rgba(0, 0, 0, 0.05)' }}
-  >
+const PremiumFallback = () => {
+  const { t } = useLanguage();
+  return (
+    <section
+      className="relative rounded-3xl overflow-hidden min-h-[340px] md:min-h-[420px]"
+      style={{ boxShadow: '0 25px 60px -12px rgba(164, 60, 18, 0.15), 0 8px 20px -4px rgba(0, 0, 0, 0.05)' }}
+    >
     {/* Top shine */}
     <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary-container/40 to-transparent z-30" />
 
@@ -245,32 +249,32 @@ const PremiumFallback = () => (
           {/* Animated badge */}
           <div className="inline-flex items-center gap-1.5 bg-primary/10 border border-primary/20 rounded-full px-3.5 py-1.5 mb-5 animate-fade-up">
             <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-            <span className="text-[11px] font-bold text-primary uppercase tracking-widest">Summer Sale</span>
+            <span className="text-[11px] font-bold text-primary uppercase tracking-widest">{t('hero.tagline')}</span>
           </div>
 
           {/* Title */}
           <h1 className="text-3xl md:text-4xl lg:text-[3.25rem] font-extrabold text-on-surface mb-4 leading-[1.1] tracking-tight animate-fade-up" style={{ animationDelay: '100ms' }}>
-            Discover Joy<br />
+            {t('hero.title1')}<br />
             <span className="bg-gradient-to-r from-primary via-primary-container to-secondary bg-clip-text text-transparent">
-              in Every Box.
+              {t('hero.title2')}
             </span>
           </h1>
 
           {/* Subtitle */}
           <p className="text-on-surface-variant/70 text-sm md:text-base mb-7 max-w-md leading-relaxed animate-fade-up" style={{ animationDelay: '200ms' }}>
-            Vibrant fashion, quirky electronics, and delightful home finds curated just for you.
+            {t('hero.subtitle')}
           </p>
 
           {/* CTAs */}
           <div className="flex items-center gap-3 animate-fade-up" style={{ animationDelay: '300ms' }}>
             <Link to="/shop" className="group relative inline-flex items-center gap-2.5 bg-primary text-on-primary text-sm font-bold px-7 py-3.5 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-[0_12px_30px_-5px_rgba(164,60,18,0.5)] hover:scale-[1.03] active:scale-[0.97]">
               <span className="absolute inset-0 bg-gradient-to-r from-primary-container/0 via-white/10 to-primary-container/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-              <span className="relative z-10">Shop Now</span>
+              <span className="relative z-10">{t('hero.shopNow')}</span>
               <span className="material-symbols-outlined text-lg relative z-10 group-hover:translate-x-0.5 transition-transform duration-300">arrow_forward</span>
             </Link>
             <Link to="/shop?flash=true" className="group inline-flex items-center gap-2 bg-surface-container-lowest/40 backdrop-blur-md border border-outline-variant/15 text-on-surface text-sm font-semibold px-6 py-3.5 rounded-2xl hover:bg-surface-container-lowest/60 hover:border-primary/20 hover:scale-[1.03] active:scale-[0.97] transition-all duration-300">
               <span className="material-symbols-outlined text-lg text-primary group-hover:animate-[wiggle_0.3s_ease-in-out]">flash_on</span>
-              <span>Flash Deals</span>
+              <span>{t('products.flashDeals')}</span>
             </Link>
           </div>
 
@@ -335,8 +339,8 @@ const PremiumFallback = () => (
                 <span className="material-symbols-outlined text-sm text-primary">local_shipping</span>
               </div>
               <div>
-                <p className="text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-wider">Free Shipping</p>
-                <p className="text-[12px] font-extrabold text-on-surface">Orders $50+</p>
+                <p className="text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-wider">{t('nav.freeShipping')}</p>
+                <p className="text-[12px] font-extrabold text-on-surface">$50+</p>
               </div>
             </div>
           </div>
@@ -344,6 +348,7 @@ const PremiumFallback = () => (
       </div>
     </div>
   </section>
-);
+  );
+};
 
 export default HeroSection;

@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
+import { LanguageProvider } from './context/LanguageContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -45,19 +46,21 @@ const PageLoader = () => (
 
 function App() {
   return (
-    <AuthProvider>
-      <CartProvider>
-        <ScrollToTop />
-        <Suspense fallback={<PageLoader />}>
-          <Routes>
-            <Route path="/login" element={<AuthLayout><LoginPage /></AuthLayout>} />
-            <Route path="/register" element={<AuthLayout><RegisterPage /></AuthLayout>} />
-            <Route path="/admin/*" element={<ProtectedRoute requireAdmin><AdminShell /></ProtectedRoute>} />
-            <Route path="/*" element={<MainShell />} />
-          </Routes>
-        </Suspense>
-      </CartProvider>
-    </AuthProvider>
+    <LanguageProvider>
+      <AuthProvider>
+        <CartProvider>
+          <ScrollToTop />
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              <Route path="/login" element={<AuthLayout><LoginPage /></AuthLayout>} />
+              <Route path="/register" element={<AuthLayout><RegisterPage /></AuthLayout>} />
+              <Route path="/admin/*" element={<ProtectedRoute requireAdmin><AdminShell /></ProtectedRoute>} />
+              <Route path="/*" element={<MainShell />} />
+            </Routes>
+          </Suspense>
+        </CartProvider>
+      </AuthProvider>
+    </LanguageProvider>
   );
 }
 

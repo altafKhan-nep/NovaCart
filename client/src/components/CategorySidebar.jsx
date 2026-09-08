@@ -1,6 +1,7 @@
 import { useState, useEffect, memo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { api } from '../api';
 
 const CategoryIcons = {
@@ -101,6 +102,7 @@ const getIcon = (name) => CategoryIcons[name] || FALLBACK_ICON;
 const CategorySidebar = ({ activeCategory }) => {
   const navigate = useNavigate();
   const { user, isAdmin } = useAuth();
+  const { t } = useLanguage();
   const [dbCategories, setDbCategories] = useState([]);
   const [sidebarPromo, setSidebarPromo] = useState(null);
 
@@ -110,7 +112,7 @@ const CategorySidebar = ({ activeCategory }) => {
   }, []);
 
   const items = [
-    { label: 'All Products', name: '', slug: '' },
+    { label: t('sidebar.allProducts'), name: '', slug: '' },
     ...dbCategories.map((c) => ({
       label: c.name,
       name: c.name,
@@ -127,7 +129,7 @@ const CategorySidebar = ({ activeCategory }) => {
           <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
             <span className="material-symbols-outlined text-[15px] text-primary">category</span>
           </div>
-          <h2 className="text-[12px] font-bold text-on-surface tracking-wide uppercase">Categories</h2>
+          <h2 className="text-[12px] font-bold text-on-surface tracking-wide uppercase">{t('sidebar.browseCategories')}</h2>
         </div>
       </div>
 
@@ -205,7 +207,7 @@ const CategorySidebar = ({ activeCategory }) => {
               className="mt-3 w-full bg-white/[0.92] text-[12px] font-bold py-2 rounded-xl hover:bg-white active:bg-white/90 transition-all duration-200 shadow-sm relative"
               style={{ color: sidebarPromo.sidebarBgColor || '#a43c12' }}
             >
-              {sidebarPromo.sidebarButtonText || 'Shop Now'}
+              {sidebarPromo.sidebarButtonText || t('sidebar.shopNow')}
             </button>
           </div>
         </div>
@@ -219,7 +221,7 @@ const CategorySidebar = ({ activeCategory }) => {
             className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-[12px] font-semibold text-on-surface-variant bg-surface-container-high/60 hover:bg-surface-container-high active:bg-surface-container-highest transition-all duration-150"
           >
             <span className="material-symbols-outlined text-[15px]">admin_panel_settings</span>
-            Admin Panel
+            {t('sidebar.adminPanel')}
           </button>
         )}
         {!user && (
@@ -228,7 +230,7 @@ const CategorySidebar = ({ activeCategory }) => {
             className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-[12px] font-bold bg-primary text-on-primary hover:bg-primary/90 active:bg-primary/80 shadow-md shadow-primary/15 hover:shadow-lg hover:shadow-primary/20 transition-all duration-200"
           >
             <span className="material-symbols-outlined text-[15px]">login</span>
-            Sign In
+            {t('sidebar.signin')}
           </button>
         )}
       </div>

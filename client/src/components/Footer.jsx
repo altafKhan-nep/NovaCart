@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useLanguage } from '../context/LanguageContext';
 import { api } from '../api';
 
 const FooterBannerStrip = () => {
@@ -44,6 +45,7 @@ const Footer = () => {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
   const [footerLinks, setFooterLinks] = useState([]);
+  const { t } = useLanguage();
 
   useEffect(() => {
     api.getNavigationByPosition('footer').then((data) => {
@@ -79,7 +81,7 @@ const Footer = () => {
                 <span className="font-headline-md text-headline-md font-bold text-primary">NovaCart</span>
               </Link>
               <p className="text-sm text-on-surface-variant leading-relaxed">
-                Designed for Joy. Curated products that bring delight to your everyday life.
+                {t('hero.subtitle')}
               </p>
               <div className="flex items-center gap-2 mt-4">
                 {[
@@ -103,10 +105,10 @@ const Footer = () => {
 
             {/* Quick Links */}
             <div>
-              <h3 className="text-sm font-bold text-on-surface mb-3 uppercase tracking-wider">Shop</h3>
+              <h3 className="text-sm font-bold text-on-surface mb-3 uppercase tracking-wider">{t('footer.shop')}</h3>
               <ul className="space-y-2">
                 {[
-                  { label: 'All Products', to: '/shop' },
+                  { label: t('footer.allProducts'), to: '/shop' },
                   { label: 'Electronics', to: '/shop/Electronics' },
                   { label: 'Fashion', to: '/shop/Fashion' },
                   { label: 'Home Decor', to: '/shop/Home%20Decor' },
@@ -114,7 +116,7 @@ const Footer = () => {
                   { label: 'Sports', to: '/shop/Sports' },
                   { label: 'Books', to: '/shop/Books' },
                 ].map((link) => (
-                  <li key={link.label}>
+                  <li key={link.to}>
                     <Link to={link.to} className="text-sm text-on-surface-variant hover:text-primary transition-colors">
                       {link.label}
                     </Link>
@@ -125,7 +127,7 @@ const Footer = () => {
 
             {/* Help — dynamic from Navigation API */}
             <div>
-              <h3 className="text-sm font-bold text-on-surface mb-3 uppercase tracking-wider">Help</h3>
+              <h3 className="text-sm font-bold text-on-surface mb-3 uppercase tracking-wider">{t('footer.support')}</h3>
               <ul className="space-y-2">
                 {footerLinks.length > 0
                   ? footerLinks.map((link) => (
@@ -136,12 +138,12 @@ const Footer = () => {
                       </li>
                     ))
                   : [
-                      { label: 'Help Center', to: '/help' },
-                      { label: 'Contact Support', to: '/support' },
-                      { label: 'Shipping & Returns', to: '/help#shipping-delivery' },
+                      { label: t('footer.helpCenter'), to: '/help' },
+                      { label: t('footer.contactUs'), to: '/support' },
+                      { label: t('footer.shippingInfo'), to: '/help#shipping-delivery' },
                       { label: 'FAQ', to: '/help#general-faq' },
                     ].map((item) => (
-                      <li key={item.label}>
+                      <li key={item.to}>
                         <Link to={item.to} className="text-sm text-on-surface-variant hover:text-primary transition-colors">
                           {item.label}
                         </Link>
@@ -153,14 +155,14 @@ const Footer = () => {
 
             {/* Newsletter */}
             <div>
-              <h3 className="text-sm font-bold text-on-surface mb-3 uppercase tracking-wider">Stay Updated</h3>
-              <p className="text-sm text-on-surface-variant mb-3">Get the latest deals and new arrivals.</p>
+              <h3 className="text-sm font-bold text-on-surface mb-3 uppercase tracking-wider">{t('newsletter.title')}</h3>
+              <p className="text-sm text-on-surface-variant mb-3">{t('newsletter.subtitle')}</p>
               <form onSubmit={handleSubscribe} className="flex gap-2">
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Your email"
+                  placeholder={t('newsletter.placeholder')}
                   className="flex-1 bg-surface-container-low text-sm rounded-lg px-3 py-2 border border-surface-container outline-none focus:border-primary-container transition-colors"
                 />
                 <button type="submit" className="bg-primary text-on-primary text-sm font-semibold px-3 py-2 rounded-lg hover:bg-primary-container transition-colors">
@@ -175,12 +177,12 @@ const Footer = () => {
 
           <div className="border-t border-surface-container mt-8 pt-6 flex flex-col sm:flex-row justify-between items-center gap-3">
             <p className="text-xs text-on-surface-variant">
-              &copy; {new Date().getFullYear()} NovaCart. All rights reserved.
+              &copy; {new Date().getFullYear()} NovaCart. {t('footer.rights')}
             </p>
             <div className="flex items-center gap-4 text-xs text-on-surface-variant">
               <Link to="/privacy" className="hover:text-primary transition-colors">Privacy Policy</Link>
               <Link to="/terms" className="hover:text-primary transition-colors">Terms of Service</Link>
-              <Link to="/help" className="hover:text-primary transition-colors">Help</Link>
+              <Link to="/help" className="hover:text-primary transition-colors">{t('nav.help')}</Link>
             </div>
           </div>
         </div>

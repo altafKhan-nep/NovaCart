@@ -2,6 +2,7 @@ import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { api } from '../api';
 import { formatPrice } from '../utils/helpers';
 import CategoryDrawer from './CategoryDrawer';
@@ -22,12 +23,12 @@ const TopBar = () => {
         <div className="flex items-center gap-5">
           <span className="flex items-center gap-1.5 text-on-surface-variant">
             <span className="material-symbols-outlined text-[15px]">local_shipping</span>
-            Free shipping on orders over $50
+            {t('nav.freeShipping')}
           </span>
           <span className="w-px h-3.5 bg-outline-variant/50" />
           <span className="flex items-center gap-1.5 text-on-surface-variant">
             <span className="material-symbols-outlined text-[15px]">support_agent</span>
-            24/7 Support
+            24/7 {t('nav.support')}
           </span>
           <span className="w-px h-3.5 bg-outline-variant/50" />
           <a href="tel:18006682278" className="flex items-center gap-1.5 text-on-surface-variant hover:text-primary transition-colors">
@@ -38,12 +39,20 @@ const TopBar = () => {
         <div className="flex items-center gap-4">
           <Link to="/account" className="flex items-center gap-1.5 text-on-surface-variant hover:text-primary transition-colors">
             <span className="material-symbols-outlined text-[15px]">location_on</span>
-            Track Order
+            {t('nav.trackOrder')}
           </Link>
           <Link to="/help" className="flex items-center gap-1.5 text-on-surface-variant hover:text-primary transition-colors">
             <span className="material-symbols-outlined text-[15px]">help</span>
-            Help
+            {t('nav.help')}
           </Link>
+          {/* Language Switcher */}
+          <button
+            onClick={toggleLanguage}
+            className="flex items-center gap-1 px-2 py-1 rounded-md bg-surface-container-high hover:bg-primary/10 text-on-surface-variant hover:text-primary transition-colors font-medium"
+          >
+            <span className="material-symbols-outlined text-[14px]">translate</span>
+            {language === 'en' ? 'नेपाली' : 'English'}
+          </button>
           <button
             onClick={dismiss}
             className="ml-1 p-2 rounded-lg hover:bg-surface-container-high transition-colors text-on-surface-variant"
@@ -59,6 +68,7 @@ const TopBar = () => {
 
 const MiniCart = ({ open }) => {
   const { cartItems, itemsPrice, shippingPrice } = useCart();
+  const { t } = useLanguage();
   const total = itemsPrice + shippingPrice;
 
   if (!open || cartItems.length === 0) return null;
@@ -67,8 +77,8 @@ const MiniCart = ({ open }) => {
     <div className="absolute top-full right-0 mt-2 w-80 bg-surface-container-lowest rounded-xl shadow-xl border border-surface-container/60 overflow-hidden z-50 animate-fade-up">
       <div className="p-4 border-b border-surface-container/60">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-bold text-on-surface">Shopping Cart ({cartItems.length})</h3>
-          <Link to="/cart" className="text-xs font-semibold text-primary hover:underline">View All</Link>
+          <h3 className="text-sm font-bold text-on-surface">{t('nav.cart')} ({cartItems.length})</h3>
+          <Link to="/cart" className="text-xs font-semibold text-primary hover:underline">{t('common.view')}</Link>
         </div>
       </div>
       <div className="max-h-64 overflow-y-auto divide-y divide-surface-container/40">
@@ -79,24 +89,24 @@ const MiniCart = ({ open }) => {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs font-semibold text-on-surface truncate">{item.name}</p>
-              <p className="text-xs text-on-surface-variant mt-0.5">Qty: {item.qty}</p>
+              <p className="text-xs text-on-surface-variant mt-0.5">{t('products.quantity')}: {item.qty}</p>
               <p className="text-xs font-bold text-primary mt-1">{formatPrice(item.price * item.qty)}</p>
             </div>
           </div>
         ))}
         {cartItems.length > 4 && (
           <div className="px-4 py-2 text-center">
-            <p className="text-xs text-on-surface-variant">+ {cartItems.length - 4} more items</p>
+            <p className="text-xs text-on-surface-variant">+ {cartItems.length - 4} {t('cart.items')}</p>
           </div>
         )}
       </div>
       <div className="p-4 border-t border-surface-container/60 bg-surface-container-low/50">
         <div className="flex items-center justify-between mb-3">
-          <span className="text-sm font-semibold text-on-surface">Subtotal</span>
+          <span className="text-sm font-semibold text-on-surface">{t('cart.subtotal')}</span>
           <span className="text-sm font-bold text-on-surface">{formatPrice(total)}</span>
         </div>
         <Link to="/cart" className="block w-full text-center bg-primary text-on-primary text-sm font-semibold py-2.5 rounded-lg hover:bg-primary/90 transition-colors">
-          Checkout
+          {t('cart.checkout')}
         </Link>
       </div>
     </div>
@@ -105,6 +115,7 @@ const MiniCart = ({ open }) => {
 
 const AccountDropdown = ({ open }) => {
   const { user, logout, isAdmin } = useAuth();
+  const { t } = useLanguage();
 
   if (!open || !user) return null;
 
@@ -125,24 +136,24 @@ const AccountDropdown = ({ open }) => {
         {isAdmin && (
           <Link to="/admin" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition-colors">
             <span className="material-symbols-outlined text-lg">dashboard</span>
-            Admin Dashboard
+            {t('nav.admin')}
           </Link>
         )}
         <Link to="/account" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition-colors">
           <span className="material-symbols-outlined text-lg">person</span>
-          My Account
+          {t('nav.account')}
         </Link>
         <Link to="/account" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition-colors">
           <span className="material-symbols-outlined text-lg">shopping_bag</span>
-          My Orders
+          {t('nav.orders')}
         </Link>
         <Link to="/account" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition-colors">
           <span className="material-symbols-outlined text-lg">favorite</span>
-          Wishlist
+          {t('nav.wishlist')}
         </Link>
         <Link to="/help" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition-colors">
           <span className="material-symbols-outlined text-lg">help</span>
-          Help Center
+          {t('nav.help')}
         </Link>
       </div>
       <div className="p-2 border-t border-surface-container/60">
@@ -151,7 +162,7 @@ const AccountDropdown = ({ open }) => {
           className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-on-surface-variant hover:bg-error-container/30 hover:text-error transition-colors"
         >
           <span className="material-symbols-outlined text-lg">logout</span>
-          Sign Out
+          {t('nav.logout')}
         </button>
       </div>
     </div>
@@ -161,6 +172,7 @@ const AccountDropdown = ({ open }) => {
 const Navbar = () => {
   const { itemsCount } = useCart();
   const { user, logout, isAdmin } = useAuth();
+  const { language, toggleLanguage, t } = useLanguage();
   const [query, setQuery] = useState('');
   const [mobileOpen, setMobileOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -238,10 +250,10 @@ const Navbar = () => {
   const links = navItems.length > 0
     ? navItems.map((item) => ({ to: item.url, label: item.label }))
     : [
-        { to: '/', label: 'Home' },
-        { to: '/shop', label: 'Shop' },
-        { to: '/shop?flash=true', label: 'Deals' },
-        { to: '/shop?sort=newest', label: 'New Arrivals' },
+        { to: '/', label: t('nav.home') },
+        { to: '/shop', label: t('nav.shop') },
+        { to: '/shop?flash=true', label: t('nav.deals') },
+        { to: '/shop?sort=newest', label: t('nav.newArrivals') },
       ];
 
   return (
@@ -297,7 +309,7 @@ const Navbar = () => {
                   NovaCart
                 </span>
                 <span className="text-[10px] text-on-surface-variant font-medium tracking-widest uppercase leading-none">
-                  Curated for you
+                  {t('nav.curated')}
                 </span>
               </div>
             </Link>
@@ -313,7 +325,7 @@ const Navbar = () => {
                   <span className="material-symbols-outlined text-on-surface-variant ml-4 text-[20px]">search</span>
                   <input
                     className="flex-1 bg-transparent py-2.5 px-3 text-sm text-on-surface outline-none placeholder:text-on-surface-variant/60"
-                    placeholder="Search for products, brands, and more..."
+                    placeholder={t('nav.search')}
                     type="text"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
@@ -333,12 +345,12 @@ const Navbar = () => {
                     type="submit"
                     className="bg-primary text-on-primary px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-primary/90 transition-colors m-0.5"
                   >
-                    Search
+                    {t('common.search')}
                   </button>
                 </div>
                 {searchFocused && (
                   <div className="absolute top-full left-0 right-0 mt-2 bg-surface-container-lowest rounded-xl shadow-xl border border-surface-container/60 p-4 z-50">
-                    <p className="text-xs font-semibold text-on-surface-variant uppercase tracking-wide mb-2">Quick Links</p>
+                    <p className="text-xs font-semibold text-on-surface-variant uppercase tracking-wide mb-2">{t('sidebar.quickLinks')}</p>
                     <div className="flex flex-wrap gap-2">
                       {['Electronics', 'Fashion', 'Home Decor', 'Toys'].map((cat) => (
                         <button
@@ -432,7 +444,7 @@ const Navbar = () => {
                   className="hidden md:inline-flex items-center gap-1.5 bg-primary text-on-primary text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-primary/90 hover:shadow-md transition-all duration-200"
                 >
                   <span className="material-symbols-outlined text-lg">person</span>
-                  Sign In
+                  {t('nav.login')}
                 </Link>
               )}
 
@@ -457,7 +469,7 @@ const Navbar = () => {
                 <span className="material-symbols-outlined absolute left-3.5 text-on-surface-variant text-lg pointer-events-none">search</span>
                 <input
                   className="w-full bg-surface-container-low rounded-full py-2.5 pl-10 pr-4 text-sm text-on-surface outline-none border border-transparent focus:border-primary/30 transition-colors"
-                  placeholder="Search products..."
+                  placeholder={t('nav.search')}
                   type="text"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
@@ -472,11 +484,11 @@ const Navbar = () => {
                   </span>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-on-surface truncate">{user.name}</p>
-                    <p className="text-xs text-on-surface-variant">{isAdmin ? 'Admin' : 'Customer'}</p>
+                    <p className="text-xs text-on-surface-variant">{isAdmin ? t('nav.admin') : t('checkout.shippingAddress')}</p>
                   </div>
                   {isAdmin && (
                     <Link to="/admin" onClick={() => setMobileOpen(false)} className="text-xs font-semibold text-primary">
-                      Dashboard
+                      {t('nav.admin')}
                     </Link>
                   )}
                 </div>
@@ -507,21 +519,30 @@ const Navbar = () => {
               <div className="grid grid-cols-2 gap-2">
                 <Link to="/account" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 p-3 rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors">
                   <span className="material-symbols-outlined text-lg text-on-surface-variant">shopping_bag</span>
-                  <span className="text-xs font-medium text-on-surface">My Orders</span>
+                  <span className="text-xs font-medium text-on-surface">{t('nav.orders')}</span>
                 </Link>
                 <Link to="/account" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 p-3 rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors">
                   <span className="material-symbols-outlined text-lg text-on-surface-variant">favorite</span>
-                  <span className="text-xs font-medium text-on-surface">Wishlist</span>
+                  <span className="text-xs font-medium text-on-surface">{t('nav.wishlist')}</span>
                 </Link>
                 <Link to="/help" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 p-3 rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors">
                   <span className="material-symbols-outlined text-lg text-on-surface-variant">help</span>
-                  <span className="text-xs font-medium text-on-surface">Help Center</span>
+                  <span className="text-xs font-medium text-on-surface">{t('nav.help')}</span>
                 </Link>
                 <Link to="/support" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 p-3 rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors">
                   <span className="material-symbols-outlined text-lg text-on-surface-variant">support_agent</span>
-                  <span className="text-xs font-medium text-on-surface">Support</span>
+                  <span className="text-xs font-medium text-on-surface">{t('nav.support')}</span>
                 </Link>
               </div>
+
+              {/* Language Switcher */}
+              <button
+                onClick={toggleLanguage}
+                className="flex items-center justify-center gap-2 w-full py-3 rounded-xl border border-surface-container text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low hover:text-primary hover:border-primary/30 transition-all"
+              >
+                <span className="material-symbols-outlined text-lg">translate</span>
+                {language === 'en' ? 'नेपालीमा स्विच गर्नुहोस्' : 'Switch to English'}
+              </button>
 
               {/* Auth Button */}
               {user ? (
@@ -530,7 +551,7 @@ const Navbar = () => {
                   className="flex items-center justify-center gap-2 w-full py-3 rounded-xl border border-surface-container text-sm font-semibold text-on-surface-variant hover:bg-error-container/30 hover:text-error hover:border-error/30 transition-all"
                 >
                   <span className="material-symbols-outlined text-lg">logout</span>
-                  Sign Out
+                  {t('nav.logout')}
                 </button>
               ) : (
                 <Link
@@ -539,7 +560,7 @@ const Navbar = () => {
                   className="flex items-center justify-center gap-2 bg-primary text-on-primary font-semibold py-3 rounded-full w-full text-sm"
                 >
                   <span className="material-symbols-outlined text-lg">person</span>
-                  Sign In
+                  {t('nav.login')}
                 </Link>
               )}
             </div>

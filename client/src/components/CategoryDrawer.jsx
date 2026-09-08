@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
+import { useLanguage } from '../context/LanguageContext';
 import { api } from '../api';
 
 const CategoryIcons = {
@@ -99,31 +100,23 @@ const FALLBACK_ICON = ({ className }) => (
 
 const getIcon = (name) => CategoryIcons[name] || FALLBACK_ICON;
 
-const quickLinks = [
-  { label: "Today's Deals", desc: 'Limited time offers', icon: 'local_offer', path: '/shop?flash=true', gradient: 'from-red-500/10 to-orange-500/5', iconColor: 'text-red-500', hoverBorder: 'hover:border-red-200' },
-  { label: 'New Arrivals', desc: 'Just landed in store', icon: 'new_releases', path: '/shop?sort=newest', gradient: 'from-blue-500/10 to-cyan-500/5', iconColor: 'text-blue-500', hoverBorder: 'hover:border-blue-200' },
-  { label: 'Best Sellers', desc: 'Customer favourites', icon: 'trending_up', path: '/shop?sort=popular', gradient: 'from-emerald-500/10 to-teal-500/5', iconColor: 'text-emerald-500', hoverBorder: 'hover:border-emerald-200' },
-  { label: 'All Products', desc: 'Browse everything', icon: 'inventory_2', path: '/shop', gradient: 'from-purple-500/10 to-violet-500/5', iconColor: 'text-purple-500', hoverBorder: 'hover:border-purple-200' },
-];
-
-const SectionLabel = ({ children, count }) => (
-  <div className="flex items-center justify-between px-5 pt-4 pb-2">
-    <span className="text-[10px] font-bold text-on-surface-variant/35 uppercase tracking-[0.15em]">{children}</span>
-    {count != null && (
-      <span className="text-[10px] font-medium text-on-surface-variant/25 tabular-nums">{count}</span>
-    )}
-  </div>
-);
-
 const CategoryDrawer = ({ open, onClose }) => {
   const navigate = useNavigate();
   const { user, isAdmin } = useAuth();
   const { itemsCount } = useCart();
+  const { t } = useLanguage();
   const [categories, setCategories] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedSection, setExpandedSection] = useState(null);
   const panelRef = useRef(null);
   const searchRef = useRef(null);
+
+  const quickLinks = [
+    { label: t('sidebar.todaysDeals'), desc: t('sidebar.limitedOffers'), icon: 'local_offer', path: '/shop?flash=true', gradient: 'from-red-500/10 to-orange-500/5', iconColor: 'text-red-500', hoverBorder: 'hover:border-red-200' },
+    { label: t('sidebar.newArrivals'), desc: t('sidebar.justLanded'), icon: 'new_releases', path: '/shop?sort=newest', gradient: 'from-blue-500/10 to-cyan-500/5', iconColor: 'text-blue-500', hoverBorder: 'hover:border-blue-200' },
+    { label: t('sidebar.bestSellers'), desc: t('sidebar.customerFavourites'), icon: 'trending_up', path: '/shop?sort=popular', gradient: 'from-emerald-500/10 to-teal-500/5', iconColor: 'text-emerald-500', hoverBorder: 'hover:border-emerald-200' },
+    { label: t('sidebar.allProducts'), desc: t('sidebar.browseEverything'), icon: 'inventory_2', path: '/shop', gradient: 'from-purple-500/10 to-violet-500/5', iconColor: 'text-purple-500', hoverBorder: 'hover:border-purple-200' },
+  ];
 
   useEffect(() => {
     if (open) {
@@ -220,7 +213,7 @@ const CategoryDrawer = ({ open, onClose }) => {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search products..."
+              placeholder={t('nav.search')}
               className="w-full bg-white/[0.12] backdrop-blur-sm rounded-2xl py-2.5 pl-10 pr-4 text-[13px] text-white placeholder:text-white/35 outline-none focus:bg-white/[0.2] focus:ring-2 focus:ring-white/15 transition-all duration-200"
             />
           </form>
@@ -239,7 +232,7 @@ const CategoryDrawer = ({ open, onClose }) => {
               </div>
               {itemsCount > 0 && (
                 <span className="text-[10px] font-bold text-primary bg-primary/10 px-2.5 py-1 rounded-lg">
-                  {itemsCount} items
+                  {itemsCount} {t('cart.items')}
                 </span>
               )}
             </div>
@@ -250,7 +243,7 @@ const CategoryDrawer = ({ open, onClose }) => {
         <nav className="flex-1 overflow-y-auto overscroll-contain">
           {/* Categories */}
           <div>
-            <SectionLabel count={`${filteredCategories.length + 1} total`}>Browse Categories</SectionLabel>
+            <SectionLabel count={`${filteredCategories.length + 1} total`}>{t('sidebar.browseCategories')}</SectionLabel>
 
             {/* All Products */}
             <button
@@ -261,8 +254,8 @@ const CategoryDrawer = ({ open, onClose }) => {
                 <CategoryIcons.All className="w-[18px] h-[18px] text-primary/50 group-hover:text-primary transition-colors duration-200" />
               </span>
               <div className="flex-1 min-w-0">
-                <span className="text-[13px] font-semibold text-on-surface group-hover:text-primary transition-colors duration-200 block">All Products</span>
-                <span className="text-[11px] text-on-surface-variant/35 block mt-0.5">Browse entire catalog</span>
+                <span className="text-[13px] font-semibold text-on-surface group-hover:text-primary transition-colors duration-200 block">{t('sidebar.allProducts')}</span>
+                <span className="text-[11px] text-on-surface-variant/35 block mt-0.5">{t('sidebar.browseEverything')}</span>
               </div>
               <span className="material-symbols-outlined text-[16px] text-on-surface-variant/15 group-hover:text-primary/30 group-hover:translate-x-0.5 transition-all duration-200">chevron_right</span>
             </button>
@@ -285,7 +278,7 @@ const CategoryDrawer = ({ open, onClose }) => {
                   <div className="flex-1 min-w-0">
                     <span className="text-[13px] font-semibold text-on-surface group-hover:text-primary transition-colors duration-200 block truncate">{cat.name}</span>
                     {cat.productCount > 0 && (
-                      <span className="text-[11px] text-on-surface-variant/35 block mt-0.5">{cat.productCount} products</span>
+                      <span className="text-[11px] text-on-surface-variant/35 block mt-0.5">{cat.productCount} {t('categories.products')}</span>
                     )}
                   </div>
                   <span className="material-symbols-outlined text-[16px] text-on-surface-variant/15 group-hover:text-primary/30 group-hover:translate-x-0.5 transition-all duration-200">chevron_right</span>
@@ -298,7 +291,7 @@ const CategoryDrawer = ({ open, onClose }) => {
                 <div className="w-12 h-12 rounded-2xl bg-surface-container-high/60 flex items-center justify-center mx-auto mb-2">
                   <span className="material-symbols-outlined text-2xl text-on-surface-variant/20">search_off</span>
                 </div>
-                <p className="text-[12px] text-on-surface-variant/35">No categories match &ldquo;{searchQuery}&rdquo;</p>
+                <p className="text-[12px] text-on-surface-variant/35">{t('common.noResults')}</p>
               </div>
             )}
           </div>
@@ -307,7 +300,7 @@ const CategoryDrawer = ({ open, onClose }) => {
 
           {/* Quick Links */}
           <div>
-            <SectionLabel>Quick Links</SectionLabel>
+            <SectionLabel>{t('sidebar.quickLinks')}</SectionLabel>
             <div className="px-5 pb-2 grid grid-cols-2 gap-2">
               {quickLinks.map((link) => (
                 <button
@@ -337,13 +330,13 @@ const CategoryDrawer = ({ open, onClose }) => {
                   <span className="material-symbols-outlined text-[20px] text-tertiary">local_fire_department</span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[13px] font-bold text-on-surface leading-tight">Flash Deals Running!</p>
-                  <p className="text-[11px] text-on-surface-variant/45 mt-1 leading-relaxed">Up to 50% off on selected items. Hurry!</p>
+                  <p className="text-[13px] font-bold text-on-surface leading-tight">{t('sidebar.flashDeals')}</p>
+                  <p className="text-[11px] text-on-surface-variant/45 mt-1 leading-relaxed">{t('sidebar.flashDesc')}</p>
                   <button
                     onClick={() => { onClose(); navigate('/shop?flash=true'); }}
                     className="mt-2.5 inline-flex items-center gap-1 text-[11px] font-bold text-primary hover:gap-1.5 transition-all duration-200"
                   >
-                    View Deals
+                    {t('sidebar.viewDeals')}
                     <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                     </svg>
@@ -362,7 +355,7 @@ const CategoryDrawer = ({ open, onClose }) => {
               className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-[12px] font-semibold text-on-surface-variant bg-surface-container-high/80 hover:bg-surface-container-high active:bg-surface-container-highest transition-all duration-150"
             >
               <span className="material-symbols-outlined text-[15px]">admin_panel_settings</span>
-              Admin Panel
+              {t('sidebar.adminPanel')}
             </button>
           )}
 
@@ -373,14 +366,14 @@ const CategoryDrawer = ({ open, onClose }) => {
                 className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-[12px] font-semibold text-on-surface-variant bg-surface-container-high/80 hover:bg-surface-container-high active:bg-surface-container-highest transition-all duration-150"
               >
                 <span className="material-symbols-outlined text-[15px]">person</span>
-                Account
+                {t('nav.account')}
               </button>
               <button
                 onClick={() => { onClose(); navigate('/cart'); }}
                 className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-[12px] font-semibold text-on-surface-variant bg-surface-container-high/80 hover:bg-surface-container-high active:bg-surface-container-highest transition-all duration-150 relative"
               >
                 <span className="material-symbols-outlined text-[15px]">shopping_cart</span>
-                Cart
+                {t('nav.cart')}
                 {itemsCount > 0 && (
                   <span className="absolute -top-1 -right-1 min-w-[16px] h-4 bg-primary text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1 shadow-sm">
                     {itemsCount}
@@ -394,13 +387,13 @@ const CategoryDrawer = ({ open, onClose }) => {
               className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-[13px] font-bold bg-primary text-on-primary hover:bg-primary/90 active:bg-primary/80 shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/25 transition-all duration-200"
             >
               <span className="material-symbols-outlined text-[17px]">login</span>
-              Sign In
+              {t('sidebar.signin')}
             </button>
           )}
 
           {/* Help links */}
           <div className="flex items-center justify-center gap-5 pt-1.5 pb-1">
-            <button onClick={() => { onClose(); navigate('/help'); }} className="text-[11px] text-on-surface-variant/30 hover:text-primary transition-colors duration-200 py-2 px-1">Help</button>
+            <button onClick={() => { onClose(); navigate('/help'); }} className="text-[11px] text-on-surface-variant/30 hover:text-primary transition-colors duration-200 py-2 px-1">{t('nav.help')}</button>
             <span className="w-1 h-1 rounded-full bg-on-surface-variant/15" />
             <button onClick={() => { onClose(); navigate('/privacy'); }} className="text-[11px] text-on-surface-variant/30 hover:text-primary transition-colors duration-200 py-2 px-1">Privacy</button>
             <span className="w-1 h-1 rounded-full bg-on-surface-variant/15" />
