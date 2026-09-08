@@ -9,6 +9,7 @@ import CategoryDrawer from './CategoryDrawer';
 
 const TopBar = () => {
   const [visible, setVisible] = useState(() => !localStorage.getItem('novacart_banner_dismissed'));
+  const { language, toggleLanguage, t } = useLanguage();
 
   const dismiss = () => {
     setVisible(false);
