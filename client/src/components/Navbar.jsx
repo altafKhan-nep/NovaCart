@@ -415,6 +415,15 @@ const Navbar = () => {
                 )}
               </Link>
 
+              {/* Language Toggle */}
+              <button
+                onClick={toggleLanguage}
+                className="hidden md:flex p-2.5 rounded-full text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors"
+                title={language === 'en' ? 'नेपालीमा स्विच गर्नुहोस्' : 'Switch to English'}
+              >
+                <span className="material-symbols-outlined text-[22px]">translate</span>
+              </button>
+
               {/* Divider */}
               <div className="hidden md:block w-px h-7 bg-outline-variant/40 mx-1" />
 
@@ -448,6 +457,15 @@ const Navbar = () => {
                   {t('nav.login')}
                 </Link>
               )}
+
+              {/* Mobile Language Toggle */}
+              <button
+                onClick={toggleLanguage}
+                className="lg:hidden p-2.5 rounded-full text-on-surface-variant hover:text-primary transition-colors"
+                title={language === 'en' ? 'नेपालीमा स्विच गर्नुहोस्' : 'Switch to English'}
+              >
+                <span className="material-symbols-outlined text-[22px]">translate</span>
+              </button>
 
               {/* Mobile toggle */}
               <button
