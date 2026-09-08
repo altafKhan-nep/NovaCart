@@ -18,6 +18,11 @@ const INITIAL_FORM = {
   startDate: '',
   endDate: '',
   isActive: true,
+  showInSidebar: false,
+  sidebarTitle: 'Special Offer',
+  sidebarSubtitle: '',
+  sidebarButtonText: 'Shop Now',
+  sidebarBgColor: '#a43c12',
 };
 
 const Toast = ({ message, type, onClose }) => {
@@ -95,6 +100,11 @@ const PromoFormPanel = ({ open, promotion, categories, onSave, onClose }) => {
         startDate: promotion.startDate ? promotion.startDate.slice(0, 10) : '',
         endDate: promotion.endDate ? promotion.endDate.slice(0, 10) : '',
         isActive: promotion.isActive !== false,
+        showInSidebar: promotion.showInSidebar ?? false,
+        sidebarTitle: promotion.sidebarTitle || 'Special Offer',
+        sidebarSubtitle: promotion.sidebarSubtitle || '',
+        sidebarButtonText: promotion.sidebarButtonText || 'Shop Now',
+        sidebarBgColor: promotion.sidebarBgColor || '#a43c12',
       });
     } else {
       setForm(INITIAL_FORM);
@@ -358,6 +368,101 @@ const PromoFormPanel = ({ open, promotion, categories, onSave, onClose }) => {
             <span className="text-sm font-semibold text-on-surface">
               {form.isActive ? 'Active' : 'Inactive'}
             </span>
+          </div>
+
+          {/* Sidebar Promo Settings */}
+          <div className="border-t border-surface-container pt-4 space-y-4">
+            <div className="flex items-center gap-3">
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={form.showInSidebar}
+                  onChange={(e) => handleChange('showInSidebar', e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-surface-container-high rounded-full peer peer-checked:bg-primary transition-colors after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full" />
+              </label>
+              <div>
+                <span className="text-sm font-semibold text-on-surface block">Show in Sidebar</span>
+                <span className="text-[11px] text-on-surface-variant/50">Display this promotion in the category sidebar on shop pages</span>
+              </div>
+            </div>
+
+            {form.showInSidebar && (
+              <div className="bg-surface-container-low rounded-xl p-4 space-y-3 ml-2 border-l-2 border-primary/20">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-on-surface-variant mb-1">Title</label>
+                    <input
+                      type="text"
+                      value={form.sidebarTitle}
+                      onChange={(e) => handleChange('sidebarTitle', e.target.value)}
+                      className={inputClass('sidebarTitle')}
+                      placeholder="Special Offer"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-on-surface-variant mb-1">Button Text</label>
+                    <input
+                      type="text"
+                      value={form.sidebarButtonText}
+                      onChange={(e) => handleChange('sidebarButtonText', e.target.value)}
+                      className={inputClass('sidebarButtonText')}
+                      placeholder="Shop Now"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-on-surface-variant mb-1">Subtitle</label>
+                  <input
+                    type="text"
+                    value={form.sidebarSubtitle}
+                    onChange={(e) => handleChange('sidebarSubtitle', e.target.value)}
+                    className={inputClass('sidebarSubtitle')}
+                    placeholder="Auto-generated from discount value if empty"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-on-surface-variant mb-1">Background Color</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={form.sidebarBgColor}
+                      onChange={(e) => handleChange('sidebarBgColor', e.target.value)}
+                      className="w-10 h-10 rounded-lg border border-surface-container cursor-pointer"
+                    />
+                    <input
+                      type="text"
+                      value={form.sidebarBgColor}
+                      onChange={(e) => handleChange('sidebarBgColor', e.target.value)}
+                      className={inputClass('sidebarBgColor')}
+                      placeholder="#a43c12"
+                    />
+                  </div>
+                </div>
+                {/* Preview */}
+                <div className="pt-2">
+                  <p className="text-[10px] font-bold text-on-surface-variant/40 uppercase tracking-wider mb-2">Preview</p>
+                  <div
+                    className="rounded-lg p-3 text-center max-w-[200px]"
+                    style={{ backgroundColor: form.sidebarBgColor || '#a43c12' }}
+                  >
+                    <p className="text-white text-[11px] font-bold uppercase tracking-wide mb-0.5">
+                      {form.sidebarTitle || 'Special Offer'}
+                    </p>
+                    <p className="text-white/90 text-lg font-bold">
+                      {form.type === 'percentage' ? `${form.value || 0}% OFF` : form.type === 'fixed' ? `$${form.value || 0} OFF` : form.sidebarSubtitle || 'OFFER'}
+                    </p>
+                    <p className="text-white/70 text-[11px] mb-2">
+                      Code: {form.code || 'CODE'}
+                    </p>
+                    <div className="w-full bg-white text-[12px] font-bold py-1.5 rounded text-center" style={{ color: form.sidebarBgColor || '#a43c12' }}>
+                      {form.sidebarButtonText || 'Shop Now'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="border-t border-surface-container pt-5 flex items-center justify-end gap-3">

@@ -18,6 +18,11 @@ const promotionSchema = mongoose.Schema(
     isActive: { type: Boolean, default: true },
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
+    showInSidebar: { type: Boolean, default: false },
+    sidebarTitle: { type: String, default: 'Special Offer' },
+    sidebarSubtitle: { type: String, default: '' },
+    sidebarButtonText: { type: String, default: 'Shop Now' },
+    sidebarBgColor: { type: String, default: '#a43c12' },
   },
   { timestamps: true }
 );

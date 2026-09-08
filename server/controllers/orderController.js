@@ -89,8 +89,26 @@ const addOrderItems = async (req, res) => {
     notes: notes || '',
     status: 'Pending',
     statusHistory: [{ status: 'Pending', date: Date.now(), note: 'Order placed' }],
-    isPaid: paymentMethod === 'Card' || paymentMethod === 'UPI',
-    paidAt: (paymentMethod === 'Card' || paymentMethod === 'UPI') ? Date.now() : undefined,
+    trackingEvents: [{
+      status: 'Order Placed',
+      timestamp: Date.now(),
+      location: shippingAddress.city || '',
+      description: 'Your order has been placed successfully',
+      icon: 'receipt',
+    }],
+    shippingOrigin: {
+      city: 'Mumbai',
+      state: 'Maharashtra',
+      country: 'India',
+    },
+    shippingDestination: {
+      city: shippingAddress.city || '',
+      state: shippingAddress.state || '',
+      country: shippingAddress.country || 'India',
+    },
+    estimatedDelivery: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
+    isPaid: paymentMethod === 'Card' || paymentMethod === 'UPI' || paymentMethod === 'Stripe',
+    paidAt: (paymentMethod === 'Card' || paymentMethod === 'UPI' || paymentMethod === 'Stripe') ? Date.now() : undefined,
   });
 
   const createdOrder = await order.save();
@@ -172,60 +190,109 @@ const getOrders = async (req, res) => {
 const updateOrderStatus = async (req, res) => {
   const order = await Order.findById(req.params.id);
 
-  if (order) {
-    const validStatuses = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
-    const { status, note } = req.body;
-
-    if (!status || !validStatuses.includes(status)) {
-      res.status(400);
-      throw new Error(`Invalid status. Must be one of: ${validStatuses.join(', ')}`);
-    }
-
-    // Status transition validation
-    const statusTransitions = {
-      Pending: ['Processing', 'Cancelled'],
-      Processing: ['Shipped', 'Cancelled'],
-      Shipped: ['Delivered'],
-      Delivered: [],
-      Cancelled: [],
-    };
-
-    const allowed = statusTransitions[order.status] || [];
-    if (!allowed.includes(status)) {
-      res.status(400);
-      throw new Error(`Cannot transition from "${order.status}" to "${status}". Allowed: ${allowed.join(', ') || 'none'}`);
-    }
-
-    order.status = status;
-    order.statusHistory.push({
-      status,
-      date: Date.now(),
-      note: note || `Status updated to ${status}`,
-    });
-
-    if (status === 'Delivered') {
-      order.deliveredAt = Date.now();
-    }
-    if (status === 'Cancelled') {
-      order.cancelledAt = Date.now();
-      order.cancelReason = note || '';
-
-      // Restore stock
-      for (const item of order.orderItems) {
-        await Product.findByIdAndUpdate(
-          item.product,
-          { $inc: { countInStock: item.qty } },
-          { new: true }
-        );
-      }
-    }
-
-    const updatedOrder = await order.save();
-    res.json(updatedOrder);
-  } else {
+  if (!order) {
     res.status(404);
     throw new Error('Order not found');
   }
+
+  const validStatuses = ['Pending', 'Processing', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled'];
+  const { status, note } = req.body;
+
+  if (!status || !validStatuses.includes(status)) {
+    res.status(400);
+    throw new Error(`Invalid status. Must be one of: ${validStatuses.join(', ')}`);
+  }
+
+  const statusTransitions = {
+    Pending: ['Processing', 'Cancelled'],
+    Processing: ['Shipped', 'Cancelled'],
+    Shipped: ['Out for Delivery', 'Delivered'],
+    'Out for Delivery': ['Delivered'],
+    Delivered: [],
+    Cancelled: [],
+  };
+
+  const allowed = statusTransitions[order.status] || [];
+  if (!allowed.includes(status)) {
+    res.status(400);
+    throw new Error(`Cannot transition from "${order.status}" to "${status}". Allowed: ${allowed.join(', ') || 'none'}`);
+  }
+
+  const trackingEventMap = {
+    Processing: {
+      status: 'Order Confirmed',
+      description: 'Your order is being confirmed and verified',
+      icon: 'check_circle',
+      location: 'Warehouse',
+    },
+    Shipped: {
+      status: 'Shipped',
+      description: `Your order has been shipped${req.body.shippingPartner ? ` via ${req.body.shippingPartner}` : ''}`,
+      icon: 'local_shipping',
+      location: req.body.location || 'Dispatch Center',
+    },
+    'Out for Delivery': {
+      status: 'Out for Delivery',
+      description: `Your order is out for delivery${order.shippingPartner ? ` via ${order.shippingPartner}` : ''} and will arrive soon`,
+      icon: 'directions_bike',
+      location: req.body.location || order.shippingAddress?.city || 'Your City',
+    },
+    Delivered: {
+      status: 'Delivered',
+      description: 'Your order has been delivered successfully',
+      icon: 'where_to_vote',
+      location: order.shippingAddress?.city || 'Destination',
+    },
+    Cancelled: {
+      status: 'Cancelled',
+      description: note || 'Order has been cancelled',
+      icon: 'cancel',
+      location: '',
+    },
+  };
+
+  const updateOps = {
+    $set: { status },
+    $push: {
+      statusHistory: { status, date: Date.now(), note: note || `Status updated to ${status}` },
+    },
+  };
+
+  const trackingEvent = trackingEventMap[status];
+  if (trackingEvent) {
+    updateOps.$push.trackingEvents = {
+      ...trackingEvent,
+      timestamp: Date.now(),
+    };
+  }
+
+  if (status === 'Delivered') {
+    updateOps.$set.deliveredAt = Date.now();
+  }
+
+  if (status === 'Cancelled') {
+    updateOps.$set.cancelledAt = Date.now();
+    updateOps.$set.cancelReason = note || '';
+  }
+
+  if (req.body.trackingNumber) updateOps.$set.trackingNumber = req.body.trackingNumber;
+  if (req.body.shippingPartner) updateOps.$set.shippingPartner = req.body.shippingPartner;
+  if (req.body.trackingUrl) updateOps.$set.trackingUrl = req.body.trackingUrl;
+  if (req.body.estimatedDelivery) updateOps.$set.estimatedDelivery = req.body.estimatedDelivery;
+
+  const updatedOrder = await Order.findByIdAndUpdate(req.params.id, updateOps, { new: true });
+
+  if (status === 'Cancelled') {
+    for (const item of order.orderItems) {
+      await Product.findByIdAndUpdate(
+        item.product,
+        { $inc: { countInStock: item.qty } },
+        { new: true }
+      );
+    }
+  }
+
+  res.json(updatedOrder);
 };
 
 // @desc    Cancel order (user)

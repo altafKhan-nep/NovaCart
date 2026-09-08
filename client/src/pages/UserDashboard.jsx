@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api';
 import ProductCard from '../components/ProductCard';
@@ -22,6 +22,7 @@ const STATUS_COLORS = {
 
 const UserDashboard = () => {
   const { user, refreshProfile } = useAuth();
+  const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
@@ -251,6 +252,17 @@ const UserDashboard = () => {
                 <p className="text-sm text-on-surface-variant">{selectedOrder.shippingAddress.street}</p>
                 <p className="text-sm text-on-surface-variant">{selectedOrder.shippingAddress.city}, {selectedOrder.shippingAddress.zip}</p>
               </div>
+            )}
+
+            {/* Track Order Button */}
+            {selectedOrder.status !== 'Cancelled' && (
+              <button
+                onClick={() => navigate(`/track/${selectedOrder._id}`)}
+                className="w-full bg-primary/8 hover:bg-primary/15 text-primary text-sm font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-colors"
+              >
+                <span className="material-symbols-outlined text-lg">local_shipping</span>
+                Track Order
+              </button>
             )}
           </div>
         </div>

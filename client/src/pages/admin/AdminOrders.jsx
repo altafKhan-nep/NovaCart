@@ -96,10 +96,18 @@ const ConfirmDialog = ({ open, title, message, confirmLabel = 'Confirm', onConfi
 
 const OrderDetailsPanel = ({ order, onClose, onUpdateStatus }) => {
   const [newStatus, setNewStatus] = useState('');
+  const [note, setNote] = useState('');
+  const [trackingNumber, setTrackingNumber] = useState('');
+  const [shippingPartner, setShippingPartner] = useState('');
+  const [trackingUrl, setTrackingUrl] = useState('');
   const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
     setNewStatus('');
+    setNote('');
+    setTrackingNumber(order?.trackingNumber || '');
+    setShippingPartner(order?.shippingPartner || '');
+    setTrackingUrl(order?.trackingUrl || '');
   }, [order]);
 
   if (!order) return null;
@@ -112,7 +120,12 @@ const OrderDetailsPanel = ({ order, onClose, onUpdateStatus }) => {
     if (!newStatus) return;
     setUpdating(true);
     try {
-      await onUpdateStatus(order._id || order.id, newStatus);
+      const payload = { status: newStatus };
+      if (note) payload.note = note;
+      if (trackingNumber) payload.trackingNumber = trackingNumber;
+      if (shippingPartner) payload.shippingPartner = shippingPartner;
+      if (trackingUrl) payload.trackingUrl = trackingUrl;
+      await onUpdateStatus(order._id || order.id, payload);
     } finally {
       setUpdating(false);
     }
@@ -263,7 +276,7 @@ const OrderDetailsPanel = ({ order, onClose, onUpdateStatus }) => {
 
           {/* Status Update */}
           {availableStatuses.length > 0 && (
-            <div className="bg-surface-container-low rounded-xl p-4 space-y-3">
+            <div className="bg-surface-container-low rounded-xl p-4 space-y-4">
               <h3 className="text-sm font-bold text-on-surface-variant uppercase tracking-wider">Update Status</h3>
               <div className="flex items-center gap-3">
                 <select
@@ -276,14 +289,74 @@ const OrderDetailsPanel = ({ order, onClose, onUpdateStatus }) => {
                     <option key={s} value={s}>{s}</option>
                   ))}
                 </select>
-                <button
-                  onClick={handleUpdate}
-                  disabled={!newStatus || updating}
-                  className="px-4 py-2.5 text-sm font-semibold rounded-lg bg-primary text-on-primary hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
-                >
-                  {updating ? 'Updating...' : 'Update'}
-                </button>
               </div>
+
+              {/* Tracking fields when shipping */}
+              {newStatus === 'Shipped' && (
+                <div className="space-y-3 p-3 bg-primary/5 rounded-lg border border-primary/10">
+                  <p className="text-xs font-bold text-primary uppercase tracking-wider">Shipping Details</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-semibold text-on-surface-variant mb-1">Tracking Number</label>
+                      <input
+                        type="text"
+                        value={trackingNumber}
+                        onChange={(e) => setTrackingNumber(e.target.value)}
+                        className="w-full bg-surface-container-lowest rounded-lg px-3 py-2 text-sm text-on-surface border border-surface-container focus:border-primary outline-none"
+                        placeholder="e.g., TRK123456789"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-on-surface-variant mb-1">Shipping Partner</label>
+                      <select
+                        value={shippingPartner}
+                        onChange={(e) => setShippingPartner(e.target.value)}
+                        className="w-full bg-surface-container-lowest rounded-lg px-3 py-2 text-sm text-on-surface border border-surface-container focus:border-primary outline-none"
+                      >
+                        <option value="">Select carrier</option>
+                        <option value="FedEx">FedEx</option>
+                        <option value="UPS">UPS</option>
+                        <option value="DHL">DHL</option>
+                        <option value="USPS">USPS</option>
+                        <option value="Blue Dart">Blue Dart</option>
+                        <option value="DTDC">DTDC</option>
+                        <option value="Delhivery">Delhivery</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-on-surface-variant mb-1">Tracking URL (optional)</label>
+                    <input
+                      type="url"
+                      value={trackingUrl}
+                      onChange={(e) => setTrackingUrl(e.target.value)}
+                      className="w-full bg-surface-container-lowest rounded-lg px-3 py-2 text-sm text-on-surface border border-surface-container focus:border-primary outline-none"
+                      placeholder="https://carrier.com/track/..."
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Note field */}
+              <div>
+                <label className="block text-xs font-semibold text-on-surface-variant mb-1">Note (optional)</label>
+                <input
+                  type="text"
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  className="w-full bg-surface-container-lowest rounded-lg px-3 py-2 text-sm text-on-surface border border-surface-container focus:border-primary outline-none"
+                  placeholder="Internal note..."
+                />
+              </div>
+
+              <button
+                onClick={handleUpdate}
+                disabled={!newStatus || updating}
+                className="w-full px-4 py-2.5 text-sm font-semibold rounded-lg bg-primary text-on-primary hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {updating ? 'Updating...' : `Update to ${newStatus || '...'}`}
+              </button>
             </div>
           )}
 
@@ -390,15 +463,22 @@ const AdminOrders = () => {
     setPage(1);
   }, [search, statusFilter]);
 
-  const handleUpdateStatus = async (orderId, newStatus) => {
+  const handleUpdateStatus = async (orderId, payload) => {
     try {
-      await api.updateOrderStatus(orderId, newStatus);
+      await api.updateOrderStatus(orderId, payload);
       setOrders((prev) =>
         prev.map((o) => {
           if ((o._id || o.id) === orderId) {
             const history = o.statusHistory ? [...o.statusHistory] : [];
-            history.push({ status: newStatus, date: new Date().toISOString() });
-            return { ...o, status: newStatus, statusHistory: history };
+            history.push({ status: payload.status, date: new Date().toISOString() });
+            return {
+              ...o,
+              status: payload.status,
+              statusHistory: history,
+              trackingNumber: payload.trackingNumber || o.trackingNumber,
+              shippingPartner: payload.shippingPartner || o.shippingPartner,
+              trackingUrl: payload.trackingUrl || o.trackingUrl,
+            };
           }
           return o;
         })
@@ -407,12 +487,19 @@ const AdminOrders = () => {
         if (!prev) return null;
         if ((prev._id || prev.id) === orderId) {
           const history = prev.statusHistory ? [...prev.statusHistory] : [];
-          history.push({ status: newStatus, date: new Date().toISOString() });
-          return { ...prev, status: newStatus, statusHistory: history };
+          history.push({ status: payload.status, date: new Date().toISOString() });
+          return {
+            ...prev,
+            status: payload.status,
+            statusHistory: history,
+            trackingNumber: payload.trackingNumber || prev.trackingNumber,
+            shippingPartner: payload.shippingPartner || prev.shippingPartner,
+            trackingUrl: payload.trackingUrl || prev.trackingUrl,
+          };
         }
         return prev;
       });
-      showToast(`Order updated to ${newStatus}`);
+      showToast(`Order updated to ${payload.status}`);
     } catch {
       showToast('Failed to update order status', 'error');
     }

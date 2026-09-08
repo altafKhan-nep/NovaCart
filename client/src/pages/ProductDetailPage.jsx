@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { api } from '../api';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { createSparkles } from '../components/ProductCard';
+import { createSparkles } from '../utils/sparkles';
 import { formatPrice, discountPercent, formatCurrency } from '../utils/helpers';
 import ProductCard from '../components/ProductCard';
 

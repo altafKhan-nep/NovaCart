@@ -16,6 +16,8 @@ const INITIAL_FORM = {
   colors: [],
   features: [''],
   badge: '',
+  featured: false,
+  bestseller: false,
   flashDeal: false,
   newArrival: false,
   status: 'active',
@@ -158,6 +160,8 @@ const ProductFormModal = ({ open, product, categories, onSave, onClose }) => {
   const [form, setForm] = useState(INITIAL_FORM);
   const [errors, setErrors] = useState({});
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef(null);
   const [openSections, setOpenSections] = useState({ basic: true, pricing: true, images: true, colors: false, features: false, flags: false });
 
   useEffect(() => {
@@ -166,7 +170,7 @@ const ProductFormModal = ({ open, product, categories, onSave, onClose }) => {
         name: product.name || '',
         slug: product.slug || '',
         sku: product.sku || '',
-        category: product.category?._id || product.category || '',
+        category: product.category?.name || product.category || '',
         description: product.description || '',
         price: product.price || '',
         originalPrice: product.originalPrice || '',
@@ -175,6 +179,8 @@ const ProductFormModal = ({ open, product, categories, onSave, onClose }) => {
         colors: product.colors || [],
         features: product.features?.length > 0 ? [...product.features] : [''],
         badge: product.badge || '',
+        featured: product.isFeatured || false,
+        bestseller: product.isBestseller || false,
         flashDeal: product.isFlashDeal || false,
         newArrival: product.isNewArrival || false,
         status: product.status || 'active',
@@ -209,6 +215,25 @@ const ProductFormModal = ({ open, product, categories, onSave, onClose }) => {
   const removeImageField = (index) => {
     if (form.images.length <= 1) return;
     setForm((prev) => ({ ...prev, images: prev.images.filter((_, i) => i !== index) }));
+  };
+
+  const handleFileUpload = async (files) => {
+    if (!files || files.length === 0) return;
+    setUploading(true);
+    try {
+      for (const file of files) {
+        const data = await api.uploadImage(file);
+        setForm((prev) => {
+          const imgs = prev.images.filter(Boolean);
+          return { ...prev, images: [...imgs, data.url, ''] };
+        });
+      }
+    } catch (err) {
+      alert(err.message || 'Upload failed');
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
   };
 
   const handleFeatureChange = (index, value) => {
@@ -258,9 +283,13 @@ const ProductFormModal = ({ open, product, categories, onSave, onClose }) => {
       images: form.images.filter(Boolean),
       features: form.features.filter(Boolean),
       status: asDraft ? 'draft' : form.status,
+      isFeatured: form.featured || false,
+      isBestseller: form.bestseller || false,
       isFlashDeal: form.flashDeal || false,
       isNewArrival: form.newArrival || false,
     };
+    delete payload.featured;
+    delete payload.bestseller;
     delete payload.flashDeal;
     delete payload.newArrival;
     setSaving(true);
@@ -336,7 +365,7 @@ const ProductFormModal = ({ open, product, categories, onSave, onClose }) => {
                     <select value={form.category} onChange={(e) => handleChange('category', e.target.value)} className={inputClass('category')}>
                       <option value="">Select category</option>
                       {categories.map((cat) => (
-                        <option key={cat._id || cat.id} value={cat._id || cat.id}>{cat.name}</option>
+                        <option key={cat._id || cat.id} value={cat.name}>{cat.name}</option>
                       ))}
                     </select>
                     {errors.category && <p className="text-[11px] text-error mt-1">{errors.category}</p>}
@@ -409,7 +438,7 @@ const ProductFormModal = ({ open, product, categories, onSave, onClose }) => {
               onToggle={() => toggleSection('images')}
             />
             {openSections.images && (
-              <div className="pb-5 space-y-3 pl-12">
+              <div className="pb-5 space-y-4 pl-12">
                 {validImages.length > 0 && (
                   <div className="grid grid-cols-4 gap-2">
                     {validImages.map((img, i) => (
@@ -417,6 +446,31 @@ const ProductFormModal = ({ open, product, categories, onSave, onClose }) => {
                     ))}
                   </div>
                 )}
+                <div
+                  className="border-2 border-dashed border-outline-variant/30 rounded-xl p-6 text-center hover:border-primary/40 hover:bg-primary/5 transition-all cursor-pointer"
+                  onClick={() => fileInputRef.current?.click()}
+                  onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                  onDrop={(e) => { e.preventDefault(); e.stopPropagation(); handleFileUpload(e.dataTransfer.files); }}
+                >
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/gif,image/webp"
+                    multiple
+                    className="hidden"
+                    onChange={(e) => handleFileUpload(e.target.files)}
+                  />
+                  <span className="material-symbols-outlined text-4xl text-on-surface-variant/30 mb-2">cloud_upload</span>
+                  <p className="text-sm font-semibold text-on-surface-variant/60">Click to upload or drag and drop</p>
+                  <p className="text-xs text-on-surface-variant/40 mt-1">PNG, JPG, GIF, WEBP up to 5MB each</p>
+                </div>
+                {uploading && (
+                  <div className="flex items-center gap-2 text-sm text-primary">
+                    <span className="material-symbols-outlined animate-spin text-lg">progress_activity</span>
+                    Uploading...
+                  </div>
+                )}
+                <p className="text-xs text-on-surface-variant/40 font-medium">Or enter image URLs:</p>
                 {form.images.map((img, i) => (
                   <div key={i} className="flex gap-2">
                     <input
@@ -435,7 +489,7 @@ const ProductFormModal = ({ open, product, categories, onSave, onClose }) => {
                 ))}
                 <button type="button" onClick={addImageField} className="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:text-primary/80 transition-colors">
                   <span className="material-symbols-outlined text-[16px]">add_circle</span>
-                  Add another image
+                  Add another image URL
                 </button>
               </div>
             )}
@@ -543,10 +597,28 @@ const ProductFormModal = ({ open, product, categories, onSave, onClose }) => {
 
           {/* ─── Flags ─── */}
           <div>
-            <SectionHeader icon="flag" title="Flags" subtitle="Flash deal, new arrival" open={openSections.flags} onToggle={() => toggleSection('flags')} />
+            <SectionHeader icon="flag" title="Flags" subtitle="Featured, bestseller, flash deal, new arrival" open={openSections.flags} onToggle={() => toggleSection('flags')} />
             {openSections.flags && (
               <div className="pb-5 space-y-3 pl-12">
-                <label className="flex items-center gap-3 cursor-pointer group p-3 rounded-xl border border-outline-variant/15 hover:border-primary/20 hover:bg-primary/5 transition-all">
+                <label onClick={() => handleChange('featured', !form.featured)} className="flex items-center gap-3 cursor-pointer group p-3 rounded-xl border border-outline-variant/15 hover:border-primary/20 hover:bg-primary/5 transition-all">
+                  <div className={`w-10 h-6 rounded-full transition-colors relative ${form.featured ? 'bg-primary' : 'bg-surface-container-high'}`}>
+                    <div className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow-sm transition-transform ${form.featured ? 'translate-x-5' : 'translate-x-1'}`} />
+                  </div>
+                  <div>
+                    <span className="text-sm font-bold text-on-surface group-hover:text-primary transition-colors">Featured</span>
+                    <p className="text-[11px] text-on-surface-variant/50">Show this product in featured sections</p>
+                  </div>
+                </label>
+                <label onClick={() => handleChange('bestseller', !form.bestseller)} className="flex items-center gap-3 cursor-pointer group p-3 rounded-xl border border-outline-variant/15 hover:border-primary/20 hover:bg-primary/5 transition-all">
+                  <div className={`w-10 h-6 rounded-full transition-colors relative ${form.bestseller ? 'bg-primary' : 'bg-surface-container-high'}`}>
+                    <div className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow-sm transition-transform ${form.bestseller ? 'translate-x-5' : 'translate-x-1'}`} />
+                  </div>
+                  <div>
+                    <span className="text-sm font-bold text-on-surface group-hover:text-primary transition-colors">Bestseller</span>
+                    <p className="text-[11px] text-on-surface-variant/50">Mark this product as a bestseller</p>
+                  </div>
+                </label>
+                <label onClick={() => handleChange('flashDeal', !form.flashDeal)} className="flex items-center gap-3 cursor-pointer group p-3 rounded-xl border border-outline-variant/15 hover:border-primary/20 hover:bg-primary/5 transition-all">
                   <div className={`w-10 h-6 rounded-full transition-colors relative ${form.flashDeal ? 'bg-primary' : 'bg-surface-container-high'}`}>
                     <div className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow-sm transition-transform ${form.flashDeal ? 'translate-x-5' : 'translate-x-1'}`} />
                   </div>
@@ -555,7 +627,7 @@ const ProductFormModal = ({ open, product, categories, onSave, onClose }) => {
                     <p className="text-[11px] text-on-surface-variant/50">Show this product in flash deals section</p>
                   </div>
                 </label>
-                <label className="flex items-center gap-3 cursor-pointer group p-3 rounded-xl border border-outline-variant/15 hover:border-primary/20 hover:bg-primary/5 transition-all">
+                <label onClick={() => handleChange('newArrival', !form.newArrival)} className="flex items-center gap-3 cursor-pointer group p-3 rounded-xl border border-outline-variant/15 hover:border-primary/20 hover:bg-primary/5 transition-all">
                   <div className={`w-10 h-6 rounded-full transition-colors relative ${form.newArrival ? 'bg-primary' : 'bg-surface-container-high'}`}>
                     <div className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow-sm transition-transform ${form.newArrival ? 'translate-x-5' : 'translate-x-1'}`} />
                   </div>
@@ -623,7 +695,7 @@ const AdminProducts = () => {
     try {
       setLoading(true);
       setError(null);
-      const res = await api.getProducts({ limit: 200 });
+      const res = await api.getAdminProducts();
       const data = Array.isArray(res) ? res : res.products || res.data || [];
       setProducts(data);
     } catch (err) {
@@ -652,7 +724,7 @@ const AdminProducts = () => {
 
   const filtered = products.filter((p) => {
     if (search && !p.name?.toLowerCase().includes(search.toLowerCase()) && !p.sku?.toLowerCase().includes(search.toLowerCase())) return false;
-    const pCat = p.category?._id || p.category;
+    const pCat = p.category?.name || p.category;
     if (filterCategory && pCat !== filterCategory) return false;
     const status = getStatus(p);
     if (filterStatus && status !== filterStatus) return false;
@@ -877,7 +949,7 @@ const AdminProducts = () => {
             >
               <option value="">All Categories</option>
               {categories.map((cat) => (
-                <option key={cat._id || cat.id} value={cat._id || cat.id}>
+                <option key={cat._id || cat.id} value={cat.name}>
                   {cat.name}
                 </option>
               ))}

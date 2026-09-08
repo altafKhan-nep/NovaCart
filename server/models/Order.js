@@ -62,7 +62,7 @@ const orderSchema = mongoose.Schema(
       type: String,
       required: true,
       default: 'Pending',
-      enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'],
+      enum: ['Pending', 'Processing', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled'],
     },
     statusHistory: [
       {
@@ -92,6 +92,36 @@ const orderSchema = mongoose.Schema(
       type: String,
       default: '',
     },
+    shippingPartner: {
+      type: String,
+      default: '',
+    },
+    trackingUrl: {
+      type: String,
+      default: '',
+    },
+    estimatedDelivery: {
+      type: Date,
+    },
+    shippingOrigin: {
+      city: { type: String, default: '' },
+      state: { type: String, default: '' },
+      country: { type: String, default: '' },
+    },
+    shippingDestination: {
+      city: { type: String, default: '' },
+      state: { type: String, default: '' },
+      country: { type: String, default: '' },
+    },
+    trackingEvents: [
+      {
+        status: { type: String, required: true },
+        timestamp: { type: Date, default: Date.now },
+        location: { type: String, default: '' },
+        description: { type: String, default: '' },
+        icon: { type: String, default: 'circle' },
+      },
+    ],
     notes: {
       type: String,
       default: '',

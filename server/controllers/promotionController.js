@@ -16,6 +16,7 @@ const createPromotion = asyncHandler(async (req, res) => {
     name, code, description, type, value, minPurchase, maxDiscount,
     usageLimit, maxPerUser, applicableProducts, applicableCategories, isActive,
     startDate, endDate,
+    showInSidebar, sidebarTitle, sidebarSubtitle, sidebarButtonText, sidebarBgColor,
   } = req.body;
 
   const existingPromo = await Promotion.findOne({ code: code.toUpperCase() });
@@ -46,6 +47,11 @@ const createPromotion = asyncHandler(async (req, res) => {
     isActive: isActive !== undefined ? isActive : true,
     startDate,
     endDate,
+    showInSidebar: showInSidebar || false,
+    sidebarTitle: sidebarTitle || 'Special Offer',
+    sidebarSubtitle: sidebarSubtitle || '',
+    sidebarButtonText: sidebarButtonText || 'Shop Now',
+    sidebarBgColor: sidebarBgColor || '#a43c12',
   });
 
   res.status(201).json(promotion);
@@ -144,6 +150,7 @@ const updatePromotion = asyncHandler(async (req, res) => {
     'name', 'code', 'description', 'type', 'value', 'minPurchase',
     'maxDiscount', 'usageLimit', 'maxPerUser', 'applicableProducts', 'applicableCategories',
     'isActive', 'startDate', 'endDate',
+    'showInSidebar', 'sidebarTitle', 'sidebarSubtitle', 'sidebarButtonText', 'sidebarBgColor',
   ];
 
   fields.forEach((field) => {

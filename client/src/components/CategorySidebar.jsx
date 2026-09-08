@@ -1,9 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api';
 
-/* ─── Flipkart-style custom SVG icons — monochrome ─── */
 const CategoryIcons = {
   'All': ({ className }) => (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
@@ -59,24 +58,55 @@ const CategoryIcons = {
       <path d="M16 17v4l4-3v-4" />
     </svg>
   ),
+  'Beauty': ({ className }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 2C8 2 4 6 4 10c0 6 8 12 8 12s8-6 8-12c0-4-4-8-8-8z" />
+      <circle cx="12" cy="10" r="3" />
+    </svg>
+  ),
+  'Pet Supplies': ({ className }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="8" cy="7" r="2.5" />
+      <circle cx="16" cy="7" r="2.5" />
+      <circle cx="5" cy="13" r="2" />
+      <circle cx="19" cy="13" r="2" />
+      <path d="M12 17c-2 0-4 2-4 4h8c0-2-2-4-4-4z" />
+    </svg>
+  ),
+  'Grocery': ({ className }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
+      <line x1="3" y1="6" x2="21" y2="6" />
+      <path d="M16 10a4 4 0 01-8 0" />
+    </svg>
+  ),
+  'Automotive': ({ className }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M14 16H9m10 0h3v-3.15a1 1 0 00-.84-.99L16 11l-2.7-5.4a1 1 0 00-.9-.6H5.24a2 2 0 00-1.8 1.1l-.8 1.63A6 6 0 002 12.42V16h2" />
+      <circle cx="6.5" cy="16.5" r="2.5" />
+      <circle cx="16.5" cy="16.5" r="2.5" />
+    </svg>
+  ),
 };
 
 const FALLBACK_ICON = ({ className }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-    <path d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z" />
+    <circle cx="12" cy="12" r="10" />
+    <path d="M8 12h.01M12 12h.01M16 12h.01" />
   </svg>
 );
 
 const getIcon = (name) => CategoryIcons[name] || FALLBACK_ICON;
 
-/* ─── Sidebar — Amazon/Flipkart/Daraz clean style ─── */
 const CategorySidebar = ({ activeCategory }) => {
   const navigate = useNavigate();
   const { user, isAdmin } = useAuth();
   const [dbCategories, setDbCategories] = useState([]);
+  const [sidebarPromo, setSidebarPromo] = useState(null);
 
   useEffect(() => {
     api.getPublicCategories().then(setDbCategories).catch(() => {});
+    api.getSidebarPromo().then(setSidebarPromo).catch(() => {});
   }, []);
 
   const items = [
@@ -90,14 +120,19 @@ const CategorySidebar = ({ activeCategory }) => {
   ];
 
   return (
-    <aside className="flex flex-col w-full lg:w-[220px] lg:h-[calc(100vh-108px)] lg:rounded-xl lg:sticky lg:top-[108px] lg:shrink-0 overflow-hidden bg-white border border-gray-200/80">
+    <aside className="flex flex-col w-full lg:w-[232px] lg:h-[calc(100vh-108px)] lg:rounded-2xl lg:sticky lg:top-[108px] lg:shrink-0 overflow-hidden bg-surface-container-lowest border border-outline-variant/10 shadow-sm">
       {/* Header */}
-      <div className="px-4 py-3 border-b border-gray-100">
-        <h2 className="text-[13px] font-bold text-gray-900 tracking-tight">Categories</h2>
+      <div className="px-4 py-3.5 border-b border-outline-variant/8">
+        <div className="flex items-center gap-2.5">
+          <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
+            <span className="material-symbols-outlined text-[15px] text-primary">category</span>
+          </div>
+          <h2 className="text-[12px] font-bold text-on-surface tracking-wide uppercase">Categories</h2>
+        </div>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 flex flex-row lg:flex-col overflow-x-auto lg:overflow-y-auto">
+      <nav className="flex-1 flex flex-row lg:flex-col overflow-x-auto lg:overflow-y-auto overscroll-contain">
         {items.map((item) => {
           const isActive = item.name ? item.name === activeCategory : !activeCategory;
           const IconComponent = getIcon(item.name);
@@ -106,21 +141,32 @@ const CategorySidebar = ({ activeCategory }) => {
             <Link
               key={item.label}
               to={item.slug ? `/shop/${encodeURIComponent(item.slug)}` : '/shop'}
-              className={`relative flex items-center gap-2.5 px-4 py-2.5 text-[13px] transition-all duration-150 whitespace-nowrap group ${
+              className={`relative flex items-center gap-3 px-4 py-3 text-[13px] transition-all duration-150 whitespace-nowrap group ${
                 isActive
-                  ? 'bg-orange-50 text-orange-600 font-semibold border-r-[3px] border-orange-500 lg:border-r-[3px] lg:border-r-orange-500'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 border-r-[3px] border-transparent'
+                  ? 'bg-primary/[0.06] text-primary font-semibold'
+                  : 'text-on-surface-variant hover:bg-primary/[0.03] hover:text-on-surface'
               }`}
             >
-              <IconComponent className={`w-[18px] h-[18px] shrink-0 transition-colors ${
-                isActive ? 'text-orange-500' : 'text-gray-400 group-hover:text-gray-600'
-              }`} />
+              {/* Active indicator */}
+              {isActive && (
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-primary" />
+              )}
+
+              <span className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-all duration-200 ${
+                isActive
+                  ? 'bg-primary/10'
+                  : 'bg-surface-container-high/60 group-hover:bg-primary/[0.06]'
+              }`}>
+                <IconComponent className={`w-[16px] h-[16px] transition-colors duration-200 ${
+                  isActive ? 'text-primary' : 'text-on-surface-variant/35 group-hover:text-primary/60'
+                }`} />
+              </span>
 
               <span className="flex-1 truncate">{item.label}</span>
 
               {item.productCount != null && item.productCount > 0 && (
-                <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${
-                  isActive ? 'bg-orange-100 text-orange-700' : 'bg-gray-100 text-gray-500'
+                <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-md tabular-nums transition-colors duration-200 ${
+                  isActive ? 'bg-primary/12 text-primary' : 'bg-surface-container-high/60 text-on-surface-variant/35'
                 }`}>
                   {item.productCount}
                 </span>
@@ -131,37 +177,57 @@ const CategorySidebar = ({ activeCategory }) => {
       </nav>
 
       {/* Promo */}
-      <div className="p-3 border-t border-gray-100 hidden lg:block">
-        <div className="bg-orange-500 rounded-lg p-3 text-center">
-          <p className="text-white text-[11px] font-bold uppercase tracking-wide mb-0.5">Special Offer</p>
-          <p className="text-white/90 text-lg font-bold">20% OFF</p>
-          <p className="text-white/70 text-[11px] mb-2">Code: WELCOME20</p>
-          <button
-            onClick={() => navigate('/shop')}
-            className="w-full bg-white text-orange-600 text-[12px] font-bold py-1.5 rounded hover:bg-orange-50 transition-colors"
+      {sidebarPromo && (
+        <div className="p-3 border-t border-outline-variant/8 hidden lg:block">
+          <div
+            className="relative rounded-2xl p-4 text-center overflow-hidden"
+            style={{ backgroundColor: sidebarPromo.sidebarBgColor || '#a43c12' }}
           >
-            Shop Now
-          </button>
+            {/* Decorative circles */}
+            <div className="absolute -top-4 -right-4 w-12 h-12 rounded-full bg-white/[0.08] pointer-events-none" />
+            <div className="absolute -bottom-6 -left-3 w-10 h-10 rounded-full bg-white/[0.05] pointer-events-none" />
+
+            <p className="text-white/70 text-[10px] font-bold uppercase tracking-[0.15em] mb-1 relative">
+              {sidebarPromo.sidebarTitle || 'Special Offer'}
+            </p>
+            <p className="text-white text-xl font-extrabold leading-tight relative">
+              {sidebarPromo.type === 'percentage'
+                ? `${sidebarPromo.value}% OFF`
+                : sidebarPromo.type === 'fixed'
+                  ? `$${sidebarPromo.value} OFF`
+                  : sidebarPromo.sidebarSubtitle || `${sidebarPromo.value}% OFF`}
+            </p>
+            <p className="text-white/50 text-[10px] font-medium mt-1 relative">
+              Code: <span className="font-bold text-white/70">{sidebarPromo.code}</span>
+            </p>
+            <button
+              onClick={() => navigate('/shop')}
+              className="mt-3 w-full bg-white/[0.92] text-[12px] font-bold py-2 rounded-xl hover:bg-white active:bg-white/90 transition-all duration-200 shadow-sm relative"
+              style={{ color: sidebarPromo.sidebarBgColor || '#a43c12' }}
+            >
+              {sidebarPromo.sidebarButtonText || 'Shop Now'}
+            </button>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Footer Actions */}
-      <div className="p-3 border-t border-gray-100 space-y-1.5 hidden lg:block">
+      <div className="p-3 border-t border-outline-variant/8 space-y-2 hidden lg:block">
         {isAdmin && (
           <button
             onClick={() => navigate('/admin')}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-[12px] font-semibold text-gray-600 bg-gray-50 hover:bg-gray-100 transition-colors"
+            className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-[12px] font-semibold text-on-surface-variant bg-surface-container-high/60 hover:bg-surface-container-high active:bg-surface-container-highest transition-all duration-150"
           >
-            <span className="material-symbols-outlined text-base">admin_panel_settings</span>
+            <span className="material-symbols-outlined text-[15px]">admin_panel_settings</span>
             Admin Panel
           </button>
         )}
         {!user && (
           <button
             onClick={() => navigate('/login')}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-[12px] font-semibold bg-orange-500 text-white hover:bg-orange-600 transition-colors"
+            className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-[12px] font-bold bg-primary text-on-primary hover:bg-primary/90 active:bg-primary/80 shadow-md shadow-primary/15 hover:shadow-lg hover:shadow-primary/20 transition-all duration-200"
           >
-            <span className="material-symbols-outlined text-base">login</span>
+            <span className="material-symbols-outlined text-[15px]">login</span>
             Sign In
           </button>
         )}
@@ -170,4 +236,4 @@ const CategorySidebar = ({ activeCategory }) => {
   );
 };
 
-export default CategorySidebar;
+export default memo(CategorySidebar);

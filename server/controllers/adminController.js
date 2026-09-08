@@ -185,6 +185,14 @@ const getAdminStats = asyncHandler(async (req, res) => {
   });
 });
 
+// @desc    Get all products (admin)
+// @route   GET /api/admin/products
+// @access  Private/Admin
+const getAllProducts = asyncHandler(async (req, res) => {
+  const products = await Product.find({}).sort({ createdAt: -1 });
+  res.json({ products, count: products.length });
+});
+
 // @desc    Get all users (admin)
 // @route   GET /api/admin/users
 // @access  Private/Admin
@@ -396,7 +404,7 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
   }
 
   const { status, note } = req.body;
-  const validStatuses = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
+  const validStatuses = ['Pending', 'Processing', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled'];
 
   if (!status || !validStatuses.includes(status)) {
     res.status(400);
@@ -408,7 +416,8 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
   const statusTransitions = {
     Pending: ['Processing', 'Cancelled'],
     Processing: ['Shipped', 'Cancelled'],
-    Shipped: ['Delivered'],
+    Shipped: ['Out for Delivery', 'Delivered'],
+    'Out for Delivery': ['Delivered'],
     Delivered: [],
     Cancelled: [],
   };
@@ -420,27 +429,73 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
     );
   }
 
-  order.status = status;
+  const trackingEventMap = {
+    Processing: {
+      status: 'Order Confirmed',
+      description: 'Your order is being confirmed and verified',
+      icon: 'check_circle',
+      location: 'Warehouse',
+    },
+    Shipped: {
+      status: 'Shipped',
+      description: `Your order has been shipped${req.body.shippingPartner ? ` via ${req.body.shippingPartner}` : ''}`,
+      icon: 'local_shipping',
+      location: req.body.location || 'Dispatch Center',
+    },
+    'Out for Delivery': {
+      status: 'Out for Delivery',
+      description: `Your order is out for delivery${order.shippingPartner ? ` via ${order.shippingPartner}` : ''} and will arrive soon`,
+      icon: 'directions_bike',
+      location: req.body.location || order.shippingAddress?.city || 'Your City',
+    },
+    Delivered: {
+      status: 'Delivered',
+      description: 'Your order has been delivered successfully',
+      icon: 'where_to_vote',
+      location: order.shippingAddress?.city || 'Destination',
+    },
+    Cancelled: {
+      status: 'Cancelled',
+      description: note || 'Order has been cancelled',
+      icon: 'cancel',
+      location: '',
+    },
+  };
 
-  // Add status history
-  if (!order.statusHistory) order.statusHistory = [];
-  order.statusHistory.push({
-    status,
-    date: Date.now(),
-    note: note || `Status updated to ${status}`,
-  });
+  const updateOps = {
+    $set: { status },
+    $push: {
+      statusHistory: { status, date: Date.now(), note: note || `Status updated to ${status}` },
+    },
+  };
+
+  const trackingEvent = trackingEventMap[status];
+  if (trackingEvent) {
+    updateOps.$push.trackingEvents = {
+      ...trackingEvent,
+      timestamp: Date.now(),
+    };
+  }
 
   if (status === 'Delivered') {
-    order.isPaid = true;
-    order.paidAt = order.paidAt || new Date();
-    order.deliveredAt = Date.now();
+    updateOps.$set.deliveredAt = Date.now();
+    updateOps.$set.isPaid = true;
+    updateOps.$set.paidAt = order.paidAt || new Date();
   }
 
   if (status === 'Cancelled') {
-    order.cancelledAt = Date.now();
-    order.cancelReason = note || '';
+    updateOps.$set.cancelledAt = Date.now();
+    updateOps.$set.cancelReason = note || '';
+  }
 
-    // Restore stock
+  if (req.body.trackingNumber) updateOps.$set.trackingNumber = req.body.trackingNumber;
+  if (req.body.shippingPartner) updateOps.$set.shippingPartner = req.body.shippingPartner;
+  if (req.body.trackingUrl) updateOps.$set.trackingUrl = req.body.trackingUrl;
+  if (req.body.estimatedDelivery) updateOps.$set.estimatedDelivery = req.body.estimatedDelivery;
+
+  const updatedOrder = await Order.findByIdAndUpdate(req.params.id, updateOps, { new: true });
+
+  if (status === 'Cancelled') {
     const Product = require('../models/Product');
     for (const item of order.orderItems) {
       await Product.findByIdAndUpdate(
@@ -451,7 +506,6 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
     }
   }
 
-  const updatedOrder = await order.save();
   res.json(updatedOrder);
 });
 
@@ -727,4 +781,5 @@ module.exports = {
   bulkUpdateStock,
   adjustStock,
   getStockHistory,
+  getAllProducts,
 };

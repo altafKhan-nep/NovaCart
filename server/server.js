@@ -21,6 +21,8 @@ const categoryRoutes = require('./routes/categoryRoutes');
 const navigationRoutes = require('./routes/navigationRoutes');
 const promotionRoutes = require('./routes/promotionRoutes');
 const settingsRoutes = require('./routes/settingsRoutes');
+const paymentRoutes = require('./routes/paymentRoutes');
+const uploadRoutes = require('./routes/uploadRoutes');
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 
 dotenv.config();
@@ -181,6 +183,8 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/navigation', navigationRoutes);
 app.use('/api/promotions', promotionRoutes);
 app.use('/api/settings', settingsRoutes);
+app.use('/api/payments', paymentRoutes);
+app.use('/api/upload', uploadRoutes);
 
 // --- Static files ---
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

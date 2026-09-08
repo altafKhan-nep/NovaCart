@@ -14,10 +14,13 @@ const {
   bulkUpdateStock,
   adjustStock,
   getStockHistory,
+  getAllProducts,
 } = require('../controllers/adminController');
 const { protect, requirePermission } = require('../middleware/authMiddleware');
 
 router.get('/stats', protect, requirePermission('dashboard:view'), getAdminStats);
+
+router.get('/products', protect, requirePermission('products:view'), getAllProducts);
 
 router.get('/users', protect, requirePermission('customers:view'), getAllUsers);
 router.get('/users/:id', protect, requirePermission('customers:view'), getUserById);

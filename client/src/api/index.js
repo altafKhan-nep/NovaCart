@@ -140,6 +140,12 @@ export const api = {
     });
     return handleResponse(res);
   },
+  trackOrder: async (orderId) => {
+    const res = await fetch(`${API_URL}/orders/track/${orderId}`, {
+      headers: getHeaders(false),
+    });
+    return handleResponse(res);
+  },
 
   // Admin - Stats & Users
   getAdminStats: async () => {
@@ -190,11 +196,11 @@ export const api = {
     });
     return handleResponse(res);
   },
-  updateOrderStatus: async (id, status) => {
+  updateOrderStatus: async (id, data) => {
     const res = await fetch(`${API_URL}/admin/orders/${id}/status`, {
       method: 'PUT',
       headers: getHeaders(true),
-      body: JSON.stringify({ status }),
+      body: JSON.stringify(data),
     });
     return handleResponse(res);
   },
@@ -350,6 +356,10 @@ export const api = {
     const res = await fetch(`${API_URL}/promotions/active`);
     return handleResponse(res);
   },
+  getSidebarPromo: async () => {
+    const res = await fetch(`${API_URL}/promotions/sidebar`);
+    return handleResponse(res);
+  },
   createPromotion: async (data) => {
     const res = await fetch(`${API_URL}/promotions`, {
       method: 'POST',
@@ -418,6 +428,52 @@ export const api = {
   getStockHistory: async (id) => {
     const res = await fetch(`${API_URL}/admin/inventory/${id}/history`, {
       headers: getHeaders(true),
+    });
+    return handleResponse(res);
+  },
+
+  // Payments
+  createPaymentIntent: async (amount, currency = 'usd', orderId) => {
+    const res = await fetch(`${API_URL}/payments/create-intent`, {
+      method: 'POST',
+      headers: getHeaders(true),
+      body: JSON.stringify({ amount, currency, orderId }),
+    });
+    return handleResponse(res);
+  },
+  confirmPayment: async (paymentIntentId) => {
+    const res = await fetch(`${API_URL}/payments/confirm`, {
+      method: 'POST',
+      headers: getHeaders(true),
+      body: JSON.stringify({ paymentIntentId }),
+    });
+    return handleResponse(res);
+  },
+  getAdminProducts: async () => {
+    const res = await fetch(`${API_URL}/admin/products`, {
+      headers: getHeaders(true),
+    });
+    return handleResponse(res);
+  },
+  uploadImage: async (file) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    const token = getToken();
+    const res = await fetch(`${API_URL}/upload`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: formData,
+    });
+    return handleResponse(res);
+  },
+  uploadMultiple: async (files) => {
+    const formData = new FormData();
+    files.forEach((f) => formData.append('images', f));
+    const token = getToken();
+    const res = await fetch(`${API_URL}/upload/multiple`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: formData,
     });
     return handleResponse(res);
   },

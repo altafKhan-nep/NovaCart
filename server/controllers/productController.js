@@ -116,6 +116,8 @@ const createProduct = async (req, res) => {
     colors: req.body.colors || [],
     features: req.body.features || [],
     badge: req.body.badge || '',
+    isFeatured: req.body.isFeatured || false,
+    isBestseller: req.body.isBestseller || false,
     isFlashDeal: req.body.isFlashDeal || false,
     isNewArrival: req.body.isNewArrival || false,
   });
@@ -148,6 +150,8 @@ const updateProduct = async (req, res) => {
       colors,
       features,
       badge,
+      isFeatured,
+      isBestseller,
       isFlashDeal,
       isNewArrival,
     } = req.body;
@@ -168,6 +172,8 @@ const updateProduct = async (req, res) => {
       product.colors = colors || product.colors;
       product.features = features || product.features;
       product.badge = badge !== undefined ? badge : product.badge;
+      product.isFeatured = isFeatured !== undefined ? isFeatured : product.isFeatured;
+      product.isBestseller = isBestseller !== undefined ? isBestseller : product.isBestseller;
       product.isFlashDeal = isFlashDeal !== undefined ? isFlashDeal : product.isFlashDeal;
       product.isNewArrival = isNewArrival !== undefined ? isNewArrival : product.isNewArrival;
 
