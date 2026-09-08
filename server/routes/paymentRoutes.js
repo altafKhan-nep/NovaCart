@@ -8,6 +8,11 @@ const { protect } = require('../middleware/authMiddleware');
 // @route   POST /api/payments/create-intent
 // @access  Private
 router.post('/create-intent', protect, asyncHandler(async (req, res) => {
+  if (!stripe) {
+    res.status(503);
+    throw new Error('Stripe is not configured');
+  }
+
   const { amount, currency = 'usd', orderId } = req.body;
 
   if (!amount || amount <= 0) {
@@ -16,7 +21,7 @@ router.post('/create-intent', protect, asyncHandler(async (req, res) => {
   }
 
   const paymentIntent = await stripe.paymentIntents.create({
-    amount: Math.round(amount * 100), // Stripe uses cents
+    amount: Math.round(amount * 100),
     currency,
     metadata: {
       orderId: orderId || '',
@@ -34,6 +39,11 @@ router.post('/create-intent', protect, asyncHandler(async (req, res) => {
 // @route   POST /api/payments/confirm
 // @access  Private
 router.post('/confirm', protect, asyncHandler(async (req, res) => {
+  if (!stripe) {
+    res.status(503);
+    throw new Error('Stripe is not configured');
+  }
+
   const { paymentIntentId } = req.body;
 
   if (!paymentIntentId) {
