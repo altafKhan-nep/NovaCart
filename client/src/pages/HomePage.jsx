@@ -48,13 +48,14 @@ const HomePage = () => {
   const [products, setProducts] = useState([]);
   const [flashDeals, setFlashDeals] = useState([]);
   const [promoBanners, setPromoBanners] = useState([]);
+  const [loading, setLoading] = useState({ categories: true, products: true, deals: true, promos: true });
   const navigate = useNavigate();
 
   useEffect(() => {
-    api.getPublicCategories().then(setDbCategories).catch(() => {});
-    api.getProducts({ pageSize: 9 }).then((data) => setProducts(data.products)).catch(() => {});
-    api.getFlashDeals().then(setFlashDeals).catch(() => {});
-    api.getActiveBanners('promo').then(setPromoBanners).catch(() => {});
+    api.getPublicCategories().then(setDbCategories).catch(() => {}).finally(() => setLoading(l => ({ ...l, categories: false })));
+    api.getProducts({ pageSize: 9 }).then((data) => setProducts(data.products)).catch(() => {}).finally(() => setLoading(l => ({ ...l, products: false })));
+    api.getFlashDeals().then(setFlashDeals).catch(() => {}).finally(() => setLoading(l => ({ ...l, deals: false })));
+    api.getActiveBanners('promo').then(setPromoBanners).catch(() => {}).finally(() => setLoading(l => ({ ...l, promos: false })));
   }, []);
 
   const goCategory = (name) => navigate(`/shop/${encodeURIComponent(name)}`);
@@ -85,21 +86,30 @@ const HomePage = () => {
           </Link>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-          {dbCategories.map((cat) => (
-            <CategoryTile
-              key={cat._id}
-              name={cat.name}
-              icon={cat.icon || 'category'}
-              image={cat.image}
-              count={cat.productCount}
-              onClick={() => goCategory(cat.slug || cat.name)}
-            />
-          ))}
+          {loading.categories
+            ? Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="bg-surface-container-lowest rounded-xl border border-outline-variant/10 overflow-hidden animate-pulse">
+                  <div className="aspect-[4/3] bg-surface-container" />
+                  <div className="px-3 py-2.5">
+                    <div className="h-3 w-20 mx-auto rounded bg-surface-container-high" />
+                  </div>
+                </div>
+              ))
+            : dbCategories.map((cat) => (
+                <CategoryTile
+                  key={cat._id}
+                  name={cat.name}
+                  icon={cat.icon || 'category'}
+                  image={cat.image}
+                  count={cat.productCount}
+                  onClick={() => goCategory(cat.slug || cat.name)}
+                />
+              ))}
         </div>
       </section>
 
       {/* Flash Deals */}
-      {flashDeals.length > 0 && (
+      {(loading.deals || flashDeals.length > 0) && (
         <section>
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-2.5">
@@ -111,9 +121,20 @@ const HomePage = () => {
             </Link>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-            {flashDeals.slice(0, 4).map((product) => (
-              <ProductCard key={product._id} product={product} />
-            ))}
+            {loading.deals
+              ? Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="bg-surface-container-lowest rounded-2xl border border-outline-variant/10 overflow-hidden animate-pulse">
+                    <div className="aspect-square bg-surface-container" />
+                    <div className="p-3 space-y-2">
+                      <div className="h-3 w-16 rounded bg-surface-container-high" />
+                      <div className="h-4 w-full rounded bg-surface-container-high" />
+                      <div className="h-3 w-20 rounded bg-surface-container-high" />
+                    </div>
+                  </div>
+                ))
+              : flashDeals.slice(0, 4).map((product) => (
+                  <ProductCard key={product._id} product={product} />
+                ))}
           </div>
         </section>
       )}
@@ -127,9 +148,20 @@ const HomePage = () => {
           </Link>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-          {products.slice(0, 8).map((product) => (
-            <ProductCard key={product._id} product={product} />
-          ))}
+          {loading.products
+            ? Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="bg-surface-container-lowest rounded-2xl border border-outline-variant/10 overflow-hidden animate-pulse">
+                  <div className="aspect-square bg-surface-container" />
+                  <div className="p-3 space-y-2">
+                    <div className="h-3 w-16 rounded bg-surface-container-high" />
+                    <div className="h-4 w-full rounded bg-surface-container-high" />
+                    <div className="h-3 w-20 rounded bg-surface-container-high" />
+                  </div>
+                </div>
+              ))
+            : products.slice(0, 8).map((product) => (
+                <ProductCard key={product._id} product={product} />
+              ))}
         </div>
       </section>
 
@@ -152,11 +184,21 @@ const HomePage = () => {
       </section>
 
       {/* Promo Banners */}
-      {promoBanners.length > 0 && (
+      {(loading.promos || promoBanners.length > 0) && (
         <section>
           <h2 className="text-lg font-bold text-on-surface mb-5">Special Offers</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {promoBanners.slice(0, 3).map((banner) => (
+            {loading.promos
+              ? Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="bg-surface-container-lowest rounded-xl border border-outline-variant/10 overflow-hidden animate-pulse">
+                    <div className="aspect-[16/7] bg-surface-container" />
+                    <div className="p-3.5 space-y-2">
+                      <div className="h-3 w-24 rounded bg-surface-container-high" />
+                      <div className="h-2 w-32 rounded bg-surface-container-high" />
+                    </div>
+                  </div>
+                ))
+              : promoBanners.slice(0, 3).map((banner) => (
               <a
                 key={banner._id}
                 href={banner.link || '/shop'}

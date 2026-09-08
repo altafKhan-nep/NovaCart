@@ -9,12 +9,13 @@ const HeroSection = () => {
   const [isPaused, setIsPaused] = useState(false);
   const [progress, setProgress] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [loading, setLoading] = useState(true);
   const { t } = useLanguage();
 
   useEffect(() => {
     api.getActiveBanners('hero').then((data) => {
       if (Array.isArray(data) && data.length > 0) setSlides(data);
-    }).catch(() => {});
+    }).catch(() => {}).finally(() => setLoading(false));
   }, []);
 
   const goTo = useCallback((i) => {
@@ -50,6 +51,28 @@ const HeroSection = () => {
     }, step);
     return () => clearInterval(timer);
   }, [isPaused, slides.length, activeIdx, isTransitioning, goTo]);
+
+  if (loading) {
+    return (
+      <section className="relative rounded-3xl overflow-hidden bg-surface-container min-h-[340px] md:min-h-[420px] animate-pulse">
+        <div className="absolute inset-0 bg-gradient-to-br from-surface via-primary/[0.02] to-secondary/[0.02]" />
+        <div className="absolute inset-0 flex items-center">
+          <div className="max-w-[1400px] mx-auto px-6 md:px-10 w-full">
+            <div className="max-w-xl space-y-4">
+              <div className="h-5 w-32 rounded-full bg-surface-container-high" />
+              <div className="h-10 w-80 rounded-xl bg-surface-container-high" />
+              <div className="h-10 w-56 rounded-xl bg-surface-container-high" />
+              <div className="h-4 w-64 rounded-lg bg-surface-container-high" />
+              <div className="flex gap-3 mt-6">
+                <div className="h-11 w-36 rounded-2xl bg-surface-container-high" />
+                <div className="h-11 w-36 rounded-2xl bg-surface-container-high" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   if (slides.length === 0) {
     return <PremiumFallback />;
