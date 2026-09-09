@@ -170,10 +170,7 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', uptime: process.uptime(), timestamp: Date.now() });
 });
 
-app.get('/', (req, res) => {
-  res.send('NovaCart API is running...');
-});
-
+// --- API Routes ---
 app.use('/api/products', productRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/orders', orderRoutes);
@@ -188,6 +185,15 @@ app.use('/api/upload', uploadRoutes);
 
 // --- Static files ---
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// --- Serve client build in production ---
+if (process.env.NODE_ENV === 'production') {
+  const clientDist = path.join(__dirname, '../client/dist');
+  app.use(express.static(clientDist));
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(clientDist, 'index.html'));
+  });
+}
 
 // --- Error handling ---
 app.use(notFound);

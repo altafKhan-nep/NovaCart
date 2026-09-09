@@ -1,4 +1,4 @@
-const API_URL = window.location.hostname === 'localhost' ? '/api' : 'https://novacart-api-j9um.onrender.com/api';
+const API_URL = import.meta.env.VITE_API_URL || '/api';
 
 const getToken = () => localStorage.getItem('novacart_token');
 
