@@ -3,6 +3,9 @@ const Order = require('../models/Order');
 const Product = require('../models/Product');
 const asyncHandler = require('../utils/asyncHandler');
 const { validateUser } = require('../middleware/validationMiddleware');
+const ObjectId = require('mongoose').Types.ObjectId;
+
+const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 // @desc    Get admin dashboard stats
 // @route   GET /api/admin/stats
@@ -208,9 +211,10 @@ const getAllUsers = asyncHandler(async (req, res) => {
     filter.isActive = req.query.isActive === 'true';
   }
   if (req.query.keyword) {
+    const safeKeyword = escapeRegex(req.query.keyword);
     filter.$or = [
-      { name: { $regex: req.query.keyword, $options: 'i' } },
-      { email: { $regex: req.query.keyword, $options: 'i' } },
+      { name: { $regex: safeKeyword, $options: 'i' } },
+      { email: { $regex: safeKeyword, $options: 'i' } },
     ];
   }
 
@@ -357,7 +361,11 @@ const getAllOrders = asyncHandler(async (req, res) => {
     filter.status = req.query.status;
   }
   if (req.query.keyword) {
-    filter._id = req.query.keyword;
+    if (ObjectId.isValid(req.query.keyword)) {
+      filter._id = req.query.keyword;
+    } else {
+      return res.status(400).json({ message: 'Invalid order ID format' });
+    }
   }
 
   const count = await Order.countDocuments(filter);

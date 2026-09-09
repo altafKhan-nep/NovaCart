@@ -31,6 +31,9 @@ connectDB();
 
 const app = express();
 
+// Trust proxy (required when behind nginx)
+app.set('trust proxy', 1);
+
 // --- Request ID middleware ---
 app.use((req, res, next) => {
   req.id = uuidv4();
@@ -70,8 +73,6 @@ const allowedOrigins = [
   'http://localhost:5174',
   'http://127.0.0.1:5173',
   'http://127.0.0.1:5174',
-  'http://localhost:3000',
-  'http://127.0.0.1:3000',
   process.env.FRONTEND_URL,
 ].filter(Boolean);
 app.use(
@@ -116,7 +117,15 @@ app.use(hpp());
 app.use(sanitizeInput);
 app.use(preventInjection);
 
-// --- Rate limiters ---
+// --- CORS rejection handler ---
+app.use((err, req, res, next) => {
+  if (err && err.message === 'Not allowed by CORS') {
+    return res.status(403).json({ message: 'CORS policy: this origin is not allowed' });
+  }
+  next(err);
+});
+
+// --- Rate limiters (MUST be before routes) ---
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 5000,
@@ -157,14 +166,6 @@ app.use('/api/users/login', loginLimiter);
 app.use('/api/users', authLimiter);
 app.use('/api/orders', orderLimiter);
 
-// --- CORS rejection handler ---
-app.use((err, req, res, next) => {
-  if (err && err.message === 'Not allowed by CORS') {
-    return res.status(403).json({ message: 'CORS policy: this origin is not allowed' });
-  }
-  next(err);
-});
-
 // --- Routes ---
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', uptime: process.uptime(), timestamp: Date.now() });
@@ -201,6 +202,23 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 5001;
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received. Shutting down gracefully...');
+  server.close(() => {
+    const mongoose = require('mongoose');
+    mongoose.connection.close(false, () => {
+      console.log('MongoDB connection closed.');
+      process.exit(0);
+    });
+  });
+});
+
+process.on('unhandledRejection', (err) => {
+  console.error('Unhandled Rejection:', err.message);
+  server.close(() => process.exit(1));
 });

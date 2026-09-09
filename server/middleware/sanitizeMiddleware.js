@@ -37,28 +37,11 @@ const sanitizeInput = (req, res, next) => {
 
 const NOSQL_PATTERNS = [
   /\$where/i,
-  /\$gt/i,
-  /\$gte/i,
-  /\$lt/i,
-  /\$lte/i,
-  /\$ne/i,
-  /\$in/i,
-  /\$nin/i,
-  /\$regex/i,
-  /\$or/i,
-  /\$and/i,
-  /\$not/i,
-  /\$nor/i,
-  /\$exists/i,
-  /\$type/i,
-  /\$mod/i,
-  /\$text/i,
   /\$expr/i,
   /\$jsonSchema/i,
-  /\$all/i,
-  /\$elemMatch/i,
-  /\$size/i,
-  /\$slice/i,
+  /\$function/i,
+  /\$accumulator/i,
+  /\$mapReduce/i,
 ];
 
 const containsNoSqlInjection = (value) => {
@@ -95,7 +78,7 @@ const preventInjection = (req, res, next) => {
 const ObjectId = require('mongoose').Types.ObjectId;
 
 const validateObjectId = (req, res, next) => {
-  const idParams = ['id'];
+  const idParams = ['id', 'orderId', 'userId'];
   for (const param of idParams) {
     if (req.params[param]) {
       if (!ObjectId.isValid(req.params[param]) || String(new ObjectId(req.params[param])) !== req.params[param]) {

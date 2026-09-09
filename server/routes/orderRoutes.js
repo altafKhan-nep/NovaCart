@@ -12,9 +12,14 @@ const {
   cancelOrder,
 } = require('../controllers/orderController');
 const { protect, admin } = require('../middleware/authMiddleware');
+const ObjectId = require('mongoose').Types.ObjectId;
 
 // Public tracking endpoint (no auth required)
 router.get('/track/:orderId', asyncHandler(async (req, res) => {
+  if (!ObjectId.isValid(req.params.orderId)) {
+    return res.status(400).json({ message: 'Invalid order ID format' });
+  }
+
   const order = await Order.findById(req.params.orderId)
     .select('orderItems shippingAddress status trackingNumber shippingPartner trackingUrl estimatedDelivery trackingEvents statusHistory createdAt shippingOrigin shippingDestination totalPrice itemsPrice shippingPrice taxPrice')
     .populate('orderItems.product', 'name images');

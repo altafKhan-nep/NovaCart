@@ -386,7 +386,7 @@ export const api = {
   validatePromotion: async (code, cartTotal) => {
     const res = await fetch(`${API_URL}/promotions/validate`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getHeaders(true),
       body: JSON.stringify({ code, cartTotal }),
     });
     return handleResponse(res);

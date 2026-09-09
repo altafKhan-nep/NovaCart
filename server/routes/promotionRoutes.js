@@ -29,7 +29,7 @@ router.get('/sidebar', asyncHandler(async (req, res) => {
 router.get('/', protect, admin, getPromotions);
 router.post('/', protect, requirePermission('promotions:create'), createPromotion);
 router.get('/active', getActivePromotions);
-router.post('/validate', validatePromotion);
+router.post('/validate', protect, validatePromotion);
 router.get('/:id', protect, admin, getPromotionById);
 router.put('/:id', protect, requirePermission('promotions:edit'), updatePromotion);
 router.delete('/:id', protect, requirePermission('promotions:delete'), deletePromotion);
